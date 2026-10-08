@@ -333,7 +333,9 @@ body.wide .wrap{max-width:960px}
         <div class="tone-demo"><span class="t1">mā 1声</span><span class="t2">má 2声</span><span class="t3">mǎ 3声</span><span class="t4">mà 4声</span><span class="t5">ma 軽声</span></div></div>
       <div class="field"><div class="lbl">めくったとき自動読み上げ</div>
         <div class="seg" data-key="autoSpeak" role="group" aria-label="自動読み上げ"><button type="button" data-v="0">オフ</button><button type="button" data-v="1">オン</button></div>
-        <p class="set-note" id="tts-status"></p></div>
+        <p class="set-note" id="tts-status"></p>
+        <button type="button" class="btn ghost" id="tts-test">読み上げテスト（你好）</button>
+        <p class="set-note">iPhone で音が出ないときは、本体横の消音スイッチをオフ（オレンジが見えない状態）にして音量を上げてください。読み上げは本体の消音設定に従います。</p></div>
     </div>
     <div class="panel">
       <div class="lbl">進捗リセット</div>
@@ -549,20 +551,33 @@ function pickVoice(){
   }
   return zh.slice().sort(function(a, b){ return score(b) - score(a); })[0];
 }
-function speak(text){
+var lastUtter = null;   // iOS では参照を保持しないと途中で破棄されて無音になる
+var ttsLog = '';
+function setTtsLog(msg){ ttsLog = msg; renderTtsStatus(); }
+function speak(text, isTest){
   if (!TTS) { toast('この環境では読み上げが使えません'); return; }
   try {
     var ss = window.speechSynthesis;
-    ss.cancel();
     var u = new SpeechSynthesisUtterance(text);
-    u.lang = 'zh-CN'; u.rate = 0.9;
+    u.lang = 'zh-CN'; u.rate = 0.9; u.volume = 1;
     var v = pickVoice();
     if (v) u.voice = v;
     else if (voices.length) toast('中国語の音声が見つかりません（端末の設定で追加できます）');
-    u.onerror = function(e){ if (e && e.error && e.error !== 'interrupted' && e.error !== 'canceled') toast('この環境では読み上げが使えません'); };
-    ss.speak(u);
+    u.onstart = function(){ if (isTest) setTtsLog('再生開始（音が聞こえない場合は、本体横の消音スイッチと音量を確認）'); };
+    u.onend = function(){ if (isTest) setTtsLog('再生終了。音が出ていれば正常です'); };
+    u.onerror = function(e){
+      var code = (e && e.error) || 'unknown';
+      if (code === 'interrupted' || code === 'canceled') return;
+      if (isTest) setTtsLog('エラー: ' + code); else toast('読み上げに失敗しました（' + code + '）');
+    };
+    lastUtter = u;
+    var go = function(){ try { ss.resume(); } catch (e) {} ss.speak(u); };
+    if (ss.speaking || ss.pending) { ss.cancel(); setTimeout(go, 80); }   // cancel 直後の speak は iOS で無音になることがある
+    else go();
+    if (isTest) setTtsLog('再生を要求しました…');
   } catch (e) { toast('この環境では読み上げが使えません'); }
 }
+(function(){ function bind(){ var b = $('#tts-test'); if (b) b.addEventListener('click', function(){ speak('你好', true); }); } if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', bind); else bind(); })();
 if (TTS) {
   refreshVoices();
   try { window.speechSynthesis.addEventListener('voiceschanged', refreshVoices); }
@@ -952,7 +967,8 @@ function renderTtsStatus(){
   var el = $('#tts-status'); if (!el) return;
   if (!TTS) { el.textContent = 'この環境では読み上げが使えません'; return; }
   var v = pickVoice();
-  el.textContent = v ? '使用する音声: ' + v.name + '（' + v.lang + '）' : voices.length ? '中国語の音声が見つかりません（端末の設定で追加できます）' : '読み上げ: 利用可能（音声の一覧を取得中）';
+  var base = v ? '使用する音声: ' + v.name + '（' + v.lang + '）' : voices.length ? '中国語の音声が見つかりません（端末の設定で追加できます）' : '読み上げ: 利用可能（音声の一覧を取得中）';
+  el.textContent = base + (ttsLog ? ' ／ ' + ttsLog : '');
 }
 function renderSettings(){
   $$('#v-settings .seg[data-key]').forEach(function(seg){
