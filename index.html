@@ -1,0 +1,998 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="孔子学院 復習カード">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#f6f4ef" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#141518" media="(prefers-color-scheme: dark)">
+<title>孔子学院 復習カード</title>
+<style>
+:root{
+  --base:100%;
+  --bg:#f6f4ef; --surface:#ffffff; --surface2:#faf9f6; --text:#1d1f23; --muted:#646a73; --faint:#9aa0a8; --line:#e4e1da;
+  --accent:#b3362c; --accent-ink:#ffffff; --accent-weak:#f8e6e3;
+  --known:#2a8f3c; --known-ink:#ffffff; --known-weak:#e2f2e5;
+  --unknown:#c25a1f; --unknown-ink:#ffffff; --unknown-weak:#fbe9dd;
+  --chip:#eeebe5; --chip-on:#b3362c; --chip-on-ink:#ffffff;
+  --shadow:0 1px 2px rgba(0,0,0,.05),0 6px 18px rgba(0,0,0,.07);
+  --rt:#4f555d; --overlay:rgba(0,0,0,.45); --toast-bg:#26282c; --toast-ink:#fff;
+  --t1:#d33; --t2:#2a8f3c; --t3:#2458c5; --t4:#8a3ab9; --t5:#777;
+  --font-zh:"PingFang SC","Hiragino Sans GB","Microsoft YaHei","Noto Sans SC",sans-serif;
+  --font-ja:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic UI","Yu Gothic","Meiryo","Noto Sans JP",sans-serif;
+  --font-py:-apple-system,BlinkMacSystemFont,"Segoe UI","Helvetica Neue",Arial,sans-serif;
+  --r:18px;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#141518; --surface:#1f2125; --surface2:#25282d; --text:#ececec; --muted:#a6abb3; --faint:#7a8089; --line:#34373d;
+    --accent:#e46b5f; --accent-ink:#1b0f0d; --accent-weak:#3b2522;
+    --known:#5cc477; --known-ink:#0d1f12; --known-weak:#1e3324;
+    --unknown:#ec9a63; --unknown-ink:#25150a; --unknown-weak:#3a2a1f;
+    --chip:#2b2e33; --chip-on:#e46b5f; --chip-on-ink:#1b0f0d;
+    --shadow:0 1px 2px rgba(0,0,0,.4),0 8px 22px rgba(0,0,0,.35);
+    --rt:#c3c8cf; --overlay:rgba(0,0,0,.6); --toast-bg:#eceef1; --toast-ink:#16171a;
+    --t1:#ff6b6b; --t2:#5fd17c; --t3:#7aa7ff; --t4:#c994f3; --t5:#a3a3a3;
+  }
+}
+*{box-sizing:border-box}
+html{font-size:var(--base);-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--font-ja);line-height:1.6;
+  -webkit-tap-highlight-color:transparent;touch-action:manipulation;overflow-x:hidden}
+button,input,select{font:inherit;color:inherit;-webkit-tap-highlight-color:transparent;touch-action:manipulation}
+button{cursor:pointer}
+button:focus-visible,select:focus-visible,input:focus-visible,.card:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+[lang="zh-Hans"]{font-family:var(--font-zh)}
+[hidden]{display:none!important}
+.wrap{max-width:640px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left));padding-right:max(16px,env(safe-area-inset-right))}
+main.wrap{overflow-x:clip;padding-bottom:calc(24px + env(safe-area-inset-bottom))}
+.muted{color:var(--muted)}
+.small{font-size:.82rem}
+
+/* header */
+header.top{position:sticky;top:0;z-index:30;background:var(--bg);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top)}
+header.top .wrap{display:flex;align-items:center;gap:6px;min-height:54px}
+.brand{flex:1;min-width:0;display:flex;align-items:center;gap:8px;border:0;background:none;padding:0;min-height:44px;
+  font-weight:800;font-size:.95rem;text-align:left;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.brand .bt{overflow:hidden;text-overflow:ellipsis}
+.logo{flex:none;display:grid;place-items:center;width:28px;height:28px;border-radius:8px;background:var(--accent);color:var(--accent-ink);font-family:var(--font-zh);font-size:.95rem;font-weight:700}
+nav.tabs{display:flex;gap:2px;flex:none}
+nav.tabs button{min-height:44px;min-width:44px;padding:0 9px;border:0;background:transparent;border-radius:10px;font-weight:700;font-size:.88rem;color:var(--muted)}
+nav.tabs button[aria-current="page"]{color:var(--accent);background:var(--accent-weak)}
+
+/* common controls */
+h2.ttl{font-size:1.1rem;margin:18px 0 10px}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);padding:16px;margin-top:16px}
+.field+.field{margin-top:18px}
+.lbl{font-size:.8rem;font-weight:700;color:var(--muted);margin-bottom:8px;letter-spacing:.03em}
+.lbl .sub{font-weight:500}
+select{width:100%;min-height:44px;border-radius:12px;border:1px solid var(--line);background:var(--surface2);padding:0 12px;font-size:max(16px,1rem)}
+.seg{display:flex;background:var(--chip);border-radius:13px;padding:3px;gap:3px}
+.seg button{flex:1;min-width:0;min-height:44px;border:0;background:transparent;border-radius:10px;font-weight:700;color:var(--muted);padding:0 6px}
+.seg button[aria-pressed="true"]{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,.14)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{min-height:44px;padding:0 16px;border-radius:22px;border:1px solid var(--line);background:var(--surface);font-weight:700}
+.chip[aria-pressed="true"]{background:var(--chip-on);border-color:var(--chip-on);color:var(--chip-on-ink)}
+.checklist{display:flex;flex-direction:column;gap:6px}
+.lrow{display:flex;align-items:center;gap:10px;width:100%;min-height:48px;padding:6px 12px;border:1px solid var(--line);border-radius:12px;background:var(--surface);text-align:left}
+.lrow .ck{flex:none;width:22px;height:22px;border-radius:7px;border:2px solid var(--faint);position:relative}
+.lrow[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-weak)}
+.lrow[aria-pressed="true"] .ck{background:var(--accent);border-color:var(--accent)}
+.lrow[aria-pressed="true"] .ck::after{content:"";position:absolute;left:5px;top:1px;width:6px;height:11px;border:solid var(--accent-ink);border-width:0 2.5px 2.5px 0;transform:rotate(45deg)}
+.lrow .lt{flex:1;min-width:0;line-height:1.35}
+.lrow .lt b{display:block;font-size:.95rem}
+.lrow .lt small{display:block;color:var(--muted);font-size:.78rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.lrow .n{flex:none;color:var(--muted);font-size:.8rem}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:50px;padding:6px 18px;line-height:1.3;border-radius:14px;border:1px solid var(--line);background:var(--surface);font-weight:800;font-size:1rem}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.known{background:var(--known);border-color:var(--known);color:var(--known-ink)}
+.btn.unknown{background:var(--unknown);border-color:var(--unknown);color:var(--unknown-ink)}
+.btn.danger{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.ghost{background:transparent}
+.btn:disabled{opacity:.4;cursor:default}
+.actions{display:grid;gap:10px;margin-top:14px}
+.home-cta{position:sticky;bottom:0;z-index:10;margin-top:12px;padding:8px 0 calc(12px + env(safe-area-inset-bottom));background:var(--bg);border-top:1px solid var(--line)}
+.count{text-align:center;color:var(--muted);font-size:.9rem;margin-bottom:6px}
+.count b{font-size:1.35rem;color:var(--text);margin-right:2px}
+.cta-row{display:grid;grid-template-columns:3fr 2fr;gap:10px}
+.resume{width:100%;margin-bottom:8px;min-height:44px;font-size:.92rem}
+.pill{min-height:44px;padding:0 14px;border-radius:22px;border:1px solid var(--line);background:var(--surface);font-weight:700;font-size:.85rem;white-space:nowrap}
+.pill[aria-pressed="true"]{background:var(--accent-weak);border-color:var(--accent);color:var(--accent)}
+.icon-btn{flex:none;display:inline-grid;place-items:center;width:44px;height:44px;border-radius:22px;border:1px solid var(--line);background:var(--surface);color:var(--muted);padding:0}
+.icon-btn svg{width:20px;height:20px}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+
+/* study */
+.study-top{display:flex;align-items:center;gap:8px;margin-top:12px}
+.prog{flex:1;min-width:0}
+.prog-txt{display:flex;justify-content:space-between;gap:6px;font-size:.82rem;color:var(--muted);font-weight:700;margin-bottom:4px}
+.bar{height:6px;border-radius:3px;background:var(--chip);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .25s}
+.stage{position:relative;margin:14px 0 4px}
+.swipe{position:relative;will-change:transform}
+.card{perspective:1400px;cursor:pointer;-webkit-user-select:none;user-select:none;border-radius:var(--r)}
+.card-inner{display:grid;transform-style:preserve-3d;-webkit-transform-style:preserve-3d;transition:transform .5s cubic-bezier(.3,.7,.2,1);--card-h:clamp(300px,52vh,520px)}
+.card.noanim .card-inner{transition:none}
+.card.flipped .card-inner{transform:rotateY(180deg)}
+.face{grid-area:1/1;align-self:start;min-width:0;min-height:var(--card-h);display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);box-shadow:var(--shadow);
+  padding:14px 18px 16px;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+.face.back{transform:rotateY(180deg)}
+.card:not(.flipped) .back,.card.flipped .front{pointer-events:none}
+/* 表を見ているあいだは裏面の高さを表に合わせ、カードが縦に間延びしないようにする */
+.card:not(.flipped) .back{max-height:var(--card-h);overflow:hidden}
+.meta{display:flex;justify-content:space-between;align-items:center;gap:8px;font-size:.75rem;color:var(--muted)}
+.badge{display:inline-block;padding:1px 9px;border-radius:999px;background:var(--chip);margin-right:4px;font-weight:700}
+.badge.rel{background:transparent;border:1px solid var(--line)}
+.src{white-space:nowrap}
+.front-body{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;padding:16px 0}
+.ja-q{font-size:1.55rem;font-weight:800;line-height:1.55;overflow-wrap:anywhere}
+.tap-hint{text-align:center;font-size:.75rem;color:var(--faint)}
+.zh-head{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;min-width:0;max-width:100%}
+.back .zh-head{margin:20px 0 2px}
+.zh-word{font-weight:600;line-height:1.3;overflow-wrap:anywhere;cursor:pointer;max-width:100%}
+.zh-word.s1{font-size:3rem}.zh-word.s2{font-size:2.5rem}.zh-word.s3{font-size:2.1rem}.zh-word.s4{font-size:1.8rem}.zh-word.s5{font-size:1.5rem}
+.zh-word ruby{ruby-position:over;-webkit-ruby-position:before;ruby-align:center;margin:0 .03em}
+.zh-word rt{font-size:.6em;font-family:var(--font-py);font-weight:500;color:var(--rt);line-height:1.15;letter-spacing:0}
+.card:not(.pin-on) .zh-word rt{visibility:hidden}
+.zh-tools{display:flex;gap:8px;justify-content:center}
+.ja-ans{font-size:1.25rem;font-weight:800;text-align:center;margin:10px 0 0;overflow-wrap:anywhere}
+.sec{margin-top:14px;border-top:1px solid var(--line);padding-top:10px}
+.sec-h{font-size:.72rem;color:var(--muted);font-weight:800;letter-spacing:.06em;margin-bottom:4px}
+.def{margin:0;font-size:1rem;overflow-wrap:anywhere}
+.note{margin:0;font-size:.92rem;line-height:1.7;overflow-wrap:anywhere;white-space:pre-line}
+ol.ex{margin:0;padding-left:1.4em}
+ol.ex li{margin:4px 0 10px}
+ol.ex li.ex-more{display:none}
+.card.ex-open ol.ex li.ex-more{display:list-item}
+.card.ex-open .more{display:none}
+.ex-zh{display:flex;align-items:flex-start;justify-content:space-between;gap:8px}
+.ex-zh span{font-size:1.05rem;padding-top:8px;overflow-wrap:anywhere;min-width:0}
+.ex-ja{font-size:.88rem;color:var(--muted);overflow-wrap:anywhere}
+.more{min-height:44px;border:0;background:transparent;color:var(--accent);font-weight:800;padding:0 4px}
+.tags{display:flex;flex-wrap:wrap;gap:6px}
+.tag{display:inline-block;padding:2px 10px;border-radius:999px;background:var(--chip);font-size:.85rem}
+.tag.parent{background:transparent;border:1px solid var(--line)}
+.ai{display:inline-block;margin-left:6px;padding:0 6px;border-radius:6px;border:1px solid var(--line);color:var(--faint);
+  font-family:var(--font-ja);font-size:.6rem;font-weight:700;line-height:1.7;vertical-align:middle;white-space:nowrap}
+.sw-tag{position:absolute;top:22px;z-index:5;padding:2px 12px;border:3px solid;border-radius:10px;font-weight:900;font-size:1.15rem;opacity:0;pointer-events:none;background:var(--surface)}
+.sw-known{left:20px;color:var(--known);border-color:var(--known);transform:rotate(-10deg)}
+.sw-unknown{right:20px;color:var(--unknown);border-color:var(--unknown);transform:rotate(10deg)}
+.judge{position:sticky;bottom:0;z-index:10;display:grid;grid-template-columns:auto 1fr 1fr;gap:10px;background:var(--bg);
+  padding:10px 0 calc(10px + env(safe-area-inset-bottom))}
+.judge .btn{min-height:54px;font-size:1.05rem}
+.judge #b-prev{padding:0 14px;font-size:.92rem}
+.hint-line{text-align:center;font-size:.75rem;color:var(--faint);margin:0}
+
+/* done */
+.done h2{margin:4px 0 12px;font-size:1.2rem;text-align:center}
+.score{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.sc{border-radius:14px;padding:12px;text-align:center;font-weight:800}
+.sc span{display:block;font-size:.85rem}
+.sc b{font-size:2.2rem;line-height:1.2}
+.sc.known{background:var(--known-weak);color:var(--known)}
+.sc.unknown{background:var(--unknown-weak);color:var(--unknown)}
+.done p{text-align:center;margin:12px 0 0}
+
+/* list */
+.search{margin-top:16px}
+.search input{width:100%;min-height:46px;border-radius:12px;border:1px solid var(--line);background:var(--surface);padding:0 14px;font-size:max(16px,1rem)}
+.tbl{width:100%;border-collapse:collapse;margin-top:8px;background:var(--surface);border:1px solid var(--line);border-radius:var(--r);overflow:hidden;display:table}
+.tbl th{font-size:.75rem;color:var(--muted);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap;background:var(--surface2)}
+.tbl td{padding:10px;border-bottom:1px solid var(--line);vertical-align:top;font-size:.9rem;overflow-wrap:anywhere}
+.tbl tbody tr{cursor:pointer}
+.tbl tbody tr:last-child td{border-bottom:0}
+.tbl tbody tr:hover{background:var(--surface2)}
+.tbl .c-zh{font-size:1.15rem;font-weight:600;white-space:nowrap}
+.tbl .c-py{font-family:var(--font-py);min-width:7em}
+.tbl .c-ja{min-width:12em}
+body.wide .wrap{max-width:960px}
+.tbl .c-ls,.tbl .c-ty{white-space:nowrap;color:var(--muted);font-size:.8rem}
+.st{display:inline-block;padding:1px 8px;border-radius:999px;font-size:.75rem;font-weight:800;white-space:nowrap}
+.st.known{background:var(--known-weak);color:var(--known)}
+.st.unknown{background:var(--unknown-weak);color:var(--unknown)}
+.st.none{color:var(--faint);border:1px solid var(--line)}
+@media (max-width:599px){
+  .tbl,.tbl tbody{display:block}
+  .tbl thead{display:none}
+  .tbl tbody tr{display:grid;grid-template-columns:auto auto 1fr;grid-template-areas:"zh zh st" "py py py" "ja ja ja" "ls ty ty";
+    column-gap:8px;padding:10px 14px;border-bottom:1px solid var(--line)}
+  .tbl tbody tr:last-child{border-bottom:0}
+  .tbl td{padding:0;border:0}
+  .tbl .c-zh{grid-area:zh;white-space:normal}
+  .tbl .c-st{grid-area:st;justify-self:end;align-self:center}
+  .tbl .c-py{grid-area:py;white-space:normal;font-size:.85rem}
+  .tbl .c-ja{grid-area:ja;margin-top:2px;min-width:0}
+  .tbl .c-ls{grid-area:ls;margin-top:4px}
+  .tbl .c-ty{grid-area:ty;margin-top:4px}
+}
+.empty{text-align:center;color:var(--muted);padding:30px 0}
+
+/* settings */
+.set-note{font-size:.8rem;color:var(--muted);margin:8px 0 0}
+.tone-demo{display:flex;flex-wrap:wrap;gap:4px 14px;font-family:var(--font-py);font-size:1rem;margin-top:8px}
+.tone-demo span{white-space:nowrap}
+.tone-on .t1{color:var(--t1)}.tone-on .t2{color:var(--t2)}.tone-on .t3{color:var(--t3)}.tone-on .t4{color:var(--t4)}.tone-on .t5{color:var(--t5)}
+.reset-btns{display:grid;gap:8px}
+
+/* modal / toast */
+.modal{position:fixed;inset:0;z-index:100;background:var(--overlay);display:grid;place-items:center;padding:16px}
+.modal-box{width:100%;max-width:380px;background:var(--surface);border-radius:var(--r);padding:20px;box-shadow:var(--shadow)}
+.modal-box p{margin:0 0 16px;white-space:pre-line}
+.m-btns{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.toast{position:fixed;left:50%;bottom:calc(96px + env(safe-area-inset-bottom));z-index:110;transform:translateX(-50%) translateY(10px);
+  max-width:calc(100% - 32px);background:var(--toast-bg);color:var(--toast-ink);padding:10px 16px;border-radius:12px;font-size:.88rem;
+  opacity:0;pointer-events:none;transition:opacity .2s,transform .2s}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+@media (prefers-reduced-motion: reduce){
+  .card-inner,.bar i,.toast{transition:none!important}
+}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap">
+  <button type="button" class="brand" data-nav="home"><span class="logo" lang="zh-Hans" aria-hidden="true">孔</span><span class="bt">孔子学院 復習カード</span></button>
+  <nav class="tabs" aria-label="画面切替">
+    <button type="button" data-nav="home">ホーム</button>
+    <button type="button" data-nav="list">一覧</button>
+    <button type="button" data-nav="settings">設定</button>
+  </nav>
+</div></header>
+
+<main class="wrap" id="main">
+  <!-- ホーム / フィルタ -->
+  <section id="v-home" class="view">
+    <div class="panel">
+      <div class="field" id="f-sem-wrap" hidden><label class="lbl" for="f-sem">学期</label><select id="f-sem"></select></div>
+      <div class="field"><div class="lbl">方向</div>
+        <div class="seg" id="f-dir" role="group" aria-label="方向"><button type="button" data-v="ja2zh">日→中</button><button type="button" data-v="zh2ja">中→日</button></div></div>
+      <div class="field"><div class="lbl">課 <span class="sub">（複数選択可）</span></div><div class="checklist" id="f-lessons"></div></div>
+      <div class="field"><div class="lbl">種類</div><div class="chips" id="f-types"></div></div>
+      <div class="field"><div class="lbl">見出し語／関連語</div><div class="chips" id="f-roles"></div></div>
+      <div class="field"><div class="lbl">覚えた状況 <span class="sub" id="f-status-note"></span></div>
+        <div class="seg" id="f-status" role="group" aria-label="覚えた状況"><button type="button" data-v="all">すべて</button><button type="button" data-v="unknown">まだ</button><button type="button" data-v="known">覚えた</button></div></div>
+      <div class="field toggle-row"><div class="lbl" style="margin:0">出題順</div>
+        <div class="seg" id="f-shuffle" role="group" aria-label="出題順" style="flex:1;max-width:240px"><button type="button" data-v="0">資料順</button><button type="button" data-v="1">シャッフル</button></div></div>
+    </div>
+    <div class="home-cta">
+      <div class="count"><b id="h-count">0</b> 枚が該当</div>
+      <button type="button" id="b-resume" class="btn ghost resume" hidden></button>
+      <div class="cta-row">
+        <button type="button" id="b-study" class="btn primary">カードで学習</button>
+        <button type="button" id="b-tolist" class="btn">一覧を見る</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- カード学習 -->
+  <section id="v-study" class="view" hidden>
+    <div class="study-top">
+      <div class="prog"><div class="prog-txt"><span id="s-pos">0 / 0</span><span id="s-dir"></span></div><div class="bar"><i id="s-bar"></i></div></div>
+      <button type="button" id="b-shuffle" class="pill" aria-pressed="false">シャッフル</button>
+      <button type="button" id="b-quit" class="pill">終了</button>
+    </div>
+    <div class="stage">
+      <div class="swipe" id="swipe">
+        <div class="card" id="card" tabindex="0" role="button" aria-label="カード（タップでめくる）">
+          <div class="card-inner">
+            <div class="face front" id="face-front"></div>
+            <div class="face back" id="face-back" aria-hidden="true"></div>
+          </div>
+        </div>
+        <div class="sw-tag sw-known" id="tag-known" aria-hidden="true">覚えた</div>
+        <div class="sw-tag sw-unknown" id="tag-unknown" aria-hidden="true">まだ</div>
+      </div>
+    </div>
+    <div class="judge">
+      <button type="button" id="b-prev" class="btn">前へ</button>
+      <button type="button" id="b-unknown" class="btn unknown">まだ</button>
+      <button type="button" id="b-known" class="btn known">覚えた</button>
+    </div>
+    <p class="hint-line">タップでめくる ／ 左スワイプ＝まだ ／ 右スワイプ＝覚えた</p>
+  </section>
+
+  <!-- 終了 -->
+  <section id="v-done" class="view" hidden>
+    <div class="panel done">
+      <h2>おつかれさまでした</h2>
+      <div class="score">
+        <div class="sc known"><span>覚えた</span><b id="d-known">0</b></div>
+        <div class="sc unknown"><span>まだ</span><b id="d-unknown">0</b></div>
+      </div>
+      <p class="muted small" id="d-note"></p>
+    </div>
+    <div class="actions">
+      <button type="button" id="b-again" class="btn primary">まだ だけもう一周</button>
+      <button type="button" id="b-restart" class="btn">最初から</button>
+      <button type="button" id="b-done-prev" class="btn ghost">最後の判定を取り消す</button>
+      <button type="button" id="b-home" class="btn ghost">ホームへ</button>
+    </div>
+  </section>
+
+  <!-- 一覧 -->
+  <section id="v-list" class="view" hidden>
+    <div class="search"><input id="l-q" type="search" placeholder="検索（中国語・ピンイン・日本語）" autocomplete="off" autocapitalize="off" spellcheck="false" enterkeyhint="search" aria-label="検索"></div>
+    <p class="muted small" id="l-info" style="margin:8px 0 0"></p>
+    <table class="tbl" id="l-table">
+      <thead><tr><th>中国語</th><th>ピンイン</th><th>日本語</th><th>課</th><th>種類</th><th>状況</th></tr></thead>
+      <tbody id="l-body"></tbody>
+    </table>
+    <p class="empty" id="l-empty" hidden>該当する語がありません</p>
+  </section>
+
+  <!-- 設定 -->
+  <section id="v-settings" class="view" hidden>
+    <div class="panel">
+      <div class="field"><div class="lbl">文字サイズ</div>
+        <div class="seg" data-key="font" role="group" aria-label="文字サイズ"><button type="button" data-v="100">標準</button><button type="button" data-v="115">大</button><button type="button" data-v="130">特大</button></div></div>
+      <div class="field"><div class="lbl">声調の色分け</div>
+        <div class="seg" data-key="tone" role="group" aria-label="声調の色分け"><button type="button" data-v="0">オフ</button><button type="button" data-v="1">オン</button></div>
+        <div class="tone-demo"><span class="t1">mā 1声</span><span class="t2">má 2声</span><span class="t3">mǎ 3声</span><span class="t4">mà 4声</span><span class="t5">ma 軽声</span></div></div>
+      <div class="field"><div class="lbl">めくったとき自動読み上げ</div>
+        <div class="seg" data-key="autoSpeak" role="group" aria-label="自動読み上げ"><button type="button" data-v="0">オフ</button><button type="button" data-v="1">オン</button></div>
+        <p class="set-note" id="tts-status"></p></div>
+    </div>
+    <div class="panel">
+      <div class="lbl">進捗リセット</div>
+      <div class="reset-btns">
+        <button type="button" id="b-reset-filter" class="btn">表示中の絞り込みの進捗をリセット</button>
+        <button type="button" id="b-reset-all" class="btn">すべての進捗をリセット</button>
+      </div>
+      <p class="set-note">「表示中の絞り込み」はホームで選んだ条件に当てはまるカードです（日→中・中→日の両方を消去）。</p>
+    </div>
+    <p class="muted small" id="about" style="text-align:center;margin-top:16px"></p>
+  </section>
+</main>
+
+<div class="modal" id="modal" hidden><div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="m-msg">
+  <p id="m-msg"></p>
+  <div class="m-btns"><button type="button" class="btn" id="m-cancel">キャンセル</button><button type="button" class="btn danger" id="m-ok">OK</button></div>
+</div></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+window.CARD_DATA = {"semester":"2026春","lessons":[{"semester":"2026春","id":1,"title":"张雪：按照你想干的去干，一直干","pages":"1-44"},{"semester":"2026春","id":2,"title":"全款买房的年轻人 不想给银行打工了","pages":"45-113"},{"semester":"2026春","id":3,"title":"有耐心，好电影会自己长出来—从《给阿嬷的情书》谈起","pages":"114-185"},{"semester":"2026春","id":4,"title":"从“村超”到“苏超”，为啥都能踢进你我心门？","pages":"186-250"}],"cards":[{"id":"2026春-1-001","lesson":1,"type":"単語","role":"見出し語","zh":"别","pinyin":"bié","ja":"留める／差し込んで固定する","ja_ai":false,"ja_note":"","def_zh":"用针、夹等把物体固定在某处。","def_zh_ai":false,"examples":[{"zh":"衣领上别满近20个话筒，张雪被记者层层“包围”。","ja":"襟には20本近いマイクがびっしりと留められ、張雪は記者たちに幾重にも「包囲」された。","ja_ai":true},{"zh":"她把一枚胸针别在衣服上，让整体妆造显得更精致。","ja":"彼女はブローチを服につけて、全体のスタイルがより洗練されて見えるようにした。","ja_ai":false},{"zh":"他习惯把工作证别在胸前，这样进出办公楼比较方便。","ja":"彼はいつも社員証を胸元に留めているので、オフィスビルの出入りがしやすい。","ja_ai":true},{"zh":"她把头发别到耳后，看起来更加干净利落。","ja":"彼女は髪を耳にかけて、よりすっきりとして清潔感のある印象に見える。","ja_ai":false},{"zh":"他随手把笔别在本子边上，这样用起来更方便。","ja":"彼はペンを何気なくノートの端に挟んでおき、使うときに便利なようにしている。","ja_ai":true},{"zh":"演讲前，她把麦克风别在衣领上，然后开始发言。","ja":"スピーチの前に、彼女はマイクを襟に留めてから話し始めた。","ja_ai":true}],"related":[],"parent":"","pages":[3,4,19],"notes":"資料の例文5文のうち日本語訳は2文のみ（訳文の内容から「胸针」「头发」の例文に対応と判断）。1件目の例文は本文（p3）の引用。"},{"id":"2026春-1-002","lesson":1,"type":"単語","role":"見出し語","zh":"大呼","pinyin":"dà hū","ja":"大声で叫ぶ／（大勢が）口々に声を上げる","ja_ai":true,"ja_note":"","def_zh":"字面意思是大声地喊出来，对某件事产生强烈反应，并明显表达出来（常表达集体反应）","def_zh_ai":false,"examples":[{"zh":"几天前，以他名字命名的摩托车，在世界超级摩托车锦标赛上夺冠，让不少欧美日车队大呼“不可思议”。","ja":"数日前、彼の名を冠したオートバイがスーパーバイク世界選手権で優勝し、欧米や日本の多くのチームに「信じられない」と言わしめた。","ja_ai":true},{"zh":"这场比赛节奏紧张又精彩，观众看完后纷纷大呼过瘾，还意犹未尽。","ja":"この試合はテンポが速くて非常に精彩で、観客は見終わったあと皆「最高だ」と感じ、まだ物足りない様子だった。","ja_ai":false},{"zh":"服务质量下降后，顾客纷纷大呼不满，甚至有人提出投诉。","ja":"サービスの質が低下した後、顧客たちは次々と不満を表し、さらに苦情を申し立てる人もいた。","ja_ai":false},{"zh":"他突然宣布辞职，让同事们大呼意外，一时间难以接受。","ja":"彼が突然辞職を発表し、同僚たちは大いに驚き、しばらく受け入れられなかった。","ja_ai":false}],"related":["大呼过瘾","大呼不满","大呼意外","不可思议"],"parent":"","pages":[3,5,19],"notes":"ピンイン補完。資料見出しは「让……大呼“不可思议”」。まとめ（p19）では「大呼 不可思议」と並記。例文中のピンイン注: 节奏 jiézòu／意犹未尽 yì yóu wèi jìn／纷纷 fēnfēn／投诉 tóusù／辞职 cízhí／过瘾 guò yǐn（意犹未尽 は関連語カード化、他はカード化せず）。1件目の例文は本文（p3）の引用。"},{"id":"2026春-1-003","lesson":1,"type":"成語","role":"見出し語","zh":"不可思议","pinyin":"bù kě sī yì","ja":"信じられない／不思議だ／想像もつかない","ja_ai":true,"ja_note":"","def_zh":"难以理解或难以想象。","def_zh_ai":false,"examples":[{"zh":"他在这么短的时间内完成任务，让人觉得非常不可思议。","ja":"彼がこんなに短い時間で任務をやり遂げたことは、本当に信じられないと感じさせる。","ja_ai":true},{"zh":"他在这么短的时间内学会三门语言，简直不可思议。","ja":"彼がこんなに短期間で3つの言語を習得したなんて、まったく信じられない。","ja_ai":true},{"zh":"听到他放弃这么好的机会，我感到不可思议，一直想不通原因。","ja":"彼がこんなに良い機会を手放したと聞いて、私は信じられない思いで、ずっと理由がわからなかった。","ja_ai":true},{"zh":"这个结果实在太不可思议了，大家一时都无法接受。","ja":"この結果はあまりにも信じがたく、みんなしばらく受け入れられなかった。","ja_ai":true}],"related":["大呼"],"parent":"","pages":[5,6,19,38],"notes":"ピンイン補完。まとめページ p19（2回）・p38 に掲載。"},{"id":"2026春-1-004","lesson":1,"type":"単語","role":"見出し語","zh":"出圈","pinyin":"chū quān","ja":"広い層に拡散する／一般層に知られるようになる","ja_ai":false,"ja_note":"","def_zh":"突破原有小范围，被更广泛的人群关注或传播","def_zh_ai":false,"examples":[{"zh":"一夜之间，张雪“出圈”。","ja":"一夜にして、張雪は一躍「世間に知られる存在」となった。","ja_ai":true},{"zh":"这部小众电影突然出圈，被很多不看电影的人也关注到了。","ja":"このマイナーな映画は突然話題になり、普段映画を見ない多くの人にも注目された。","ja_ai":true},{"zh":"他原本只是业内有名，但这次比赛后彻底出圈了。","ja":"彼はもともと業界内で知られているだけだったが、今回の試合をきっかけに一気に広く知られるようになった。","ja_ai":false}],"related":[],"parent":"","pages":[7,19],"notes":"例文中のピンイン注: 彻底 chèdǐ。本文 p33 にも「“出圈”后」として再出。"},{"id":"2026春-1-005","lesson":1,"type":"成語","role":"見出し語","zh":"死缠烂打","pinyin":"sǐ chán làn dǎ","ja":"しつこく食い下がる／執拗に食らいつく","ja_ai":false,"ja_note":"","def_zh":"纠缠不休，用各种方式反复请求或跟随。","def_zh_ai":false,"examples":[{"zh":"一段20年前他“死缠烂打”追记者的视频，被人们反复观看。","ja":"20年前に彼が記者に「しつこく食い下がって」ついて回った映像が、人々に繰り返し視聴された。","ja_ai":true},{"zh":"他一直死缠烂打地请求对方帮忙，让人有点不舒服。","ja":"彼はしつこく相手に助けを求め続け、周りを少し不快にさせた。","ja_ai":true},{"zh":"他向对方表白被拒绝后，还天天打电话、发信息死缠烂打，这种行为很不礼貌。","ja":"彼は告白して断られた後も、毎日電話をかけたりメッセージを送ったりしてしつこく付きまとっており、こうした行為はとても失礼だ。","ja_ai":true}],"related":[],"parent":"","pages":[7,19],"notes":"例文中の「礼貌」に（lǐ mào）のピンイン注あり（例文 zh からは除去）。"},{"id":"2026春-1-006","lesson":1,"type":"単語","role":"見出し語","zh":"上百","pinyin":"shàng bǎi","ja":"（数が）百を超える／百以上に達する","ja_ai":true,"ja_note":"百、千、万、億といった大きな数の単位と概数にのみ使われ、正確な数字には使いません。数が多いことを強調するニュアンスがあり、距離、人数、時間、金額、生産量などによく使われます。","def_zh":"表示数量达到并超出某个标准。只用于大数（百、千、万、亿）、概数，不用于精确数字，带有强调数量多的语气，多用于距离、人数、时间、金额、产量等。","def_zh_ai":false,"examples":[{"zh":"视频里，19岁的张雪跟随电视台摄制组冒雨骑行上百公里，只为在镜头前展示他的摩托车技术。","ja":"映像の中で、19歳の張雪はテレビ局の撮影クルーについて雨の中を100キロ以上もバイクで走った。ただカメラの前で自分のバイクの腕前を見せるためだった。","ja_ai":true},{"zh":"会场里聚集了上百人。","ja":"会場には100人以上が集まった。","ja_ai":true},{"zh":"节假日期间，这个景点接待游客上万人次。","ja":"連休期間中、この観光地は延べ1万人以上の観光客を受け入れた。","ja_ai":true},{"zh":"从这座城市到海边，距离有上百公里。","ja":"この町から海辺までは、100キロ以上の距離がある。","ja_ai":true},{"zh":"这部新款耳机价格上千元，有点贵。","ja":"この新型イヤホンは価格が1000元以上もして、少し高い。","ja_ai":true}],"related":["上千","上万","成百上千","成千上万"],"parent":"","pages":[3,8],"notes":"ピンイン補完。資料見出しは「上百公里」、型の例として「上百人 上千元 上万次」を提示（上+百/千/万/亿 の文型）。語釈は「上百公里表示数量达到并超出某个标准」＋用法説明を連結。資料の日本語解説（用法説明）は ja_note に収録、ja は補完。まとめページには無し。1件目の例文は本文（p3）の引用。"},{"id":"2026春-1-007","lesson":1,"type":"成語","role":"見出し語","zh":"成百上千","pinyin":"chéng bǎi shàng qiān","ja":"何百何千もの／非常に多くの","ja_ai":true,"ja_note":"","def_zh":"形容数量很多，成百成千。","def_zh_ai":true,"examples":[{"zh":"每天都有成百上千的游客来这里参观。","ja":"毎日、何百何千もの観光客がここを見学に訪れる。","ja_ai":true}],"related":["上百","成千上万"],"parent":"","pages":[8,19],"notes":"ピンイン補完。p8 で 上百 の関連表現として提示、まとめ p19 に掲載のため見出し語。"},{"id":"2026春-1-008","lesson":1,"type":"成語","role":"見出し語","zh":"成千上万","pinyin":"chéng qiān shàng wàn","ja":"何千何万もの／数えきれないほど多くの","ja_ai":true,"ja_note":"","def_zh":"形容数量极多。","def_zh_ai":true,"examples":[{"zh":"网络上成千上万的人都在关注这件事。","ja":"ネット上で何千何万もの人がこの件に注目している。","ja_ai":true}],"related":["上百","成百上千"],"parent":"","pages":[8,19],"notes":"ピンイン補完。p8 で 上百 の関連表現として提示、まとめ p19 に掲載のため見出し語。"},{"id":"2026春-1-009","lesson":1,"type":"慣用句","role":"見出し語","zh":"赛道上的车展","pinyin":"sài dào shang de chē zhǎn","ja":"サーキット上のモーターショー","ja_ai":false,"ja_note":"","def_zh":"比喻WSBK赛事：参赛车辆基于量产车改装，是厂商展示量产车技术实力的舞台。","def_zh_ai":true,"examples":[{"zh":"与世界摩托车锦标赛（MotoGP）原型车体系不同，WSBK赛事最大特点是参赛车辆基于量产车进行有限改装，因此被誉为“赛道上的车展”，是摩托车制造商展示量产车技术实力的重要舞台之一。","ja":"世界ロードレース選手権（MotoGP）のプロトタイプ車両体系とは異なり、WSBKの最大の特徴は、参戦車両が量産車をベースに限定的な改造を施したものである点にある。そのため、「サーキット上のモーターショー」とも呼ばれ、各メーカーが量産車の技術力を示す重要な舞台の一つとされている。","ja_ai":false}],"related":[],"parent":"","pages":[11,19],"notes":"ピンイン補完（「上」は方位詞として軽声表記）。出典は「知识补充」（WSBK の説明）だが、まとめ p19 に掲載されているため見出し語にした。ja は p11 の日本語訳中の表現。"},{"id":"2026春-1-010","lesson":1,"type":"慣用句","role":"見出し語","zh":"拨开乌云见明月","pinyin":"bō kāi wū yún jiàn míng yuè","ja":"暗雲を払って明月を見る（長い苦難の末にようやく成功・希望が訪れる）","ja_ai":true,"ja_note":"","def_zh":"经历长期困难之后，终于迎来成功或希望。","def_zh_ai":false,"examples":[{"zh":"夺冠后，朋友给他发信息说，“终于拨开乌云见明月了”。","ja":"優勝後、友人は彼に「ついに暗雲が晴れて明月が見えたね」とメッセージを送った。","ja_ai":true}],"related":["守得云开见月明"],"parent":"","pages":[13],"notes":"ピンイン補完。p13 の問い「拨开乌云见明月是什么意思？」への答えを語釈とした。まとめページには無いが語釈付きのため見出し語扱い。"},{"id":"2026春-1-011","lesson":1,"type":"慣用句","role":"関連語","zh":"道不同不相为谋","pinyin":"dào bù tóng bù xiāng wéi móu","ja":"志す道が異なれば、共に事を図ることはできない","ja_ai":true,"ja_note":"","def_zh":"主张、志向不同的人，无法在一起共事、谋划。","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[13],"notes":"ピンイン補完。p13 本文の行末に「道不同 不相为谋」と単独で書き込まれており、どの見出し語に付随するか不明のため parent は空。出典は『論語』。"},{"id":"2026春-1-012","lesson":1,"type":"慣用句","role":"見出し語","zh":"守得云开见月明","pinyin":"shǒu de yún kāi jiàn yuè míng","ja":"耐え抜けば雲が晴れて月が見える／辛抱を続ければいつか必ず報われる","ja_ai":true,"ja_note":"","def_zh":"是一种坚持和永不放弃的积极乐观的精神。意思就是说只有坚持到底的人才能等到拨云见日，云散月明的一天。","def_zh_ai":false,"examples":[{"zh":"人生再难，也要相信守得云开见月明。","ja":"人生がどんなに困難でも、耐え抜けばいつか雲が晴れて月が見えると信じなければならない。","ja_ai":true},{"zh":"只要你继续努力，总有一天守得云开见月明。","ja":"努力を続けさえすれば、いつか必ず雲が晴れて月が見える日が来る。","ja_ai":true}],"related":["拨开乌云见明月","拨云见日"],"parent":"","pages":[14,19],"notes":"ピンイン補完。"},{"id":"2026春-1-013","lesson":1,"type":"成語","role":"見出し語","zh":"心甘情愿","pinyin":"xīn gān qíng yuàn","ja":"心から進んで〜する／喜んで〜する","ja_ai":false,"ja_note":"","def_zh":"完全出于自愿，没有一点勉强。","def_zh_ai":true,"examples":[{"zh":"他愿意为梦想一直努力，即使最终无法成功、看不到希望，也心甘情愿，无怨无悔。","ja":"彼は夢のためにずっと努力し続けたいと思っており、たとえ最終的に成功できず希望が見えなくても、喜んでそれを受け入れ、悔いはない。","ja_ai":true}],"related":["无怨无悔"],"parent":"","pages":[14,19],"notes":"例文は p14 の問い（張雪の言葉の意味）に対する解説文。資料では語の後に（xīn gān qíng yuàn）の注（例文 zh からは除去）。"},{"id":"2026春-1-014","lesson":1,"type":"成語","role":"見出し語","zh":"无怨无悔","pinyin":"wú yuàn wú huǐ","ja":"後悔も不満もない／悔いはない","ja_ai":false,"ja_note":"","def_zh":"没有抱怨，也不后悔。","def_zh_ai":true,"examples":[{"zh":"他愿意为梦想一直努力，即使最终无法成功、看不到希望，也心甘情愿，无怨无悔。","ja":"彼は夢のためにずっと努力し続けたいと思っており、たとえ最終的に成功できず希望が見えなくても、喜んでそれを受け入れ、悔いはない。","ja_ai":true}],"related":["心甘情愿"],"parent":"","pages":[14,19],"notes":"例文は p14 の問い（張雪の言葉の意味）に対する解説文。資料では語の後に（wú yuàn wú huǐ）の注（例文 zh からは除去）。"},{"id":"2026春-1-015","lesson":1,"type":"単語","role":"見出し語","zh":"痴迷","pinyin":"chī mí","ja":"夢中になる／熱中する","ja_ai":false,"ja_note":"","def_zh":"深深地迷恋某种事物，到了难以自拔的程度。","def_zh_ai":true,"examples":[{"zh":"本田宗一郎痴迷机械，张雪也是。","ja":"本田宗一郎は機械に夢中だったが、張雪もそうだ。","ja_ai":true}],"related":[],"parent":"","pages":[14,35],"notes":"p14 に「痴迷 身体发肤」と単独で書き込み。p35 本文中に（chī mí 夢中になる／熱中する）の注があり、そこからピンイン・訳を採用。まとめページには無い。"},{"id":"2026春-1-016","lesson":1,"type":"成語","role":"関連語","zh":"身体发肤","pinyin":"shēn tǐ fà fū","ja":"体・髪・皮膚（親から授かったこの身）","ja_ai":true,"ja_note":"","def_zh":"指人的身体，语出《孝经》“身体发肤，受之父母”。","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[14,33],"notes":"ピンイン補完。p14・p33 の本文ページ末尾に単独で書き込み（授業中の話題と思われる）。親見出し語不明のため parent は空。"},{"id":"2026春-1-017","lesson":1,"type":"単語","role":"見出し語","zh":"灵光","pinyin":"líng guāng","ja":"頭の回転が速い／機転が利く","ja_ai":false,"ja_note":"","def_zh":"头脑反应快、聪明、思路清楚","def_zh_ai":false,"examples":[{"zh":"“我脑袋灵光些，想问题能想到点上去。”","ja":"「自分は頭の回転が少し速くて、物事のポイントをつかむことができるんです。」","ja_ai":false},{"zh":"她脑子很灵光，一点就通。","ja":"彼女は頭の回転が速くて、少し言えばすぐに理解できる。","ja_ai":false},{"zh":"遇到问题要脑子灵光一点，别钻牛角尖。","ja":"問題にぶつかったときは頭を柔軟にして、考え込みすぎないようにしなさい。","ja_ai":false}],"related":["一点就通","钻牛角尖"],"parent":"","pages":[17,19],"notes":"ピンイン補完。まとめ p19 では「灵光 一点就通」と並記。"},{"id":"2026春-1-018","lesson":1,"type":"成語","role":"見出し語","zh":"一点就通","pinyin":"yī diǎn jiù tōng","ja":"少し言えばすぐ分かる／飲み込みが早い","ja_ai":true,"ja_note":"","def_zh":"稍微一点拨就能明白，形容人聪明、理解力强。","def_zh_ai":true,"examples":[{"zh":"她脑子很灵光，一点就通。","ja":"彼女は頭の回転が速くて、少し言えばすぐに理解できる。","ja_ai":false}],"related":["灵光"],"parent":"","pages":[17,19],"notes":"ピンイン補完（「一」は本来声調 yī で表記）。まとめ p19 に「灵光 一点就通」と並記されているため見出し語。"},{"id":"2026春-1-019","lesson":1,"type":"成語","role":"関連語","zh":"钻牛角尖","pinyin":"zuān niú jiǎo jiān","ja":"袋小路に入り込む／些細なことにこだわって考え込む","ja_ai":true,"ja_note":"","def_zh":"比喻费力研究不值得研究或无法解决的问题，也指固执地坚持某种看法，不知变通。","def_zh_ai":true,"examples":[{"zh":"遇到问题要脑子灵光一点，别钻牛角尖。","ja":"問題にぶつかったときは頭を柔軟にして、考え込みすぎないようにしなさい。","ja_ai":false}],"related":["灵光","一根筋"],"parent":"灵光","pages":[17,39],"notes":"ピンイン補完。p17 灵光 の例文中に登場し、p39 課堂討論記録にも記載。四字の固定表現のため type は成語とした（中国語学上は惯用语）。"},{"id":"2026春-1-020","lesson":1,"type":"成語","role":"関連語","zh":"不厌其烦","pinyin":"bù yàn qí fán","ja":"面倒をいとわない／根気よく繰り返す","ja_ai":true,"ja_note":"","def_zh":"不嫌麻烦，形容很有耐心。","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[17],"notes":"ピンイン補完。p17 のページ末尾に単独で書き込み。どの語に付随するか不明のため parent は空。"},{"id":"2026春-1-021","lesson":1,"type":"慣用句","role":"見出し語","zh":"到点上","pinyin":"dào diǎn shang","ja":"要点を押さえられる／核心を突ける","ja_ai":false,"ja_note":"","def_zh":"能抓住问题的关键/本质","def_zh_ai":false,"examples":[{"zh":"她考虑问题总能想到点上，所以大家都很信任她的判断。","ja":"彼女は物事を考えるときいつも要点を押さえられるので、みんな彼女の判断を信頼している。","ja_ai":true},{"zh":"有些人说了很多，但一句都没说到点上。","ja":"話はたくさんしているのに、肝心な点にはまったく触れていない人もいる。","ja_ai":false},{"zh":"如果分析不到点上，就很难找到真正的解决办法。","ja":"分析が要点を押さえていなければ、本当の解決策を見つけるのは難しい。","ja_ai":false},{"zh":"你刚才那个问题问到点上了，大家都开始认真思考。","ja":"さっきのあなたの質問は要点を突いていて、みんな真剣に考え始めた。","ja_ai":false},{"zh":"“我脑袋灵光些，想问题能想到点上去。”","ja":"「自分は頭の回転が少し速くて、物事のポイントをつかむことができるんです。」","ja_ai":false}],"related":["想到点上","说到点上","问到点上","灵光"],"parent":"","pages":[17,18,19],"notes":"ピンイン補完（「上」は方向補語として軽声表記）。資料の見出しは文型「V+到点上」（zh は記号を除くため「到点上」とした）。三字の文型のため type は慣用句とした（単語扱いも可）。"},{"id":"2026春-1-022","lesson":1,"type":"単語","role":"見出し語","zh":"产业集群","pinyin":"chǎn yè jí qún","ja":"産業集積","ja_ai":false,"ja_note":"","def_zh":"同一产业的众多企业及相关机构在某一地区集中分布而形成的群体。","def_zh_ai":true,"examples":[{"zh":"“产业集群。”张雪答得干脆。","ja":"「産業集積です」と張雪はきっぱりと答えた。","ja_ai":false},{"zh":"目前正从传统燃油向电动化、高端化转型，形成庞大产业集群，并在高性能大排量越野摩托车领域领先，出口排名前十企业占5席。","ja":"現在、同地域は従来のガソリン車から電動化・高付加価値化への転換を進めており、大規模な産業クラスターを形成している。また、高性能・大排気量のオフロードバイク分野で先行しており、輸出額上位10社のうち5社を占めている。","ja_ai":false}],"related":[],"parent":"","pages":[20,21,22],"notes":"ピンイン補完。p20 本文末に日本語訳「産業集積」のみ付記（語釈・例文の解説スライドは無く、まとめページにも無い）。訳付きのため見出し語扱いとしたが、関連語扱いでもよい。p22（知识补充）では「産業クラスター」と訳出。四字だが複合名詞のため type は単語。"},{"id":"2026春-1-023","lesson":1,"type":"成語","role":"見出し語","zh":"身兼数职","pinyin":"shēn jiān shù zhí","ja":"一人で複数の役割を兼ねる／多役をこなす","ja_ai":false,"ja_note":"","def_zh":"一个人同时做多个工作 / 担任多个角色","def_zh_ai":false,"examples":[{"zh":"刚来重庆，他先靠手艺赚钱：通过论坛发帖、网店销售，帮车友改装摩托车，一人身兼美工、客服、售后。","ja":"重慶に来たばかりの頃、彼はまず自分の技術で生計を立てた。フォーラムに投稿したり、ネットショップで販売したりして、バイク仲間のためにカスタムを手がけ、美工・カスタマーサポート・アフターサービスを一人で兼任していた。","ja_ai":false},{"zh":"创业初期人手不足，他一人身兼数职，既做管理又负责销售。","ja":"創業初期は人手が足りず、彼は一人で何役もこなし、管理も販売も担当した。","ja_ai":true},{"zh":"在小公司里，员工常常身兼数职，因此工作压力比较大。","ja":"小さな会社では社員が複数の役割を兼ねることが多く、そのため仕事のプレッシャーが比較的大きい。","ja_ai":true}],"related":[],"parent":"","pages":[23,24,25,38],"notes":"本文は「一人身兼美工、客服、售后」（身兼＋具体的な役割）の形。1件目の例文は本文 p23、訳は p24。"},{"id":"2026春-1-024","lesson":1,"type":"単語","role":"見出し語","zh":"众筹","pinyin":"zhòng chóu","ja":"クラウドファンディング","ja_ai":false,"ja_note":"","def_zh":"通过很多人一起筹集资金","def_zh_ai":false,"examples":[{"zh":"缺少资金，他就“众筹”，让车友先付钱，他再买零件改装。","ja":"資金が不足すると、「クラウドファンディング」の形で仲間に先に代金を支払ってもらい、その後で部品を購入して改装を行った。","ja_ai":false},{"zh":"他通过网络发起众筹项目，成功筹集到启动资金。","ja":"彼はネットでクラウドファンディングのプロジェクトを立ち上げ、立ち上げ資金を集めることに成功した。","ja_ai":true},{"zh":"她把自己的创意发布到平台上进行众筹，一方面解决了资金问题，另一方面也积累了第一批用户。","ja":"彼女は自分のアイデアをプラットフォームに公開してクラウドファンディングを行い、資金問題を解決すると同時に、最初のユーザーも獲得した。","ja_ai":false}],"related":[],"parent":"","pages":[23,24,25,38],"notes":"1件目の例文は本文 p23、訳は p24。"},{"id":"2026春-1-025","lesson":1,"type":"成語","role":"見出し語","zh":"自立门户","pinyin":"zì lì mén hù","ja":"独立する／独自に一派を立てる","ja_ai":true,"ja_note":"独立して家庭を築くことを指す。また、学問の分野で先人に依存せず独自の一派を立てることもいう。現在では、ある集団を離れて独自に別のやり方を行うことも指す。","def_zh":"指单独成立家庭。也指学术上不依赖前人而另立一派。现也指离开某一集体，自己另搞一套。","def_zh_ai":false,"examples":[{"zh":"2024年4月，他自立门户，创立张雪机车。","ja":"2024年4月には独立して、自身の名を冠した「張雪機車」を創立。","ja_ai":false},{"zh":"兄弟俩原本一起经营店铺，后来理念不合，便各自自立门户，分开做生意。","ja":"兄弟二人はもともと一緒に店を経営していたが、のちに考え方が合わなくなり、それぞれ独立して別々に商売をするようになった。","ja_ai":true},{"zh":"他在公司积累了经验和人脉后，选择自立门户，创办了自己的工作室。","ja":"彼は会社で経験と人脈を積んだ後、独立して自分のスタジオを立ち上げた。","ja_ai":true},{"zh":"这位设计师不愿再受雇于人，决定自立门户，开设个人设计事务所。","ja":"このデザイナーはもう人に雇われたくないと考え、独立して個人のデザイン事務所を開くことにした。","ja_ai":true}],"related":[],"parent":"","pages":[23,24,26,38],"notes":"資料の日本語は語釈の訳（長文）のため ja_note に収録し、ja は短い訳語を補完。1件目の例文の訳は本文訳 p24。"},{"id":"2026春-1-026","lesson":1,"type":"単語","role":"見出し語","zh":"发帖","pinyin":"fā tiě","ja":"投稿する／書き込みをする","ja_ai":false,"ja_note":"","def_zh":"在网络平台发布帖子 / 发言","def_zh_ai":false,"examples":[{"zh":"他在论坛发帖求助，很快就有人给出了建议。","ja":"彼が掲示板に投稿して助けを求めると、すぐに誰かがアドバイスをくれた。","ja_ai":true},{"zh":"她经常发帖分享生活，因此积累了不少粉丝。","ja":"彼女はよく投稿して日常をシェアしているので、たくさんのフォロワーを獲得した。","ja_ai":true},{"zh":"有人发帖吐槽这个产品质量不好，没想到评论区一下子热闹起来。","ja":"ある人がこの製品の品質がよくないと投稿して不満を述べたところ、コメント欄が一気に盛り上がった。","ja_ai":false},{"zh":"刚来重庆，他先靠手艺赚钱：通过论坛发帖、网店销售，帮车友改装摩托车，一人身兼美工、客服、售后。","ja":"重慶に来たばかりの頃、彼はまず自分の技術で生計を立てた。フォーラムに投稿したり、ネットショップで販売したりして、バイク仲間のためにカスタムを手がけ、美工・カスタマーサポート・アフターサービスを一人で兼任していた。","ja_ai":false}],"related":["帖子","回帖","请帖"],"parent":"","pages":[23,24,27,38],"notes":"例文中のピンイン注: 吐槽 tǔ cáo（カード化せず）。4件目の例文は本文 p23、訳は p24。"},{"id":"2026春-1-027","lesson":1,"type":"単語","role":"関連語","zh":"帖子","pinyin":"tiě zi","ja":"（ネット掲示板などの）投稿／書き込み","ja_ai":true,"ja_note":"","def_zh":"在网络论坛等处发布的文章或留言。","def_zh_ai":true,"examples":[],"related":["发帖"],"parent":"发帖","pages":[27],"notes":"ピンイン補完（資料は「tiě 帖子 回帖 请帖」と「帖」の読み tiě の語例として列挙）。"},{"id":"2026春-1-028","lesson":1,"type":"単語","role":"関連語","zh":"回帖","pinyin":"huí tiě","ja":"返信を書き込む／返信の投稿","ja_ai":true,"ja_note":"","def_zh":"在论坛中回复别人的帖子；也指回复的帖子。","def_zh_ai":true,"examples":[],"related":["发帖"],"parent":"发帖","pages":[27],"notes":"ピンイン補完（資料は「tiě 帖子 回帖 请帖」と「帖」の読み tiě の語例として列挙）。"},{"id":"2026春-1-029","lesson":1,"type":"単語","role":"関連語","zh":"请帖","pinyin":"qǐng tiě","ja":"招待状","ja_ai":true,"ja_note":"","def_zh":"邀请客人时送去的通知，请柬。","def_zh_ai":true,"examples":[],"related":["发帖"],"parent":"发帖","pages":[27],"notes":"ピンイン補完（資料は「tiě 帖子 回帖 请帖」と「帖」の読み tiě の語例として列挙）。"},{"id":"2026春-1-030","lesson":1,"type":"単語","role":"見出し語","zh":"曲折","pinyin":"qū zhé","ja":"曲がりくねっている／紆余曲折がある","ja_ai":false,"ja_note":"","def_zh":"（具体）弯弯曲曲（抽象）过程不顺利、有变化","def_zh_ai":false,"examples":[{"zh":"我走的每一步，哪怕有些曲折，但是一定朝着这个方向。","ja":"自分の歩む一歩一歩は、たとえ多少の曲折があっても、必ずその方向に向かっているんです。","ja_ai":false},{"zh":"这条山路非常曲折，所以开车时一定要小心。","ja":"この山道はとても曲がりくねっているので、運転するときは必ず気をつけなければならない。","ja_ai":true},{"zh":"虽然过程有些曲折，但他最终还是实现了目标。","ja":"過程には多少の紆余曲折があったが、彼は最終的に目標を達成した。","ja_ai":true}],"related":["歌曲"],"parent":"","pages":[23,24,27,38],"notes":"1件目の例文は本文 p23、訳は p24。"},{"id":"2026春-1-031","lesson":1,"type":"単語","role":"関連語","zh":"歌曲","pinyin":"gē qǔ","ja":"歌／歌曲","ja_ai":true,"ja_note":"","def_zh":"供人歌唱的作品。","def_zh_ai":true,"examples":[],"related":["曲折"],"parent":"曲折","pages":[27],"notes":"「曲」の読み分け（曲折 qū／歌曲 qǔ）として提示された語。ピンインは資料どおり。"},{"id":"2026春-1-032","lesson":1,"type":"単語","role":"見出し語","zh":"调校","pinyin":"tiáo jiào","ja":"調整する／チューニングする／セッティングする","ja_ai":false,"ja_note":"","def_zh":"对设备、系统、参数等进行细致调整，使其性能更好、更准确","def_zh_ai":false,"examples":[{"zh":"这次夺冠的车型，发动机、关键零部件到整车调校，均实现国产化。","ja":"今回優勝した車両は、エンジンや主要部品から車体のセッティングに至るまで、すべて国産化が実現されている。","ja_ai":false},{"zh":"这款车经过专业团队调校，因此在性能和稳定性方面表现得非常出色。","ja":"この車は専門チームによってチューニングされているため、性能と安定性の面で非常に優れている。","ja_ai":true},{"zh":"工程师对系统进行了多次调校，最终达到了理想的运行效果。","ja":"エンジニアはシステムに何度も調整を加え、最終的に理想的な動作を実現した。","ja_ai":true}],"related":["校对","校正","校准"],"parent":"","pages":[23,24,28,38],"notes":"資料に字解「调 = 调整　校 = 校正」あり。1件目の例文は本文 p23、訳は p24。"},{"id":"2026春-1-033","lesson":1,"type":"単語","role":"見出し語","zh":"校对","pinyin":"jiào duì","ja":"校正","ja_ai":false,"ja_note":"","def_zh":"按照原稿或标准核对文字、数据等，改正其中的错误。","def_zh_ai":true,"examples":[{"zh":"正式印刷前要再校对一遍。","ja":"正式に印刷する前に、もう一度校正しなければならない。","ja_ai":true}],"related":["校正","校准","调校"],"parent":"","pages":[28,38],"notes":"ピンイン補完。p28 下部の日本語対訳欄「校正／補正 修正／較正 調整」を 校对・校正・校准 の順に対応すると判断（日本語の「校正」＝中国語の校对）。要確認。まとめ p38 に掲載。"},{"id":"2026春-1-034","lesson":1,"type":"単語","role":"見出し語","zh":"校正","pinyin":"jiào zhèng","ja":"補正／修正","ja_ai":false,"ja_note":"","def_zh":"校对并改正（错误）；也指对仪器等进行校准修正。","def_zh_ai":true,"examples":[{"zh":"老师帮我校正了作文中的错误。","ja":"先生が作文の誤りを直してくれた。","ja_ai":true}],"related":["校对","校准","调校"],"parent":"","pages":[28,38],"notes":"ピンイン補完。ja は p28 対訳欄「補正  修正」（対応関係は推定、校对 の notes 参照）。資料では 调校 の字解（校 = 校正）にも登場。"},{"id":"2026春-1-035","lesson":1,"type":"単語","role":"見出し語","zh":"校准","pinyin":"jiào zhǔn","ja":"較正／調整","ja_ai":false,"ja_note":"","def_zh":"对仪器、钟表等的精度进行核对并调整，使其准确。","def_zh_ai":true,"examples":[{"zh":"钟表店帮我校准了手表时间。","ja":"時計店で腕時計の時刻を合わせてもらった。","ja_ai":true}],"related":["校对","校正","调校"],"parent":"","pages":[28,38],"notes":"ピンイン補完。ja は p28 対訳欄「較正  調整」（対応関係は推定、校对 の notes 参照）。"},{"id":"2026春-1-036","lesson":1,"type":"成語","role":"関連語","zh":"慕名而来","pinyin":"mù míng ér lái","ja":"評判を聞いて（慕って）やって来る","ja_ai":true,"ja_note":"","def_zh":"因仰慕对方的名声而来。","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[29],"notes":"ピンイン補完。p29 本文の段落末に単独で書き込み。親見出し語不明のため parent は空。"},{"id":"2026春-1-037","lesson":1,"type":"単語","role":"見出し語","zh":"瓶颈","pinyin":"píng jǐng","ja":"ボトルネック／発展の制約となる要因","ja_ai":false,"ja_note":"","def_zh":"比喻事物发展过程中遇到的限制或关键难点","def_zh_ai":false,"examples":[{"zh":"“瓶颈在研发。”张雪有点着急，公司现在有200多名工程师，只能同时推进三四个项目，“如果有500个工程师，上市的车型就会更多、更快。”","ja":"「ボトルネックは研究開発だ」。張雪は少し焦っている。会社には現在200人余りのエンジニアがいるが、同時に進められるプロジェクトは三つか四つだけだ。「もしエンジニアが500人いれば、発売できる車種はもっと多く、もっと速くなる。」","ja_ai":true},{"zh":"目前公司发展的最大瓶颈在于技术创新能力不足。","ja":"現在、会社の発展における最大のボトルネックは技術革新力の不足にある。","ja_ai":true},{"zh":"很多人在减肥过程中都会经历瓶颈期，这时候更需要坚持。","ja":"多くの人はダイエットの途中で停滞期を経験するが、そういうときこそ続けることが大切だ。","ja_ai":true}],"related":["瓶颈期"],"parent":"","pages":[30,31,38],"notes":"1件目の例文は本文 p30 の引用（本文訳は資料に無し）。"},{"id":"2026春-1-038","lesson":1,"type":"単語","role":"見出し語","zh":"垮","pinyin":"kuǎ","ja":"崩れる／倒産する／ダメになる","ja_ai":false,"ja_note":"","def_zh":"倒下、失败、崩溃（多用于组织/身体/心理）","def_zh_ai":false,"examples":[{"zh":"跟了张雪7年的员工尹中意对记者说，最艰难时，他曾担心公司会垮。","ja":"張雪のもとで7年働いてきた社員の尹中意は記者に、最も苦しかった時期には会社がつぶれるのではないかと心配したこともあると語った。","ja_ai":true},{"zh":"如果资金链断裂，公司可能很快就垮了。","ja":"資金繰りが途絶えれば、会社はすぐにつぶれてしまうかもしれない。","ja_ai":true},{"zh":"连续加班让他身体差点儿垮掉。","ja":"連日の残業で、彼は危うく体を壊すところだった。","ja_ai":true},{"zh":"精神一旦垮了，就很难再坚持下去。","ja":"心が一度折れてしまうと、もう頑張り続けるのは難しい。","ja_ai":true}],"related":["垮掉"],"parent":"","pages":[30,31,38],"notes":"1件目の例文は本文 p30 の引用（本文訳は資料に無し）。"},{"id":"2026春-1-039","lesson":1,"type":"成語","role":"見出し語","zh":"烟消云散","pinyin":"yān xiāo yún sàn","ja":"跡形もなく消える／雲散霧消する","ja_ai":false,"ja_note":"","def_zh":"像烟和云一样消散，完全消失、不复存在","def_zh_ai":false,"examples":[{"zh":"如今，这些忧虑已烟消云散。","ja":"今では、そうした心配はすっかり消え去った。","ja_ai":true},{"zh":"随着问题的解决，所有误会都烟消云散了。","ja":"問題が解決するにつれて、すべての誤解はきれいに消えた。","ja_ai":true},{"zh":"真相大白后，谣言自然烟消云散。","ja":"真相が明らかになった後、デマは自然と跡形もなく消え去った。","ja_ai":false}],"related":[],"parent":"","pages":[30,32,38],"notes":"1件目の例文は本文 p30 の引用（本文訳は資料に無し）。"},{"id":"2026春-1-040","lesson":1,"type":"単語","role":"見出し語","zh":"怀揣","pinyin":"huái chuāi","ja":"～を胸に抱く／心に抱く","ja_ai":false,"ja_note":"","def_zh":"心里带着（理想、情感、希望等）","def_zh_ai":false,"examples":[{"zh":"张雪希望，来应聘的，不仅仅是把这里当成一份工作，更是像他一样，怀揣着热爱而来。","ja":"張雪は、応募してくる人がここを単なる仕事の場と考えるのではなく、自分と同じように情熱を胸に抱いて来てほしいと願っている。","ja_ai":true},{"zh":"她怀揣着对未来的期待开始了新的生活。","ja":"彼女は未来への期待を胸に、新しい生活を始めた。","ja_ai":true},{"zh":"很多年轻人怀揣理想走上创业之路。","ja":"多くの若者が理想を胸に起業の道へ踏み出す。","ja_ai":true},{"zh":"带着不安和希望，他怀揣复杂的心情出发了。","ja":"不安と希望を抱えながら、彼は複雑な思いを胸に出発した。","ja_ai":true}],"related":[],"parent":"","pages":[30,32,38],"notes":"1件目の例文は本文 p30 の引用（本文訳は資料に無し）。"},{"id":"2026春-1-041","lesson":1,"type":"成語","role":"関連語","zh":"朴实无华","pinyin":"pǔ shí wú huá","ja":"素朴で飾り気がない","ja_ai":true,"ja_note":"","def_zh":"质朴实在，没有浮华的修饰。","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[33],"notes":"ピンイン補完。p33 本文末（「按照你想干的去干，一直干，就对了。」の後）に「朴实无华 身体发肤 跃跃欲试」と書き込み。親見出し語不明のため parent は空。 【重複】第4課にも同じ語あり"},{"id":"2026春-1-042","lesson":1,"type":"成語","role":"関連語","zh":"跃跃欲试","pinyin":"yuè yuè yù shì","ja":"やってみたくてうずうずする／腕が鳴る","ja_ai":true,"ja_note":"","def_zh":"形容心里急切地想试一试。","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[33],"notes":"ピンイン補完。p33 本文末に単独で書き込み。親見出し語不明のため parent は空。"},{"id":"2026春-1-043","lesson":1,"type":"成語","role":"関連語","zh":"奋勇前进","pinyin":"fèn yǒng qián jìn","ja":"勇気を奮って前進する","ja_ai":true,"ja_note":"","def_zh":"鼓起勇气，奋力向前。","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[34],"notes":"ピンイン補完。p34 課堂討論記録（板書メモ）に記載された語。語釈・訳は資料に無く補完。"},{"id":"2026春-1-044","lesson":1,"type":"成語","role":"関連語","zh":"异想天开","pinyin":"yì xiǎng tiān kāi","ja":"突拍子もないことを考える／奇想天外","ja_ai":true,"ja_note":"","def_zh":"形容想法非常奇特，不切实际。","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[34],"notes":"ピンイン補完。p34 課堂討論記録（板書メモ）に記載された語。語釈・訳は資料に無く補完。"},{"id":"2026春-1-045","lesson":1,"type":"成語","role":"関連語","zh":"不择手段","pinyin":"bù zé shǒu duàn","ja":"手段を選ばない","ja_ai":true,"ja_note":"","def_zh":"为了达到目的，什么手段都使得出来。","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[34],"notes":"ピンイン補完。p34 課堂討論記録（板書メモ）に記載された語。語釈・訳は資料に無く補完。資料では“不择手段”と引用符付き。"},{"id":"2026春-1-046","lesson":1,"type":"成語","role":"関連語","zh":"不屈不挠","pinyin":"bù qū bù náo","ja":"不撓不屈／決してくじけない","ja_ai":true,"ja_note":"","def_zh":"在困难或压力面前不屈服、不退缩，意志坚强。","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[34],"notes":"ピンイン補完。p34 課堂討論記録（板書メモ）に記載された語。語釈・訳は資料に無く補完。"},{"id":"2026春-1-047","lesson":1,"type":"成語","role":"関連語","zh":"坚定不拔","pinyin":"jiān dìng bù bá","ja":"意志が固く揺るがない","ja_ai":true,"ja_note":"","def_zh":"意志坚定，不可动摇。","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[34],"notes":"ピンイン補完。p34 課堂討論記録（板書メモ）に記載された語。語釈・訳は資料に無く補完。資料は「坚定不拔的毅力」。一般的な成語は「坚韧不拔」（jiān rèn bù bá）であり、表記ゆれ（または誤記）の可能性あり。"},{"id":"2026春-1-048","lesson":1,"type":"成語","role":"関連語","zh":"热情洋溢","pinyin":"rè qíng yáng yì","ja":"熱意に満ちあふれている","ja_ai":true,"ja_note":"","def_zh":"热烈的感情充分地流露出来。","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[34],"notes":"ピンイン補完。p34 課堂討論記録（板書メモ）に記載された語。語釈・訳は資料に無く補完。"},{"id":"2026春-1-049","lesson":1,"type":"成語","role":"関連語","zh":"始终如一","pinyin":"shǐ zhōng rú yī","ja":"終始一貫している","ja_ai":true,"ja_note":"","def_zh":"从开始到最后都一样，没有变化。","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[34],"notes":"ピンイン補完。p34 課堂討論記録（板書メモ）に記載された語。語釈・訳は資料に無く補完。"},{"id":"2026春-1-050","lesson":1,"type":"単語","role":"見出し語","zh":"贫寒","pinyin":"pín hán","ja":"貧しい／貧乏である","ja_ai":true,"ja_note":"","def_zh":"贫穷，生活困苦。","def_zh_ai":true,"examples":[{"zh":"他也出身贫寒，小学毕业就在东京的修车铺当学徒，满手油污，和零件打交道。","ja":"彼もまた貧しい家の出身で、小学校を卒業するとすぐに東京の自動車修理工場で見習いとなり、油まみれの手で部品と向き合っていた。","ja_ai":true}],"related":["出身贫寒","家境贫寒"],"parent":"","pages":[35],"notes":"p35 本文中の注釈語（資料はピンイン・訳のみで語釈・例文の解説スライドは無し）。例文は本文から注釈の括弧を除いたもの（本文訳は資料に無し）。資料は（pín hán）のみで訳無し。p12 年表にも「家境贫寒」とあり。"},{"id":"2026春-1-051","lesson":1,"type":"単語","role":"見出し語","zh":"油污","pinyin":"yóu wū","ja":"油汚れ","ja_ai":true,"ja_note":"","def_zh":"油泥污垢。","def_zh_ai":true,"examples":[{"zh":"他也出身贫寒，小学毕业就在东京的修车铺当学徒，满手油污，和零件打交道。","ja":"彼もまた貧しい家の出身で、小学校を卒業するとすぐに東京の自動車修理工場で見習いとなり、油まみれの手で部品と向き合っていた。","ja_ai":true}],"related":["满手油污"],"parent":"","pages":[35],"notes":"p35 本文中の注釈語（資料はピンイン・訳のみで語釈・例文の解説スライドは無し）。例文は本文から注釈の括弧を除いたもの（本文訳は資料に無し）。資料は（yóu wū）のみで訳無し。"},{"id":"2026春-1-052","lesson":1,"type":"単語","role":"見出し語","zh":"打交道","pinyin":"dǎ jiāo dào","ja":"～と関わる／～と付き合う","ja_ai":false,"ja_note":"","def_zh":"跟人交往、联系；也指接触、处理某种事物。","def_zh_ai":true,"examples":[{"zh":"他也出身贫寒，小学毕业就在东京的修车铺当学徒，满手油污，和零件打交道。","ja":"彼もまた貧しい家の出身で、小学校を卒業するとすぐに東京の自動車修理工場で見習いとなり、油まみれの手で部品と向き合っていた。","ja_ai":true}],"related":[],"parent":"","pages":[35],"notes":"p35 本文中の注釈語（資料はピンイン・訳のみで語釈・例文の解説スライドは無し）。例文は本文から注釈の括弧を除いたもの（本文訳は資料に無し）。ピンインは資料どおり（辞書では dǎ jiāo dao と軽声表記が一般的）。"},{"id":"2026春-1-053","lesson":1,"type":"単語","role":"見出し語","zh":"信誉","pinyin":"xìn yù","ja":"信用と評判／信望","ja_ai":true,"ja_note":"","def_zh":"信用和名誉。","def_zh_ai":true,"examples":[{"zh":"本田宗一郎以自己名字命名品牌，把脸面和信誉全押上去，张雪也是。","ja":"本田宗一郎は自分の名前をブランド名にし、面子と信用のすべてを懸けたが、張雪もそうだ。","ja_ai":true}],"related":[],"parent":"","pages":[35],"notes":"p35 本文中の注釈語（資料はピンイン・訳のみで語釈・例文の解説スライドは無し）。例文は本文から注釈の括弧を除いたもの（本文訳は資料に無し）。資料は（xìn yù）のみで訳無し。"},{"id":"2026春-1-054","lesson":1,"type":"単語","role":"見出し語","zh":"押上去","pinyin":"yā shàng qù","ja":"賭ける／すべてを懸ける","ja_ai":false,"ja_note":"","def_zh":"把（名誉、财产等）作为赌注全部押出去。","def_zh_ai":true,"examples":[{"zh":"本田宗一郎以自己名字命名品牌，把脸面和信誉全押上去，张雪也是。","ja":"本田宗一郎は自分の名前をブランド名にし、面子と信用のすべてを懸けたが、張雪もそうだ。","ja_ai":true}],"related":[],"parent":"","pages":[35],"notes":"p35 本文中の注釈語（資料はピンイン・訳のみで語釈・例文の解説スライドは無し）。例文は本文から注釈の括弧を除いたもの（本文訳は資料に無し）。ピンインは資料どおり（方向補語「上去」は通常 shang qu と軽声）。"},{"id":"2026春-1-055","lesson":1,"type":"単語","role":"見出し語","zh":"执着","pinyin":"zhí zhuó","ja":"こだわる／執着する","ja_ai":false,"ja_note":"","def_zh":"坚持不放，一心追求某事物而不肯放弃。","def_zh_ai":true,"examples":[{"zh":"本田宗一郎执着于征战曼岛TT、征服世界赛道，张雪也是。","ja":"本田宗一郎はマン島TTへの参戦と世界のサーキット制覇にこだわり続けたが、張雪もそうだ。","ja_ai":true}],"related":[],"parent":"","pages":[35],"notes":"p35 本文中の注釈語（資料はピンイン・訳のみで語釈・例文の解説スライドは無し）。例文は本文から注釈の括弧を除いたもの（本文訳は資料に無し）。p36 課堂討論記録にも「不执着于结果」として出現。"},{"id":"2026春-1-056","lesson":1,"type":"単語","role":"見出し語","zh":"匠人","pinyin":"jiàng rén","ja":"職人","ja_ai":false,"ja_note":"","def_zh":"有专门手艺的人，工匠。","def_zh_ai":true,"examples":[{"zh":"两代匠人，在不同的时代、不同的国度，用同样的热爱和倔强，书写着各自的传奇。","ja":"二代の職人は、異なる時代、異なる国で、同じ情熱と不屈の精神によって、それぞれの伝説を書き記している。","ja_ai":true}],"related":[],"parent":"","pages":[35],"notes":"p35 本文中の注釈語（資料はピンイン・訳のみで語釈・例文の解説スライドは無し）。例文は本文から注釈の括弧を除いたもの（本文訳は資料に無し）。"},{"id":"2026春-1-057","lesson":1,"type":"単語","role":"見出し語","zh":"倔强","pinyin":"jué jiàng","ja":"頑固で意地を張る／不屈","ja_ai":false,"ja_note":"","def_zh":"性格刚强，不肯屈服。","def_zh_ai":true,"examples":[{"zh":"两代匠人，在不同的时代、不同的国度，用同样的热爱和倔强，书写着各自的传奇。","ja":"二代の職人は、異なる時代、異なる国で、同じ情熱と不屈の精神によって、それぞれの伝説を書き記している。","ja_ai":true}],"related":[],"parent":"","pages":[35],"notes":"p35 本文中の注釈語（資料はピンイン・訳のみで語釈・例文の解説スライドは無し）。例文は本文から注釈の括弧を除いたもの（本文訳は資料に無し）。"},{"id":"2026春-1-058","lesson":1,"type":"単語","role":"見出し語","zh":"传奇","pinyin":"chuán qí","ja":"伝説","ja_ai":false,"ja_note":"","def_zh":"情节离奇或人物行为超乎寻常的故事；也指非同寻常的经历。","def_zh_ai":true,"examples":[{"zh":"两代匠人，在不同的时代、不同的国度，用同样的热爱和倔强，书写着各自的传奇。","ja":"二代の職人は、異なる時代、異なる国で、同じ情熱と不屈の精神によって、それぞれの伝説を書き記している。","ja_ai":true}],"related":[],"parent":"","pages":[35],"notes":"p35 本文中の注釈語（資料はピンイン・訳のみで語釈・例文の解説スライドは無し）。例文は本文から注釈の括弧を除いたもの（本文訳は資料に無し）。"},{"id":"2026春-1-059","lesson":1,"type":"慣用句","role":"見出し語","zh":"活到老，学到老","pinyin":"huó dào lǎo xué dào lǎo","ja":"生きている限り学び続ける／生涯学び続ける","ja_ai":true,"ja_note":"","def_zh":"人活着一天就要学习一天，一辈子都要不断学习。","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[36,38],"notes":"ピンイン補完。p36 課堂討論記録・まとめ p38 に掲載（資料表記は「活到老 学到老」と空白区切り。zh は全角読点で区切った）。例文無し。"},{"id":"2026春-1-060","lesson":1,"type":"成語","role":"見出し語","zh":"深思熟虑","pinyin":"shēn sī shú lǜ","ja":"熟慮する／じっくり考え抜く","ja_ai":true,"ja_note":"","def_zh":"深入细致地反复考虑。","def_zh_ai":true,"examples":[{"zh":"这两点不矛盾，在深思熟虑后有成功的可能，但也有一种万一失败也不会后悔的强烈决心。","ja":"この二つは矛盾しない。熟慮の末に成功の可能性はあるが、万一失敗しても後悔しないという強い決意もある。","ja_ai":true}],"related":[],"parent":"","pages":[36,38],"notes":"ピンイン補完。p36 課堂討論記録・まとめ p38 に掲載。例文は課堂討論記録（学生発言のメモ）の文。"},{"id":"2026春-1-061","lesson":1,"type":"成語","role":"関連語","zh":"屡战屡败","pinyin":"lǚ zhàn lǚ bài","ja":"戦うたびに負ける／何度挑んでも失敗する","ja_ai":true,"ja_note":"","def_zh":"每次作战都失败，形容一再失败。","def_zh_ai":true,"examples":[],"related":["屡败屡战"],"parent":"屡败屡战","pages":[36],"notes":"ピンイン補完。p36 課堂討論記録で「屡战屡败 屡败屡战」と並記（語順の違いで意味の重点が変わる対比）。まとめ p38 には 屡败屡战 のみ。"},{"id":"2026春-1-062","lesson":1,"type":"成語","role":"見出し語","zh":"屡败屡战","pinyin":"lǚ bài lǚ zhàn","ja":"何度負けても挑み続ける","ja_ai":true,"ja_note":"","def_zh":"虽然多次失败，仍然继续奋战，形容意志顽强。","def_zh_ai":true,"examples":[],"related":["屡战屡败"],"parent":"","pages":[36,38],"notes":"ピンイン補完。p36 課堂討論記録・まとめ p38 に掲載。例文無し。"},{"id":"2026春-1-063","lesson":1,"type":"成語","role":"見出し語","zh":"全力以赴","pinyin":"quán lì yǐ fù","ja":"全力を尽くす","ja_ai":true,"ja_note":"","def_zh":"把全部力量都投入进去。","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[36,38],"notes":"ピンイン補完。p36 課堂討論記録（「心态上不执着于结果 行动上仍然为梦想全力以赴」）・まとめ p38 に掲載。討論メモは句の羅列のため例文には採らなかった。"},{"id":"2026春-1-064","lesson":1,"type":"成語","role":"関連語","zh":"一如既往","pinyin":"yī rú jì wǎng","ja":"これまでと変わらず／相変わらず","ja_ai":true,"ja_note":"","def_zh":"完全像过去一样。","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[37],"notes":"ピンイン補完（「一」は本来声調表記）。p37「分享彼此观点」の板書メモに記載。同ページの 一副墨镜・街舞・燃脂搏击・和我的脸型不太搭・潮流恐惧症・新潮 は自由会話のメモと判断しカード化せず。"},{"id":"2026春-1-065","lesson":1,"type":"慣用句","role":"関連語","zh":"谦虚使人进步，骄傲使人落后","pinyin":"qiān xū shǐ rén jìn bù jiāo ào shǐ rén luò hòu","ja":"謙虚は人を進歩させ、驕りは人を後退させる","ja_ai":true,"ja_note":"","def_zh":"谦虚能让人不断进步，骄傲会让人停滞落后。","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[39],"notes":"ピンイン補完。p39 課堂討論記録（板書メモ）に記載された語。語釈・訳は資料に無く補完。資料表記は空白区切り（zh は全角読点で区切った）。"},{"id":"2026春-1-066","lesson":1,"type":"成語","role":"関連語","zh":"言行一致","pinyin":"yán xíng yī zhì","ja":"言行が一致している","ja_ai":true,"ja_note":"","def_zh":"说的和做的完全一样。","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[39],"notes":"ピンイン補完。p39 課堂討論記録（板書メモ）に記載された語。語釈・訳は資料に無く補完。"},{"id":"2026春-1-067","lesson":1,"type":"成語","role":"関連語","zh":"德不配位","pinyin":"dé bù pèi wèi","ja":"徳が地位に見合わない","ja_ai":true,"ja_note":"","def_zh":"品德与所处的地位不相称。","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[39],"notes":"ピンイン補完。p39 課堂討論記録（板書メモ）に記載された語。語釈・訳は資料に無く補完。"},{"id":"2026春-1-068","lesson":1,"type":"成語","role":"関連語","zh":"亲力亲为","pinyin":"qīn lì qīn wéi","ja":"何事も自ら手がける","ja_ai":true,"ja_note":"","def_zh":"亲自去做，亲自参与。","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[39],"notes":"ピンイン補完。p39 課堂討論記録（板書メモ）に記載された語。語釈・訳は資料に無く補完。"},{"id":"2026春-1-069","lesson":1,"type":"慣用句","role":"関連語","zh":"一根筋","pinyin":"yī gēn jīn","ja":"一本気で融通が利かない／一途","ja_ai":true,"ja_note":"","def_zh":"形容人思想固执、认死理，不懂变通。","def_zh_ai":true,"examples":[],"related":["钻牛角尖"],"parent":"","pages":[39],"notes":"ピンイン補完。p39 課堂討論記録（板書メモ）に記載された語。語釈・訳は資料に無く補完。「一」は本来声調で表記。"},{"id":"2026春-1-070","lesson":1,"type":"成語","role":"関連語","zh":"一成不变","pinyin":"yī chéng bù biàn","ja":"一度決まったら変わらない／旧態依然","ja_ai":true,"ja_note":"","def_zh":"一经形成，永不改变。","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[39],"notes":"ピンイン補完。p39 課堂討論記録（板書メモ）に記載された語。語釈・訳は資料に無く補完。「一」は本来声調で表記。"},{"id":"2026春-1-071","lesson":1,"type":"成語","role":"関連語","zh":"一呼百应","pinyin":"yī hū bǎi yìng","ja":"一声かければ大勢が応じる","ja_ai":true,"ja_note":"","def_zh":"一人呼喊，百人响应，形容号召力强。","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[39],"notes":"ピンイン補完。p39 課堂討論記録（板書メモ）に記載された語。語釈・訳は資料に無く補完。「一」は本来声調で表記。"},{"id":"2026春-1-072","lesson":1,"type":"慣用句","role":"関連語","zh":"知之者不如好之者，好之者不如乐之者","pinyin":"zhī zhī zhě bù rú hào zhī zhě hào zhī zhě bù rú lè zhī zhě","ja":"知る者は好む者に及ばず、好む者は楽しむ者に及ばない","ja_ai":true,"ja_note":"","def_zh":"语出《论语》：懂得它的人不如爱好它的人，爱好它的人不如以它为乐的人。","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[39],"notes":"ピンイン補完。p39 課堂討論記録（板書メモ）に記載された語。語釈・訳は資料に無く補完。資料表記は空白区切り（zh は全角読点で区切った）。"},{"id":"2026春-1-073","lesson":1,"type":"慣用句","role":"見出し語","zh":"世上无难事，只怕有心人","pinyin":"shì shàng wú nán shì zhǐ pà yǒu xīn rén","ja":"世の中に難しいことはない、心を込めて頑張る人さえいれば。","ja_ai":false,"ja_note":"","def_zh":"只要肯下决心去做、用心坚持，世界上就没有做不成的事情。","def_zh_ai":false,"examples":[],"related":["世上无难事，只要肯放弃"],"parent":"","pages":[40],"notes":"ピンイン補完。資料表記は「世上无难事 只怕有心人」と空白区切り（zh は全角読点で区切った）。例文無し。"},{"id":"2026春-1-074","lesson":1,"type":"慣用句","role":"見出し語","zh":"世上无难事，只要肯放弃","pinyin":"shì shàng wú nán shì zhǐ yào kěn fàng qì","ja":"この世に難しいことはない、諦めさえすれば","ja_ai":true,"ja_note":"からかいという意味で、「この世に難しいことなんてない。諦めてしまえば、何もかも難しくなくなる。」\nこれはネットで流行しているユーモラスな逆ポジティブで、元のことわざとは正反対の意味になっています。","def_zh":"调侃（tiáo kǎn）意思：世界上没有难事儿，只要你肯放弃，就啥都不难了。这句话是网络搞笑版 “反鸡汤”，跟原句刚好相反。","def_zh_ai":false,"examples":[],"related":["世上无难事，只怕有心人","鸡汤"],"parent":"","pages":[40],"notes":"ピンイン補完。「世上无难事，只怕有心人」のネット上のパロディ（反鸡汤）。資料の日本語説明2か所（調侃の訳・補足訳）は ja_note に改行区切りで収録し、ja は短い訳語を補完。語釈の2文は資料の別行を連結（1文目末尾の句点は補った）。"},{"id":"2026春-1-075","lesson":1,"type":"単語","role":"見出し語","zh":"鸡汤","pinyin":"jī tāng","ja":"心のチキンスープ（空疎な励ましの言葉）","ja_ai":true,"ja_note":"ここでいう「チキンスープ」は飲み物のことではなく、「心のチキンスープ」の略である。それは、聞くととても励まされ、温かく、ポジティブに感じられるが、しばしば内容がやや空虚で現実的ではない慰めの言葉や格言を指す。","def_zh":"这里不是指喝的鸡汤，而是心灵鸡汤的简称。指那些听起来很励志、很温暖、很正能量，但往往有点空洞、不切实际的安慰话或格言。","def_zh_ai":false,"examples":[],"related":["心灵鸡汤","反鸡汤"],"parent":"","pages":[40],"notes":"ピンイン補完。資料見出しは【鸡汤】。資料の説明文の訳（長文）は ja_note に収録し、ja は短い訳語を補完。"},{"id":"2026春-1-076","lesson":1,"type":"慣用句","role":"見出し語","zh":"胜败乃兵家常事","pinyin":"shèng bài nǎi bīng jiā cháng shì","ja":"勝ち負けはよくあることであり、特別なことではない","ja_ai":false,"ja_note":"","def_zh":"胜利和失败都是很正常的事情（原指打仗，现泛指各种竞争）","def_zh_ai":false,"examples":[{"zh":"比赛输了也没关系，胜败乃兵家常事，重要的是总结经验。","ja":"試合に負けても構わない。勝ち負けは兵家の常であり、大切なのは経験を振り返ることだ。","ja_ai":true}],"related":["胜不骄，败不馁"],"parent":"","pages":[42],"notes":"ピンイン補完。"},{"id":"2026春-1-077","lesson":1,"type":"慣用句","role":"見出し語","zh":"胜不骄，败不馁","pinyin":"shèng bù jiāo bài bù něi","ja":"勝っても驕らず、負けてもくじけない","ja_ai":false,"ja_note":"","def_zh":"胜利时不骄傲，失败时不气馁","def_zh_ai":false,"examples":[{"zh":"一个成熟的人应该胜不骄，败不馁，保持稳定的心态。","ja":"成熟した人は、勝っても驕らず負けてもくじけず、安定した心の状態を保つべきだ。","ja_ai":true}],"related":["胜败乃兵家常事"],"parent":"","pages":[42],"notes":"資料表記は「胜不骄  败不馁」と空白区切り（zh は全角読点で区切った）。資料に補足「接受结果 + 调整心态」あり。"},{"id":"2026春-1-078","lesson":1,"type":"成語","role":"関連語","zh":"意犹未尽","pinyin":"yì yóu wèi jìn","ja":"まだ物足りない／名残惜しい","ja_ai":true,"ja_note":"","def_zh":"意思还没有尽，形容余味无穷、兴致未尽。","def_zh_ai":true,"examples":[{"zh":"这场比赛节奏紧张又精彩，观众看完后纷纷大呼过瘾，还意犹未尽。","ja":"この試合はテンポが速くて非常に精彩で、観客は見終わったあと皆「最高だ」と感じ、まだ物足りない様子だった。","ja_ai":false}],"related":["大呼"],"parent":"大呼","pages":[5],"notes":"p5 大呼 の例文中にピンイン注（資料では「jiézòu yì yóu wèi jìnfēnfēn」と隣接語と連結して抽出、分離した）。ピンインは資料どおり。出現順では 大呼 の直後だが、追加分のため末尾に連番。"},{"id":"2026春-1-079","lesson":1,"type":"成語","role":"関連語","zh":"泪如泉涌","pinyin":"lèi rú quán yǒng","ja":"涙がとめどなくあふれる","ja_ai":true,"ja_note":"","def_zh":"眼泪像泉水一样涌出来，形容极度悲伤或激动。","def_zh_ai":true,"examples":[{"zh":"张雪泪如泉涌，那一刻，也许只有失败过的人才懂。","ja":"張雪の目からは涙がとめどなくあふれた。その瞬間の思いは、失敗を経験した者にしかわからないのかもしれない。","ja_ai":true}],"related":[],"parent":"","pages":[29],"notes":"ピンイン補完。p29 本文中の成語（スライドでの解説は無し）。親見出し語が無いため parent は空。追加分のため末尾に連番。"},{"id":"2026春-2-001","lesson":2,"type":"単語","role":"見出し語","zh":"热衷","pinyin":"rè zhōng","ja":"熱中する／夢中になる","ja_ai":false,"ja_note":"","def_zh":"非常爱好、十分积极地投入某件事情","def_zh_ai":false,"examples":[{"zh":"他一直热衷于理财投资，经常研究各种金融产品，希望让自己的资产不断增值。","ja":"彼は資産運用に熱中しており、さまざまな金融商品を研究して資産を増やそうとしている。","ja_ai":false},{"zh":"很多年轻人热衷于打卡网红景点，把旅行当成一种社交方式。","ja":"多くの若者は人気スポットに行って写真を撮るのに熱中し、旅行を一種の社交の手段と考えている。","ja_ai":false}],"related":["热衷于"],"parent":"","pages":[49],"notes":""},{"id":"2026春-2-002","lesson":2,"type":"単語","role":"見出し語","zh":"攒钱","pinyin":"zǎn qián","ja":"お金を貯める","ja_ai":true,"ja_note":"","def_zh":"一点一点地积存钱财","def_zh_ai":true,"examples":[{"zh":"全款买房成为可能出自几个方面：一个是热衷于攒钱的年轻人随着时间累积手握大额流动资金；另一方面是由于一线城市房价持续下跌，刚需门槛还在不断探底，刚好落入刚需购房者全款买房的可承受区间。","ja":"一括購入が可能になっている背景には、いくつかの要因がある。ひとつは、貯蓄を重視する若者が時間をかけて資金を積み上げ、多額の流動資金を手元に持つようになったこと。もうひとつは、一線都市における住宅価格の下落が続き、実需向け住宅の参入ハードルが下がり続けているため、ちょうど一括購入が可能な範囲に収まってきていることである。","ja_ai":false}],"related":[],"parent":"","pages":[46,49,73],"notes":"まとめ（p73）のみ掲載、語釈なし。ピンイン補完。例文は本文から採録。例文訳は本文訳（p47）。"},{"id":"2026春-2-003","lesson":2,"type":"単語","role":"見出し語","zh":"下跌","pinyin":"xià diē","ja":"下落する／下がる","ja_ai":false,"ja_note":"","def_zh":"价格、数量等向下降低","def_zh_ai":false,"examples":[{"zh":"近期房价出现明显下跌，影响了很多购房者的决策。","ja":"最近、住宅価格が明らかに下落し、多くの購入希望者の判断に影響を与えた。","ja_ai":true},{"zh":"股市连续下跌，让不少投资者感到不安。","ja":"株式市場が続落し、多くの投資家が不安を感じている。","ja_ai":true},{"zh":"如果经济持续低迷，消费水平也可能下跌。","ja":"景気の低迷が続けば、消費水準も下がる可能性がある。","ja_ai":true}],"related":["跌幅"],"parent":"","pages":[50],"notes":"p50 の行内に混入した「老破小」「刚性需求」は書き込みとみなし除外（それぞれ別カード）。"},{"id":"2026春-2-004","lesson":2,"type":"単語","role":"見出し語","zh":"刚需门槛","pinyin":"gāng xū mén kǎn","ja":"実需の参入ハードル","ja_ai":false,"ja_note":"","def_zh":"满足基本需求（如住房）所需要达到的最低条件或标准","def_zh_ai":false,"examples":[{"zh":"随着房价下降，刚需门槛逐渐降低，更多人开始考虑买房。","ja":"住宅価格の下落に伴い実需の参入ハードルが徐々に下がり、より多くの人が住宅購入を考え始めた。","ja_ai":true},{"zh":"对年轻人来说，首付比例直接影响刚需门槛。","ja":"若者にとって、頭金の比率は実需の参入ハードルに直接影響する。","ja_ai":true},{"zh":"如果收入不稳定，很难跨过购房的刚需门槛。","ja":"収入が不安定だと、住宅購入の実需ハードルを越えるのは難しい。","ja_ai":true}],"related":["落户门槛","入学门槛","入职门槛","行业门槛","技术门槛","准入门槛","刚性需求"],"parent":"","pages":[50],"notes":""},{"id":"2026春-2-005","lesson":2,"type":"単語","role":"見出し語","zh":"探底","pinyin":"tàn dǐ","ja":"底を打つ／底値を探る","ja_ai":false,"ja_note":"","def_zh":"价格或情况下降到最低点","def_zh_ai":false,"examples":[{"zh":"房价是否已经探底，目前还存在争议。","ja":"住宅価格がすでに底を打ったかどうかについては、現在も議論がある。","ja_ai":true},{"zh":"如果经济继续下行，价格可能进一步探底。","ja":"景気がさらに下向けば、価格はさらに底値を探る可能性がある。","ja_ai":true},{"zh":"很多投资者选择观望，等待价格真正探底之后再决定是否入场。","ja":"多くの投資家は様子見を選び、価格が本当に底を打ってから参入するかどうかを決めようとしている。","ja_ai":true}],"related":[],"parent":"","pages":[51],"notes":""},{"id":"2026春-2-006","lesson":2,"type":"単語","role":"見出し語","zh":"落入……区间","pinyin":"luò rù … qū jiān","ja":"〜の範囲に入る","ja_ai":false,"ja_note":"","def_zh":"进入某一个范围之内","def_zh_ai":false,"examples":[{"zh":"物价涨幅落入可控区间，不会影响日常生活。","ja":"物価の上昇幅が管理可能な範囲に収まっており、日常生活には影響しない。","ja_ai":true},{"zh":"房价调整后，逐渐落入年轻人可承受的区间。","ja":"住宅価格が調整された後、次第に若者が負担できる範囲に収まってきた。","ja_ai":true},{"zh":"这款手机定价落入大众消费区间，销量持续走高。","ja":"この携帯電話は価格が一般消費者向けの価格帯に収まり、販売台数が伸び続けている。","ja_ai":true}],"related":[],"parent":"","pages":[51],"notes":"1つ目の例文（物价涨幅…）は p51 の冒頭に単独で出ており、ページ配置上この語の例文と判断。"},{"id":"2026春-2-007","lesson":2,"type":"単語","role":"見出し語","zh":"上车","pinyin":"shàng chē","ja":"（住宅を）購入する／マイホームを手に入れる","ja_ai":true,"ja_note":"","def_zh":"入手买房、购房定居。","def_zh_ai":false,"examples":[{"zh":"同时更值得注意的是，新上车的年轻人对“房贷”的态度发生了明显转变。","ja":"同時に、より注目すべきなのは、新たに住宅市場に参入した若者たちの「住宅ローン」に対する考え方が明らかに変化している点である。","ja_ai":false}],"related":["全款上车"],"parent":"","pages":[53,55,58,60,63,64],"notes":"ピンイン補完。本文訳（p54）では「新たに住宅市場に参入した」と訳出。例文は本文から採録。"},{"id":"2026春-2-008","lesson":2,"type":"単語","role":"見出し語","zh":"资产缩水","pinyin":"zī chǎn suō shuǐ","ja":"資産価値が目減りする","ja_ai":true,"ja_note":"","def_zh":"资产价值变少、贬值。","def_zh_ai":false,"examples":[{"zh":"害怕资产缩水，还要背负房贷利息，担心“两头亏”，越来越多的人抵触房贷，高杠杆买房、背上高额房贷的情况越来越少。","ja":"資産価値の下落を恐れ、さらにローン利息を背負うことになり、「両損になる」ことを懸念して、住宅ローンに抵抗感を持つ人が増えている。高いレバレッジで住宅を購入し、多額の住宅ローンを抱えるケースはますます減少している。","ja_ai":false}],"related":["贬值"],"parent":"","pages":[53,55,58,60],"notes":"ピンイン補完。例文は本文から採録。"},{"id":"2026春-2-009","lesson":2,"type":"単語","role":"見出し語","zh":"房贷利息","pinyin":"fáng dài lì xī","ja":"住宅ローンの利息","ja_ai":true,"ja_note":"","def_zh":"买房贷款要付给银行的额外利息。","def_zh_ai":false,"examples":[{"zh":"害怕资产缩水，还要背负房贷利息，担心“两头亏”，越来越多的人抵触房贷，高杠杆买房、背上高额房贷的情况越来越少。","ja":"資産価値の下落を恐れ、さらにローン利息を背負うことになり、「両損になる」ことを懸念して、住宅ローンに抵抗感を持つ人が増えている。高いレバレッジで住宅を購入し、多額の住宅ローンを抱えるケースはますます減少している。","ja_ai":false}],"related":[],"parent":"","pages":[53,55,58,60,73],"notes":"ピンイン補完。例文は本文から採録。"},{"id":"2026春-2-010","lesson":2,"type":"単語","role":"見出し語","zh":"抵触","pinyin":"dǐ chù","ja":"抵抗感を持つ／反発する","ja_ai":true,"ja_note":"","def_zh":"内心抗拒、不愿意接受。","def_zh_ai":false,"examples":[{"zh":"害怕资产缩水，还要背负房贷利息，担心“两头亏”，越来越多的人抵触房贷，高杠杆买房、背上高额房贷的情况越来越少。","ja":"資産価値の下落を恐れ、さらにローン利息を背負うことになり、「両損になる」ことを懸念して、住宅ローンに抵抗感を持つ人が増えている。高いレバレッジで住宅を購入し、多額の住宅ローンを抱えるケースはますます減少している。","ja_ai":false},{"zh":"大家对高房价的抵触情绪，从冷清的楼市成交量可见一斑。","ja":"高い住宅価格に対する人々の反発は、低迷する不動産取引量からも見て取れる。","ja_ai":true}],"related":["抵触情绪"],"parent":"","pages":[53,55,58,60,61,73],"notes":"p61 末尾に「dǐ chù qíng xù」（抵触情绪）のピンインのみ記載。2つ目の例文は 可见一斑 の例文（p61）から。"},{"id":"2026春-2-011","lesson":2,"type":"単語","role":"見出し語","zh":"高杠杆买房","pinyin":"gāo gàng gǎn mǎi fáng","ja":"高レバレッジで住宅を購入する","ja_ai":false,"ja_note":"","def_zh":"首付比例很低、贷款额度很高，自有资金投入极少，几乎全靠借钱买房。","def_zh_ai":false,"examples":[{"zh":"害怕资产缩水，还要背负房贷利息，担心“两头亏”，越来越多的人抵触房贷，高杠杆买房、背上高额房贷的情况越来越少。","ja":"資産価値の下落を恐れ、さらにローン利息を背負うことになり、「両損になる」ことを懸念して、住宅ローンに抵抗感を持つ人が増えている。高いレバレッジで住宅を購入し、多額の住宅ローンを抱えるケースはますます減少している。","ja_ai":false}],"related":["杠杆"],"parent":"","pages":[53,55,58,60],"notes":"ピンイン補完。五字だが決まり文句ではない語句のため 単語 扱い。例文は本文から採録。"},{"id":"2026春-2-012","lesson":2,"type":"単語","role":"見出し語","zh":"截至2025年底","pinyin":"jié zhì èr líng èr wǔ nián dǐ","ja":"2025年末時点で","ja_ai":true,"ja_note":"","def_zh":"到2025年12月31日为止的时间节点。","def_zh_ai":false,"examples":[{"zh":"根据央行近期公布的数据，截至2025年底，中国居民个人住房贷款余额37.01万亿，同比下降1.8%，这已是居民房贷连续三年下降。","ja":"中央銀行が最近公表したデータによると、2025年末時点で中国の個人住宅ローン残高は37.01兆元で、前年同期比1.8％減となっており、これで住宅ローン残高は3年連続の減少となった。","ja_ai":false}],"related":["截至"],"parent":"","pages":[53,55,58,60],"notes":"ピンイン補完（数字は èr líng èr wǔ と読む表記にしたため漢字数と音節数が一致しない）。見出しは資料どおり数字入り。例文は本文から採録。"},{"id":"2026春-2-013","lesson":2,"type":"単語","role":"見出し語","zh":"同比下降","pinyin":"tóng bǐ xià jiàng","ja":"前年同期比で減少する","ja_ai":true,"ja_note":"","def_zh":"和去年同一时期相比，数量变少、数值变低。","def_zh_ai":false,"examples":[{"zh":"根据央行近期公布的数据，截至2025年底，中国居民个人住房贷款余额37.01万亿，同比下降1.8%，这已是居民房贷连续三年下降。","ja":"中央銀行が最近公表したデータによると、2025年末時点で中国の個人住宅ローン残高は37.01兆元で、前年同期比1.8％減となっており、これで住宅ローン残高は3年連続の減少となった。","ja_ai":false}],"related":[],"parent":"","pages":[53,55,58,60],"notes":"ピンイン補完。例文は本文から採録。"},{"id":"2026春-2-014","lesson":2,"type":"単語","role":"見出し語","zh":"零负债","pinyin":"líng fù zhài","ja":"無借金（ゼロ負債）","ja_ai":false,"ja_note":"","def_zh":"没有任何欠款，不欠银行、不欠别人钱。","def_zh_ai":false,"examples":[{"zh":"在“零负债”成为年轻人维持财务健康的新趋势下，人们的买房逻辑也变了。","ja":"「無借金（ゼロ負債）」が若者にとって財務健全性を維持する新たなトレンドとなる中、人々の住宅購入に対する考え方も変化している。","ja_ai":false}],"related":[],"parent":"","pages":[53,55,58,60,104],"notes":"ピンイン補完。ja は本文訳（p54）の訳語を採用。例文は本文から採録。"},{"id":"2026春-2-015","lesson":2,"type":"単語","role":"見出し語","zh":"逻辑","pinyin":"luó jí","ja":"論理／ロジック、（物事の）筋道・考え方","ja_ai":true,"ja_note":"","def_zh":"思维规律、事理条理；也指事情的因果道理。","def_zh_ai":false,"examples":[{"zh":"在“零负债”成为年轻人维持财务健康的新趋势下，人们的买房逻辑也变了。","ja":"「無借金（ゼロ負債）」が若者にとって財務健全性を維持する新たなトレンドとなる中、人々の住宅購入に対する考え方も変化している。","ja_ai":false}],"related":["买房逻辑","购房逻辑"],"parent":"","pages":[53,55,58,60,64,73],"notes":"例文は本文から採録。"},{"id":"2026春-2-016","lesson":2,"type":"単語","role":"見出し語","zh":"刚性需求","pinyin":"gāng xìng xū qiú","ja":"必需の需要／実需（硬直的需要）","ja_ai":true,"ja_note":"","def_zh":"刚性：不能减少、不能代替、必须要有。需求：需要、想要、离不开的东西。刚需：不管价格涨不涨、收入高不高，人必须要有的东西，不能省、不能不买，就叫刚需。","def_zh_ai":false,"examples":[],"related":["刚需","弹性需求","刚需门槛"],"parent":"","pages":[50,56,73],"notes":"ピンイン補完。p56「刚需=刚性需求」の説明3項目を句点でつないで def_zh とした。p56 の分類（生存基础刚需：粮食、大米…／日常生活刚需：衣服、鞋子…／人生大事刚需：住房、教育、医疗、养老、通勤交通／现代社会刚需：智能手机、手机流量…）は省略。p50 にも書き込みあり。"},{"id":"2026春-2-017","lesson":2,"type":"単語","role":"見出し語","zh":"弹性需求","pinyin":"tán xìng xū qiú","ja":"弾力的需要（価格や収入に応じて増減する需要）","ja_ai":true,"ja_note":"","def_zh":"会随价格、收入等变化而明显增减的需求，可以减少、推迟或用别的东西代替。","def_zh_ai":true,"examples":[],"related":["刚性需求"],"parent":"","pages":[56,73],"notes":"ピンイン補完。p56 で 刚性需求 の「反义词」として提示、まとめ p73 掲載。語釈・例文なし。"},{"id":"2026春-2-018","lesson":2,"type":"成語","role":"見出し語","zh":"可见一斑","pinyin":"kě jiàn yì bān","ja":"一部から全体がうかがえる","ja_ai":true,"ja_note":"斑：まだら模様。竹の筒から豹をのぞくと、全体を見ることはできないが、体の一部の斑紋は見ることができる。そこから、物事の一部分から全体の様子を推し量ることができるというたとえである。","def_zh":"斑：斑纹。从竹管里看豹，虽然不能看到豹的全体，但也能看到豹身上的一块斑纹。比喻从一点可推知全貌。","def_zh_ai":false,"examples":[{"zh":"年轻人购房意愿降低，从观望人数大增可见一斑。","ja":"若者の住宅購入意欲が低下していることは、様子見の人が大幅に増えていることからもうかがえる。","ja_ai":true},{"zh":"大家对高房价的抵触情绪，从冷清的楼市成交量可见一斑。","ja":"高い住宅価格に対する人々の反発は、低迷する不動産取引量からも見て取れる。","ja_ai":true},{"zh":"他平时做事十分细心，从整理笔记的认真程度可见一斑。","ja":"彼が普段から非常に几帳面であることは、ノートの整理ぶりの丁寧さからもうかがえる。","ja_ai":true},{"zh":"这个现象从近年来连续下滑的房贷规模可见一斑。","ja":"この現象は、近年の住宅ローン残高の継続的な減少からも見て取れる。","ja_ai":false}],"related":["管中窥豹"],"parent":"","pages":[53,58,61,73],"notes":"資料のピンインは「bān」のみ。kě jiàn yì 補完（一 は資料の 一团糟 yì tuán zāo に合わせ変調表記）。4つ目の例文は本文（p53）と本文訳（p54）。 資料の日本語説明文は ja_note に移し、ja は短い訳語を補完。"},{"id":"2026春-2-019","lesson":2,"type":"成語","role":"見出し語","zh":"管中窥豹","pinyin":"guǎn zhōng kuī bào","ja":"管中から豹を窺う（一部だけを見る）","ja_ai":true,"ja_note":"","def_zh":"从管子里看豹。比喻只见到事物的一小部分。也比喻可以从观察到的部分推测全貌。","def_zh_ai":false,"examples":[{"zh":"仅靠一次表现就评价一个人，无异于管中窥豹。","ja":"僅か一度の振る舞いだけで人を評価するのは、まさに管中窺豹のようなものだ。","ja_ai":false}],"related":["可见一斑"],"parent":"","pages":[61,73],"notes":"可见一斑 のスライド内で解説。まとめ p73 掲載のため見出し語。"},{"id":"2026春-2-020","lesson":2,"type":"単語","role":"見出し語","zh":"人才房","pinyin":"rén cái fáng","ja":"人材住宅","ja_ai":true,"ja_note":"人材住宅は地方政府が資格を満たす専門人材向けに設けた政策的な安居住宅で、一般の分譲住宅より価格が安く、特定人材に限定供給され、取引には規定の制約が設けられている。","def_zh":"人才房是地方政府面向符合资质的专业人才推出的政策性安居住房，售价低于普通商品住房，面向特定人才定向供应，并有相应交易约束规定。","def_zh_ai":false,"examples":[{"zh":"在犹豫了很久之后，33岁的Bella和她的先生小项最终决定，全款200万拿下深圳光明区一处70平米的人才房。","ja":"長い間迷った末、33歳のBellaと夫の小項は、200万元を一括で支払い、深圳市光明区にある70平方メートルの人材住宅を購入することに決めた。","ja_ai":true}],"related":[],"parent":"","pages":[63],"notes":"ピンイン補完。本文中の用語解説（まとめには無し）。例文は本文から採録。 資料の日本語説明文は ja_note に移し、ja は短い訳語を補完。"},{"id":"2026春-2-021","lesson":2,"type":"単語","role":"見出し語","zh":"纠结","pinyin":"jiū jié","ja":"思い悩む／迷う、葛藤する","ja_ai":true,"ja_note":"","def_zh":"心里矛盾，犹豫不决，难以做出决定","def_zh_ai":true,"examples":[{"zh":"但是，在全款买房和贷款买更大的房子上，两人纠结过一段时间。","ja":"しかし、一括で家を買うか、ローンを組んでより大きな家を買うかで、二人はしばらく悩んだ。","ja_ai":true}],"related":[],"parent":"","pages":[63,73,107],"notes":"まとめ p73 掲載、語釈なし。ピンインは p107 末尾の「jiūjié」による。例文は本文から採録。"},{"id":"2026春-2-022","lesson":2,"type":"単語","role":"見出し語","zh":"倾向于","pinyin":"qīng xiàng yú","ja":"〜する傾向がある／〜の方に傾く","ja_ai":true,"ja_note":"","def_zh":"偏向于某一方面，更愿意选择某种做法或观点","def_zh_ai":true,"examples":[{"zh":"按照以往的购房逻辑，手握200万现金的购房者大多会倾向于加杠杆，以此作为首付，购置一套远超200万的房产。","ja":"これまでの住宅購入の考え方に従えば、200万元の現金を持つ購入者の多くはレバレッジをかけてそれを頭金とし、200万元をはるかに超える物件を購入する傾向がある。","ja_ai":true}],"related":[],"parent":"","pages":[64,73],"notes":"まとめ p73 掲載。ピンインは p64 本文注「qīng xiàng」、yú は補完。例文は本文から採録。例文中の読み注（qīng xiàng）は除いた。"},{"id":"2026春-2-023","lesson":2,"type":"単語","role":"見出し語","zh":"首付","pinyin":"shǒu fù","ja":"頭金","ja_ai":true,"ja_note":"","def_zh":"分期付款购买房子、汽车等时，第一次支付的那部分款项","def_zh_ai":true,"examples":[{"zh":"对年轻人来说，首付比例直接影响刚需门槛。","ja":"若者にとって、頭金の比率は実需の参入ハードルに直接影響する。","ja_ai":true}],"related":["首付比例"],"parent":"","pages":[50,64,73],"notes":"まとめ p73 掲載、語釈なし。ピンイン補完。例文は 刚需门槛 の例文（p50）から。"},{"id":"2026春-2-024","lesson":2,"type":"単語","role":"見出し語","zh":"杠杆","pinyin":"gàng gǎn","ja":"てこ／レバレッジ","ja_ai":true,"ja_note":"","def_zh":"原指撬动重物的工具；在金融中指借钱投资或消费，用较少的自有资金撬动更大的资金规模","def_zh_ai":true,"examples":[{"zh":"要加杠杆去买一个跌幅空间挺大的东西，确实不划算，风险也很大。","ja":"下落の余地がかなり大きいものをレバレッジをかけて買うのは、確かに割に合わないし、リスクも大きい。","ja_ai":true}],"related":["加杠杆","高杠杆买房"],"parent":"","pages":[64,73,94],"notes":"まとめ p73 掲載、語釈なし。ピンイン補完。例文は本文から採録。"},{"id":"2026春-2-025","lesson":2,"type":"単語","role":"見出し語","zh":"稳妥起见","pinyin":"wěn tuǒ qǐ jiàn","ja":"念のため、万全を期すため、安心のため","ja_ai":false,"ja_note":"","def_zh":"为了稳当可靠、不出差错（而这样做）","def_zh_ai":true,"examples":[{"zh":"但是二人最终还是稳妥起见，选择全款上车。","ja":"しかし二人は結局、万全を期して一括購入を選んだ。","ja_ai":true}],"related":[],"parent":"","pages":[64],"notes":"本文中の注釈語（本文に読み・日本語注のみ付記、まとめスライドには無し）。採否要確認。ピンインは「wěn tuǒ」のみ資料、qǐ jiàn 補完。例文は本文から採録。例文中の注釈は除いた。"},{"id":"2026春-2-026","lesson":2,"type":"単語","role":"見出し語","zh":"宁可","pinyin":"nìng kě","ja":"むしろ、～するほうがましだ","ja_ai":false,"ja_note":"","def_zh":"表示比较两方面的利害得失后，选取其中一面","def_zh_ai":true,"examples":[{"zh":"我不想扛这么多房贷，宁可再攒一攒。","ja":"こんなに多くの住宅ローンを背負いたくない。むしろもう少しお金を貯めたい。","ja_ai":true}],"related":["宁愿"],"parent":"","pages":[64,73],"notes":"まとめ p73 掲載。ピンイン・ja は p64 本文注による。例文は本文から採録。例文中の注釈は除いた。"},{"id":"2026春-2-027","lesson":2,"type":"単語","role":"関連語","zh":"月供","pinyin":"yuè gòng","ja":"（ローンの）毎月の返済（額）","ja_ai":true,"ja_note":"","def_zh":"按月偿还贷款的固定金额","def_zh_ai":true,"examples":[{"zh":"更重要的是，即便小贷一笔，每月的“月供”本身也会成为一种心理负担。","ja":"さらに重要なのは、たとえ少額のローンでも、毎月の「返済」そのものが心理的な負担になるということだ。","ja_ai":true}],"related":["断供","上供","供品"],"parent":"","pages":[65,72,74,76],"notes":"ページ上の書き込み語（授業メモと思われる）。特定の見出し語との関係は資料上明示されていない。採否要確認。p72 の書き込み「月供 断供 上供 供品」（「供」を含む語のまとめと思われる）。本文 p65・p74・p76 にも出現。ピンイン補完。"},{"id":"2026春-2-028","lesson":2,"type":"単語","role":"見出し語","zh":"并非个例","pinyin":"bìng fēi gè lì","ja":"決して特別な例ではない","ja_ai":true,"ja_note":"","def_zh":"并不是个别的例子，说明这种情况并不少见","def_zh_ai":true,"examples":[{"zh":"Bella全款买房并非个例。","ja":"Bellaのように一括で家を買うのは決して特別な例ではない。","ja_ai":true}],"related":["不是个例"],"parent":"","pages":[65,73,94],"notes":"まとめ p73 掲載、語釈なし。ピンイン補完。四字だが成語ではない語句のため 単語 扱い。例文は本文から採録。"},{"id":"2026春-2-029","lesson":2,"type":"単語","role":"見出し語","zh":"对……的执念","pinyin":"duì … de zhí niàn","ja":"……に対するこだわり／執着","ja_ai":false,"ja_note":"","def_zh":"对某种事物念念不忘、难以放下的执着想法","def_zh_ai":true,"examples":[{"zh":"国人对房子的执念，在90后这代人身上并没有被淡化，随着年岁渐长，房子给人带来的安全感和归属感反而日渐浓烈。","ja":"中国人の家に対するこだわりは、90年代生まれの世代でも薄れておらず、年齢を重ねるにつれて、家がもたらす安心感や帰属感はむしろ日に日に強まっている。","ja_ai":true},{"zh":"能看到夕阳，是她在选房时一个小小的执念。","ja":"夕日が見えることは、彼女が部屋を選ぶときの小さなこだわりだった。","ja_ai":true}],"related":["执念"],"parent":"","pages":[65,104,105],"notes":"まとめ p105 の表記は「对…… 的执念」。p65 本文注は「执念（zhí niàn 執着、こだわり、未練）」。ピンインの duì … de は補完。例文は本文から採録。"},{"id":"2026春-2-030","lesson":2,"type":"単語","role":"見出し語","zh":"不无道理","pinyin":"bù wú dào lǐ","ja":"一理ある","ja_ai":true,"ja_note":"","def_zh":"并不是没有道理，有一定的道理","def_zh_ai":true,"examples":[{"zh":"朋友的说法不无道理。","ja":"友人の言うことにも一理ある。","ja_ai":true}],"related":[],"parent":"","pages":[67,73],"notes":"まとめ p73 掲載、語釈なし。ピンイン補完。四字だが成語ではない語句のため 単語 扱い。例文は本文から採録。"},{"id":"2026春-2-031","lesson":2,"type":"単語","role":"見出し語","zh":"上岸","pinyin":"shàng àn","ja":"無事合格して安定した身分になる／定職に就いて落ち着く","ja_ai":false,"ja_note":"","def_zh":"从水里走到岸上。从不稳定、压力大、漂泊不确定的状态，成功进入稳定、有编制、有保障的人生状态，叫上岸。","def_zh_ai":false,"examples":[{"zh":"两年前，她花了3个月的时间备战考公，成功上岸了另一座小城的体制内工作，开始异地上班。","ja":"2年前、彼女は3か月かけて公務員試験の準備をし、見事に別の小さな町の公務員職に合格して、よその町で働き始めた。","ja_ai":true}],"related":["考公上岸","考研上岸","大厂上岸"],"parent":"","pages":[67,69,73],"notes":"p69 は「知识补充」だが、まとめ p73 掲載のため見出し語化。ピンイン補完。用例: 考公上岸：考上公务员、事业编，有稳定体制内工作／考研上岸：考研成功被录取，考上研究生／大厂上岸：成功通过面试，进入知名大厂正式工作。例文は本文から採録。"},{"id":"2026春-2-032","lesson":2,"type":"成語","role":"見出し語","zh":"忽冷忽热","pinyin":"hū lěng hū rè","ja":"熱くなったり冷たくなったり／気まぐれ","ja_ai":true,"ja_note":"","def_zh":"一会儿冷，一会儿热；也比喻态度、感情不稳定","def_zh_ai":true,"examples":[{"zh":"虽然可以住宿舍，但是宿舍条件有限，洗澡水忽冷忽热，上厕所要排队，食堂饭菜高油高盐把老同事吃出了三高。","ja":"寮に住むこともできるが、寮の設備は限られていて、シャワーのお湯は熱くなったり冷たくなったりし、トイレは順番待ち、食堂の食事は油と塩分が多く、古株の同僚は三高（高血圧・高血糖・脂質異常）になってしまった。","ja_ai":true}],"related":[],"parent":"","pages":[67,73],"notes":"まとめ p73 掲載、語釈なし。ピンイン補完。例文は本文から採録。"},{"id":"2026春-2-033","lesson":2,"type":"単語","role":"見出し語","zh":"大厂","pinyin":"dà chǎng","ja":"大手企業（特に大手IT企業）","ja_ai":true,"ja_note":"","def_zh":"大型工厂、大型企业厂房。特指国内头部大型互联网公司、知名高科技大企业。","def_zh_ai":false,"examples":[{"zh":"关于贷款的风险，她想起一位在大厂工作的男性朋友，这位朋友早几年赶在房价高点买了房，月供小2万，如今房产缩水50%，贷款照还，两头亏。","ja":"ローンのリスクについて、彼女は大手企業で働く男性の友人を思い出した。その友人は数年前、住宅価格が高い時期に家を買い、毎月の返済は2万元近く。今では物件価値が50%目減りしたのにローンは返し続けなければならず、両方で損をしている。","ja_ai":true}],"related":["大厂上岸","拿命换钱","拿钱买命"],"parent":"","pages":[68,73,74],"notes":"p68「知识补充」だが、まとめ p73 掲載のため見出し語化。ピンイン補完。資料の「大型工x厂」は抽出ノイズとみなし「大型工厂」とした（要原本確認）。例: 阿里巴巴、腾讯、字节跳动、百度、华为、京东、网易等。特徴: 规模大、名气大、薪资高、福利好／工作压力大、节奏快、有裁员风险／大学生、求职者最向往的就业去向之一。例文は本文から採録。"},{"id":"2026春-2-034","lesson":2,"type":"成語","role":"関連語","zh":"拿命换钱","pinyin":"ná mìng huàn qián","ja":"命を削って金を稼ぐ","ja_ai":true,"ja_note":"","def_zh":"以牺牲健康甚至生命为代价去挣钱，形容工作极度辛苦","def_zh_ai":true,"examples":[],"related":["拿钱买命"],"parent":"大厂","pages":[68],"notes":"p68 大厂 の知识补充に「拿命换钱／拿钱买命」と並記。ピンイン補完。四字の決まり文句として 成語 扱い（俗語）。"},{"id":"2026春-2-035","lesson":2,"type":"成語","role":"関連語","zh":"拿钱买命","pinyin":"ná qián mǎi mìng","ja":"（稼いだ）金で命（健康）を買い戻す","ja_ai":true,"ja_note":"","def_zh":"用挣来的钱去换回健康、治病保命","def_zh_ai":true,"examples":[],"related":["拿命换钱"],"parent":"大厂","pages":[68],"notes":"p68 大厂 の知识补充に「拿命换钱／拿钱买命」と並記。ピンイン補完。四字の決まり文句として 成語 扱い（俗語）。"},{"id":"2026春-2-036","lesson":2,"type":"慣用句","role":"関連語","zh":"苍蝇腿也是肉","pinyin":"cāng ying tuǐ yě shì ròu","ja":"わずかな利益でも利益は利益","ja_ai":true,"ja_note":"","def_zh":"比喻利益再小也是利益，不应轻视","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[70],"notes":"ページ上の書き込み語（授業メモと思われる）。特定の見出し語との関係は資料上明示されていない。採否要確認。p70 下部（本文「多出小几万的利息」付近）。ピンイン補完。"},{"id":"2026春-2-037","lesson":2,"type":"単語","role":"関連語","zh":"超前消费","pinyin":"chāo qián xiāo fèi","ja":"先行消費（将来の収入を前提にした消費）","ja_ai":false,"ja_note":"","def_zh":"超出当前收入水平，提前使用未来收入（如贷款、分期付款）进行消费","def_zh_ai":true,"examples":[{"zh":"这个故事原本用来推崇超前消费、贷款买房的观念，如今随着楼市逻辑改变，已经不再贴合当下人们的生活选择。","ja":"この話はもともと先取り消費やローンでの住宅購入を肯定するために語られてきたが、今は不動産市場の考え方が変わり、現代の人々の生活選択にはもう合わなくなっている。","ja_ai":false}],"related":["延迟满足"],"parent":"","pages":[71,74,75],"notes":"本文のキーワード（p71・p74）で p75 討論テーマの見出し。語釈スライド・まとめには無いため関連語扱い（parent なし）、採否要確認。ja は p75 設問訳の表現、p71 訳では「先取り消費」。ピンイン補完。例文は本文から採録。"},{"id":"2026春-2-038","lesson":2,"type":"慣用句","role":"関連語","zh":"任重而道远","pinyin":"rèn zhòng ér dào yuǎn","ja":"任重くして道遠し","ja_ai":true,"ja_note":"","def_zh":"担子沉重，路途遥远；比喻责任重大，需要长期艰苦努力","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[72],"notes":"ページ上の書き込み語（授業メモと思われる）。特定の見出し語との関係は資料上明示されていない。採否要確認。p72 討論ページ（日本の住宅観）の書き込み。ピンイン補完。"},{"id":"2026春-2-039","lesson":2,"type":"単語","role":"関連語","zh":"适老化建设","pinyin":"shì lǎo huà jiàn shè","ja":"高齢者対応（バリアフリー化）の整備","ja_ai":true,"ja_note":"","def_zh":"为适应老年人的生活需要，对住宅、公共设施等进行的改造和建设","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[72],"notes":"ページ上の書き込み語（授業メモと思われる）。特定の見出し語との関係は資料上明示されていない。採否要確認。p72 討論ページの書き込み。ピンイン補完。"},{"id":"2026春-2-040","lesson":2,"type":"単語","role":"関連語","zh":"断供","pinyin":"duàn gòng","ja":"（住宅ローンの）返済停止／返済不能","ja_ai":true,"ja_note":"","def_zh":"因无力偿还而停止按月偿还房贷等贷款","def_zh_ai":true,"examples":[{"zh":"在全款买房的人看来，不背贷款也就不必承担断供的风险。","ja":"一括で家を買う人から見れば、ローンを背負わなければ返済不能に陥るリスクも負わなくて済む。","ja_ai":true}],"related":["月供","断供实录"],"parent":"","pages":[72,74,76,94],"notes":"ページ上の書き込み語（授業メモと思われる）。特定の見出し語との関係は資料上明示されていない。採否要確認。p72 の書き込み「月供 断供 上供 供品」の一つ。第2節の見出し「02 断供的恐惧」・本文にも頻出。ピンイン補完。例文は本文から採録。"},{"id":"2026春-2-041","lesson":2,"type":"慣用句","role":"関連語","zh":"上有老下有小","pinyin":"shàng yǒu lǎo xià yǒu xiǎo","ja":"養うべき老親と幼い子がいる","ja_ai":true,"ja_note":"","def_zh":"上有年老的父母要赡养，下有年幼的子女要抚养，形容中年人家庭负担重","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[72],"notes":"ページ上の書き込み語（授業メモと思われる）。特定の見出し語との関係は資料上明示されていない。採否要確認。p72 の書き込み。ピンイン補完。"},{"id":"2026春-2-042","lesson":2,"type":"単語","role":"関連語","zh":"上供","pinyin":"shàng gòng","ja":"供え物をする／貢ぎ物をする","ja_ai":true,"ja_note":"","def_zh":"摆上供品祭祀祖先或神佛；也比喻给有权势的人送礼","def_zh_ai":true,"examples":[],"related":["月供","供品"],"parent":"","pages":[72],"notes":"ページ上の書き込み語（授業メモと思われる）。特定の見出し語との関係は資料上明示されていない。採否要確認。p72 の書き込み「月供 断供 上供 供品」の一つ。ピンイン補完。"},{"id":"2026春-2-043","lesson":2,"type":"単語","role":"関連語","zh":"供品","pinyin":"gòng pǐn","ja":"供え物／供物","ja_ai":true,"ja_note":"","def_zh":"祭祀时供奉神佛、祖先的物品","def_zh_ai":true,"examples":[],"related":["上供"],"parent":"","pages":[72],"notes":"ページ上の書き込み語（授業メモと思われる）。特定の見出し語との関係は資料上明示されていない。採否要確認。p72 の書き込み「月供 断供 上供 供品」の一つ。ピンイン補完。"},{"id":"2026春-2-044","lesson":2,"type":"単語","role":"関連語","zh":"生物信息","pinyin":"shēng wù xìn xī","ja":"生体情報","ja_ai":true,"ja_note":"","def_zh":"指纹、面部、虹膜、声音等可以识别个人身份的生物特征信息","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[74],"notes":"ページ上の書き込み語（授業メモと思われる）。特定の見出し語との関係は資料上明示されていない。採否要確認。p74 の節見出し行の書き込み。本文との関係不明。ピンイン補完。"},{"id":"2026春-2-045","lesson":2,"type":"単語","role":"関連語","zh":"分期付款","pinyin":"fēn qī fù kuǎn","ja":"分割払い","ja_ai":true,"ja_note":"","def_zh":"把总价款分成若干期，按期支付","def_zh_ai":true,"examples":[],"related":["超前消费"],"parent":"","pages":[74],"notes":"ページ上の書き込み語（授業メモと思われる）。特定の見出し語との関係は資料上明示されていない。採否要確認。p74 の節見出し行の書き込み。ピンイン補完。"},{"id":"2026春-2-046","lesson":2,"type":"単語","role":"見出し語","zh":"裁员","pinyin":"cái yuán","ja":"人員削減","ja_ai":false,"ja_note":"","def_zh":"企业、机构裁减工作人员","def_zh_ai":true,"examples":[{"zh":"“现在互联网裁员很严重，AI发展对各行各业都有冲击，”小项说，“谁也不知道接下来会发生什么。”","ja":"「今はIT業界のリストラが深刻で、AIの発展はあらゆる業界に影響を与えている」と小項は言う。「この先何が起こるかは誰にもわからない」","ja_ai":true}],"related":["裁员高峰"],"parent":"","pages":[74,76],"notes":"本文中の注釈語（本文に読み・日本語注のみ付記、まとめスライドには無し）。採否要確認。例文は本文から採録。例文中の注釈（cái yuán人員削減）は除いた。"},{"id":"2026春-2-047","lesson":2,"type":"単語","role":"見出し語","zh":"犹豫","pinyin":"yóu yù","ja":"ためらう","ja_ai":false,"ja_note":"","def_zh":"拿不定主意，迟疑不决","def_zh_ai":true,"examples":[{"zh":"她手握300万现金，在全款买房和贷款买房之间一直在犹豫。","ja":"彼女は300万元の現金を持っているが、一括購入かローン購入かでずっと迷っている。","ja_ai":true}],"related":[],"parent":"","pages":[63,74],"notes":"本文中の注釈語（本文に読み・日本語注のみ付記、まとめスライドには無し）。採否要確認。例文は本文から採録。例文中の注釈（yóu yù ためらう）は除いた。"},{"id":"2026春-2-048","lesson":2,"type":"単語","role":"関連語","zh":"代步车","pinyin":"dài bù chē","ja":"（通勤などの）足代わりの車","ja_ai":true,"ja_note":"","def_zh":"用来代替步行、满足日常出行需要的普通汽车","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[75],"notes":"ページ上の書き込み語（授業メモと思われる）。特定の見出し語との関係は資料上明示されていない。採否要確認。p75 討論（超前消费）ページの書き込み。ピンイン補完。"},{"id":"2026春-2-049","lesson":2,"type":"単語","role":"関連語","zh":"保值","pinyin":"bǎo zhí","ja":"価値を保つ","ja_ai":true,"ja_note":"","def_zh":"保持原有价值，不贬值","def_zh_ai":true,"examples":[{"zh":"当买房不再是一种保值增值的投资，而更像是一次大额消费时，人们的买房逻辑也在变化。","ja":"住宅購入がもはや価値を保ち増やすための投資ではなく、むしろ一度の大きな消費のようになったとき、人々の住宅購入の考え方も変わりつつある。","ja_ai":true}],"related":["贬值","保值增值"],"parent":"","pages":[71,75],"notes":"ページ上の書き込み語（授業メモと思われる）。特定の見出し語との関係は資料上明示されていない。採否要確認。p75 討論ページの書き込み「保值 贬值」。ピンイン補完。例文は本文から採録。"},{"id":"2026春-2-050","lesson":2,"type":"単語","role":"関連語","zh":"贬值","pinyin":"biǎn zhí","ja":"価値が下がる","ja_ai":true,"ja_note":"","def_zh":"价值降低；货币购买力下降","def_zh_ai":true,"examples":[],"related":["保值","资产缩水"],"parent":"","pages":[55,60,75],"notes":"ページ上の書き込み語（授業メモと思われる）。特定の見出し語との関係は資料上明示されていない。採否要確認。p75 討論ページの書き込み「保值 贬值」。资产缩水 の語釈（p55）にも出現。ピンイン補完。"},{"id":"2026春-2-051","lesson":2,"type":"単語","role":"関連語","zh":"孝顺","pinyin":"xiào shùn","ja":"親孝行（である）","ja_ai":true,"ja_note":"","def_zh":"尽心奉养父母，顺从父母的意愿","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[75],"notes":"ページ上の書き込み語（授業メモと思われる）。特定の見出し語との関係は資料上明示されていない。採否要確認。p75 討論ページの書き込み。ピンイン補完。"},{"id":"2026春-2-052","lesson":2,"type":"単語","role":"見出し語","zh":"骤降","pinyin":"zhòu jiàng","ja":"急激に下がる／急落する","ja_ai":true,"ja_note":"","def_zh":"（数量、温度等）突然大幅度下降","def_zh_ai":true,"examples":[{"zh":"人到中年，正好赶上裁员高峰，月收入从3万骤降到0。","ja":"中年になって、ちょうどリストラのピークにぶつかり、月収は3万元から一気にゼロになった。","ja_ai":true}],"related":[],"parent":"","pages":[76,89],"notes":"まとめ p89 掲載、語釈なし。ピンイン補完。例文は本文から採録。"},{"id":"2026春-2-053","lesson":2,"type":"慣用句","role":"見出し語","zh":"给……狠狠上了一课","pinyin":"gěi … hěn hěn shàng le yí kè","ja":"（〜に）痛烈な教訓を与えた／身にしみる教訓となった","ja_ai":true,"ja_note":"","def_zh":"某件事让一个人深刻吸取了教训。","def_zh_ai":false,"examples":[{"zh":"朋友的境遇给苏苏狠狠上了一课，“买房真是把一代中产坑惨了，努力奋斗十年，还不如躺平十年，起码没有债。”","ja":"友人の境遇は蘇蘇にとって痛烈な教訓となった。「家を買ったせいで、一世代の中間層が本当にひどい目に遭った。10年必死に頑張るより、10年寝そべっていたほうがましだ。少なくとも借金はないのだから」","ja_ai":true}],"related":["上了一课"],"parent":"","pages":[76],"notes":"本文 p76 末尾で語釈付き解説（まとめには無し）。ピンイン補完。例文は本文から採録。"},{"id":"2026春-2-054","lesson":2,"type":"単語","role":"見出し語","zh":"坑惨","pinyin":"kēng cǎn","ja":"ひどい目に遭わされる／散々な目に遭わせる","ja_ai":true,"ja_note":"","def_zh":"被害得特别惨。","def_zh_ai":false,"examples":[{"zh":"朋友的境遇给苏苏狠狠上了一课，“买房真是把一代中产坑惨了，努力奋斗十年，还不如躺平十年，起码没有债。”","ja":"友人の境遇は蘇蘇にとって痛烈な教訓となった。「家を買ったせいで、一世代の中間層が本当にひどい目に遭った。10年必死に頑張るより、10年寝そべっていたほうがましだ。少なくとも借金はないのだから」","ja_ai":true}],"related":[],"parent":"","pages":[76],"notes":"本文 p76 末尾で語釈付き解説（まとめには無し）。ピンイン補完。例文は本文から採録。"},{"id":"2026春-2-055","lesson":2,"type":"成語","role":"見出し語","zh":"资不抵债","pinyin":"zī bù dǐ zhài","ja":"債務超過、資産が負債に届かない","ja_ai":false,"ja_note":"","def_zh":"个人或企业的全部资产，不足以抵偿所欠的债务，处于负债超过资产的状态。","def_zh_ai":false,"examples":[{"zh":"盲目投资房产又遭遇失业，他背负多笔贷款早已资不抵债。","ja":"やみくもに不動産投資をしたうえ失業にも見舞われ、複数のローンを抱えた彼はとっくに債務超過に陥っている。","ja_ai":true},{"zh":"这家企业管理混乱又无力盈利，短短几年就走到资不抵债的地步。","ja":"この企業は経営が混乱し利益も出せず、わずか数年で債務超過に陥った。","ja_ai":true},{"zh":"他借遍亲友还无力偿还欠款，资产早已变卖一空，完全处于资不抵债的尴尬（gān gà 窮屈、板挟み）境地。","ja":"彼は親戚や友人じゅうから借金をしてもなお返済できず、資産もとっくにすべて売り払い、完全に債務超過という苦しい状況にある。","ja_ai":true},{"zh":"更紧要的是，即便卖掉房子还不够还银行贷款，“属于是资不抵债，没法卖。”","ja":"さらに深刻なのは、家を売っても銀行ローンを返しきれないことで、「債務超過だから売るに売れない」ということだ。","ja_ai":true}],"related":[],"parent":"","pages":[76,77,89],"notes":"資料ではピンインと語釈が連続（zī bù dǐ zhài个人或…）していたため分離。3つ目の例文の（gān gà 窮屈、板挟み）は資料の注釈をそのまま残した。4つ目は本文（p76）から。"},{"id":"2026春-2-056","lesson":2,"type":"単語","role":"見出し語","zh":"尴尬","pinyin":"gān gà","ja":"窮屈、板挟み","ja_ai":false,"ja_note":"","def_zh":"处境困难，不好处理；神情、态度不自然","def_zh_ai":true,"examples":[],"related":["尴尬境地","尴尬的局面"],"parent":"","pages":[77,95],"notes":"本文中の注釈語（本文に読み・日本語注のみ付記、まとめスライドには無し）。採否要確認。資不抵債 の例文（p77）と 陷入……困境 の搭配（p95）に読み・訳の注釈のみ。"},{"id":"2026春-2-057","lesson":2,"type":"単語","role":"見出し語","zh":"延迟满足","pinyin":"yán chí mǎn zú","ja":"満足の先送り（目先の欲求を我慢する）","ja_ai":true,"ja_note":"","def_zh":"为了获得更长远、更有价值的结果，主动放弃眼前的即时满足","def_zh_ai":true,"examples":[],"related":["超前消费"],"parent":"","pages":[77,89],"notes":"p77 下部に書き込み、まとめ p89 掲載。資料に語釈・例文なし。ピンイン補完。"},{"id":"2026春-2-058","lesson":2,"type":"慣用句","role":"見出し語","zh":"一团糟","pinyin":"yì tuán zāo","ja":"めちゃくちゃ、ひどく混乱している、収拾がつかない状態","ja_ai":false,"ja_note":"","def_zh":"形容事情、生活、局面、环境等极度混乱，毫无秩序、无法收拾。","def_zh_ai":false,"examples":[{"zh":"失业叠加房贷和育儿压力，他的收入和支出完全失衡，整个人的生活变得一团糟。","ja":"失業に住宅ローンと子育ての重圧が重なり、彼の収支は完全にバランスを崩し、生活全体がめちゃくちゃになった。","ja_ai":true},{"zh":"突然遭遇家庭变故又无人帮忙，她的情绪和日常事务全都搅在一起，过得一团糟。","ja":"突然家庭の不幸に見舞われたうえ助けてくれる人もおらず、彼女は感情も日常の用事もすべてがごちゃ混ぜになり、ひどく混乱した日々を送っている。","ja_ai":true},{"zh":"长期熬夜、作息不规律，饮食也毫无节制，他的身体健康和精神状态早已一团糟。","ja":"長期間の夜更かしや不規則な生活に加え、食事もまったく節制しないため、彼の体の健康も精神状態もとっくにぼろぼろだ。","ja_ai":true},{"zh":"房子月供，孩子教育，父母养老，简直一团糟，他不得不跑滴滴挣点外快，甚至拿父母的养老钱和自己的一点存款去填窟窿。","ja":"住宅ローンの返済、子どもの教育、親の老後と、まさにめちゃくちゃな状態で、彼は滴滴（配車サービス）の運転手をして副収入を稼がざるを得ず、さらには親の老後資金や自分のわずかな貯金まで使って穴埋めをしている。","ja_ai":true}],"related":["一言难尽"],"parent":"","pages":[76,78,89],"notes":"三字慣用語として 慣用句 扱い。4つ目の例文は本文（p76）から。"},{"id":"2026春-2-059","lesson":2,"type":"成語","role":"関連語","zh":"一言难尽","pinyin":"yì yán nán jìn","ja":"一言では言い尽くせない","ja_ai":true,"ja_note":"","def_zh":"事情复杂，不是一句话能说清楚的","def_zh_ai":true,"examples":[],"related":["一团糟"],"parent":"一团糟","pages":[78],"notes":"p78 一团糟 スライド下部の書き込み。ピンイン補完。"},{"id":"2026春-2-060","lesson":2,"type":"単語","role":"見出し語","zh":"外快","pinyin":"wài kuài","ja":"臨時収入、副収入、アルバイト代","ja_ai":false,"ja_note":"","def_zh":"在本职工作固定工资之外，额外通过兼职、副业等获得的收入。","def_zh_ai":false,"examples":[{"zh":"面对高额的房贷压力，很多上班族都会利用业余时间做副业，顺便挣点外快补贴家用。","ja":"高額な住宅ローンのプレッシャーを前に、多くのサラリーマンは余暇に副業をし、臨時収入を得て家計を補っている。","ja_ai":false},{"zh":"他擅长写作和翻译，常常接线上兼职挣外快，既能发挥特长又能增加收入。","ja":"彼は文章作成や翻訳が得意で、よくオンライン副業をして副収入を稼ぎ、特技を活かしながら収入を増やしている。","ja_ai":false},{"zh":"中年失业后很难找到合适全职工作，他只能靠跑网约车挣外快，勉强维持基本生活。","ja":"中年で失業した後は適した正社員の仕事が見つかりにくく、配車アプリのドライバーで臨時収入を稼ぎ、どうにか生活を維持している。","ja_ai":false},{"zh":"房子月供，孩子教育，父母养老，简直一团糟，他不得不跑滴滴挣点外快，甚至拿父母的养老钱和自己的一点存款去填窟窿。","ja":"住宅ローンの返済、子どもの教育、親の老後と、まさにめちゃくちゃな状態で、彼は滴滴（配車サービス）の運転手をして副収入を稼がざるを得ず、さらには親の老後資金や自分のわずかな貯金まで使って穴埋めをしている。","ja_ai":true}],"related":["挣外快"],"parent":"","pages":[76,79,89],"notes":"ピンイン補完。資料の日本語訳は例文3→1→2の順に並んでいたため対応付けを整理。4つ目の例文は本文（p76）から。"},{"id":"2026春-2-061","lesson":2,"type":"慣用句","role":"見出し語","zh":"填窟窿","pinyin":"tián kū long","ja":"損失を補う、借金の穴を埋める、赤字を補填する","ja_ai":false,"ja_note":"","def_zh":"比喻弥补欠下的债务、亏损的缺口，填补经济上的亏空。","def_zh_ai":false,"examples":[{"zh":"投资失败欠下一大笔债，他只能拿出多年积蓄（jīxù）去填窟窿，瞬间花光了所有存款。","ja":"投資に失敗して多額の借金を抱え、彼は長年の貯蓄を出して穴埋めするしかなく、あっという間に貯金をすべて使い果たした。","ja_ai":true},{"zh":"每月房贷压力太大，工资根本不够还款，他只好靠父母的钱来填窟窿维持周转。","ja":"毎月の住宅ローンの負担が大きすぎて給料では到底返済が足りず、彼は親のお金で穴埋めしてやりくりするしかなかった。","ja_ai":true},{"zh":"他不敢告诉家人负债实情，只能借钱填窟窿，生活过得十分煎熬。","ja":"彼は借金の実情を家族に打ち明けられず、借金をして穴埋めするしかなく、苦しい毎日を送っている。","ja_ai":true},{"zh":"房子月供，孩子教育，父母养老，简直一团糟，他不得不跑滴滴挣点外快，甚至拿父母的养老钱和自己的一点存款去填窟窿。","ja":"住宅ローンの返済、子どもの教育、親の老後と、まさにめちゃくちゃな状態で、彼は滴滴（配車サービス）の運転手をして副収入を稼がざるを得ず、さらには親の老後資金や自分のわずかな貯金まで使って穴埋めをしている。","ja_ai":true}],"related":["拆东墙补西墙"],"parent":"","pages":[76,80,89],"notes":"資料のピンイン表記は「tián kūlong」。三字慣用語として 慣用句 扱い。3つ目の例文の行間に「拆东墙补西墙」が挿入されていたが書き込みとみなし関連語カードへ。ページ末「jiān'áo」は例文中「煎熬」の読み。4つ目の例文は本文（p76）から。"},{"id":"2026春-2-062","lesson":2,"type":"慣用句","role":"関連語","zh":"拆东墙补西墙","pinyin":"chāi dōng qiáng bǔ xī qiáng","ja":"その場しのぎのやりくり／借金で借金を返す","ja_ai":true,"ja_note":"","def_zh":"拆掉东边的墙去修补西边的墙；比喻临时勉强应付，借新债还旧债","def_zh_ai":true,"examples":[],"related":["填窟窿"],"parent":"填窟窿","pages":[80],"notes":"p80 填窟窿 の例文の行間に書き込み。ピンイン補完。"},{"id":"2026春-2-063","lesson":2,"type":"成語","role":"見出し語","zh":"省吃俭用","pinyin":"shěng chī jiǎn yòng","ja":"質素倹約、つましく暮らす、食費や生活費を切り詰める","ja_ai":false,"ja_note":"","def_zh":"在吃穿和日常花费上极力节省，不铺张浪费，尽量减少开支积攒钱财。","def_zh_ai":false,"examples":[{"zh":"为了早日还清巨额负债，他开始省吃俭用缩减一切非必要开支，慢慢积累还款资金。","ja":"巨額の借金を早く完済するため、彼は生活を切り詰めて不要な支出を一切削り、少しずつ返済資金を貯めている。","ja_ai":true},{"zh":"他多年省吃俭用攒下一笔积蓄，本想安稳养老，却被意外变故拿去填了债务窟窿。","ja":"彼は長年つましく暮らして貯金を作り、穏やかな老後を送るつもりだったが、思いがけない出来事で借金の穴埋めに使われてしまった。","ja_ai":true},{"zh":"“几代人省吃俭用的这点钱，最后又贴补给了银行。”","ja":"「何世代にもわたって切り詰めて貯めたこのお金も、結局はまた銀行に注ぎ込まれてしまった。」","ja_ai":true}],"related":["节衣缩食"],"parent":"","pages":[76,81,89],"notes":"資料のピンイン表記は「shěngchī jiǎnyòng」。3つ目の例文は本文（p76）から。"},{"id":"2026春-2-064","lesson":2,"type":"成語","role":"見出し語","zh":"节衣缩食","pinyin":"jié yī suō shí","ja":"衣食を切り詰める／極めて質素に暮らす","ja_ai":true,"ja_note":"","def_zh":"节省穿衣、缩减伙食，形容生活极度节俭，尽量减少开支。","def_zh_ai":false,"examples":[{"zh":"为了早日还清巨额贷款，他不得不节衣缩食，砍掉所有不必要的娱乐开销。","ja":"巨額のローンを早く完済するため、彼は衣食を切り詰め、不要な娯楽費をすべて削らざるを得なかった。","ja_ai":true}],"related":["省吃俭用"],"parent":"","pages":[81,89],"notes":"省吃俭用 のスライド内で解説、まとめ p89 掲載のため見出し語。"},{"id":"2026春-2-065","lesson":2,"type":"単語","role":"見出し語","zh":"贴补","pinyin":"tiē bǔ","ja":"穴を埋める、補填する、自腹で補う、家計を補う","ja_ai":false,"ja_note":"","def_zh":"从经济上拿出钱财，补助不足、填补亏空；用自有资金补上生活、债务、开销的缺口。","def_zh_ai":false,"examples":[{"zh":"工资不够偿还房贷，她只能拿父母的钱贴补家用。","ja":"給料では住宅ローンの返済に足りず、彼女は親のお金で家計を補うしかない。","ja_ai":true},{"zh":"生意常年亏损，老板只能用自己的存款贴补店铺，勉强维持经营。","ja":"商売が長年赤字続きで、店主は自分の貯金で店の赤字を補填し、なんとか経営を続けるしかない。","ja_ai":true},{"zh":"“几代人省吃俭用的这点钱，最后又贴补给了银行。”","ja":"「何世代にもわたって切り詰めて貯めたこのお金も、結局はまた銀行に注ぎ込まれてしまった。」","ja_ai":true}],"related":["补贴"],"parent":"","pages":[76,82,83,89],"notes":"「贴补 VS 补贴」の対比。p82 の例文1・2を 贴补 に割り当て。ピンイン補完。3つ目の例文は本文（p76）から。"},{"id":"2026春-2-066","lesson":2,"type":"単語","role":"見出し語","zh":"补贴","pinyin":"bǔ tiē","ja":"補助する、手当を支給する、補助金、手当","ja_ai":false,"ja_note":"","def_zh":"政府、单位、集体额外给的经费、物资，补助生活、工作、物价开销；也指额外补助的钱款。","def_zh_ai":false,"examples":[{"zh":"很多公司都会给员工发放住房补贴，用来减轻大家租房或买房的经济压力。","ja":"多くの会社は社員に住宅手当を支給し、賃貸や住宅購入の経済的負担を軽減している。","ja_ai":true},{"zh":"当地政府给困难学生发放生活补贴，让他们可以安心完成学业不用为生活费发愁。","ja":"地元政府は生活の苦しい学生に生活補助金を支給し、生活費の心配をせずに安心して学業を終えられるようにしている。","ja_ai":true}],"related":["贴补","住房补贴","生活补贴"],"parent":"","pages":[82,83,89],"notes":"「贴补 VS 补贴」の対比。p82 の例文3・4を 补贴 に割り当て。ピンイン補完。なお p79 外快 の例文「补贴家用」は 贴补 に近い意味での用法。"},{"id":"2026春-2-067","lesson":2,"type":"慣用句","role":"見出し語","zh":"眼不见为净","pinyin":"yǎn bú jiàn wéi jìng","ja":"見なければ気にならない；目を閉じて平然とする","ja_ai":false,"ja_note":"","def_zh":"出自民间俗语，指眼睛看不到杂乱、不堪或令人心烦的事物，内心就会觉得清净、安稳；常用来形容刻意回避糟心事、烦心事，以求心境平和。","def_zh_ai":false,"examples":[{"zh":"两人当众发生争执，我不想卷入纠纷，只能转身离开，眼不见为净。","ja":"二人が人前で言い争いを始め、私はもめ事に巻き込まれたくなかったので、その場を離れるしかなかった。見なければ気にならない。","ja_ai":true},{"zh":"网络上充斥着负面言论，不必逐条反驳，有时候眼不见为净也是一种生活智慧。","ja":"ネットに否定的な言葉があふれているので、一つ一つ反論する必要はなく、見ないことも生きる知恵だ。","ja_ai":false},{"zh":"客厅里杂物堆积、无人整理，我不愿烦心，干脆出门躲开，眼不见为净。","ja":"リビングにはがらくたが積み上がって誰も片付けない。いらいらしたくないので、いっそ外出して見ないようにしている。","ja_ai":true}],"related":[],"parent":"","pages":[84],"notes":"ピンイン補完（不 は変調表記 bú）。"},{"id":"2026春-2-068","lesson":2,"type":"単語","role":"見出し語","zh":"视奸","pinyin":"shì jiān","ja":"SNSをこっそり盗み見る；他人のページを無断で覗き見る","ja_ai":false,"ja_note":"","def_zh":"网络专用词，指未经对方允许，暗中反复浏览他人社交平台、朋友圈、个人主页等动态，只偷看、不点赞、不评论、不互动，侧重窥探他人线上隐私，带有贬义。","def_zh_ai":false,"examples":[{"zh":"不少人出于好奇心视奸陌生人的账号，这种行为很容易越过人际交往的隐私边界。","ja":"好奇心から見知らぬ人のアカウントをこっそりのぞく人は少なくないが、こうした行為は人付き合いにおけるプライバシーの境界を越えやすい。","ja_ai":true},{"zh":"不要反复视奸前任的社交主页，过度沉溺过往只会让自己迟迟走不出负面情绪。","ja":"元恋人のSNSページを何度も盗み見てはいけない、過去に執着すると気持ちが立ち直れなくなる。","ja_ai":false},{"zh":"她察觉到有人长期视奸自己的动态，于是立刻设置了主页访问限制保护隐私。","ja":"自分の投稿を長期間盗み見ている人がいると気づき、彼女はすぐ閲覧制限を設定してプライバシーを守った。","ja_ai":false}],"related":["监视"],"parent":"","pages":[85],"notes":""},{"id":"2026春-2-069","lesson":2,"type":"単語","role":"見出し語","zh":"监视","pinyin":"jiān shì","ja":"監視する；見張る","ja_ai":false,"ja_note":"","def_zh":"从旁严密、持续地观察人、场所或事物，带有监督、防范、管控、排查的目的；可用于公务安保、生产管理，也可指恶意盯梢、限制他人自由。","def_zh_ai":false,"examples":[{"zh":"安保人员在路口严密监视来往行人，全力维护这片区域的公共安全与秩序。","ja":"警備員は交差点で行き交う通行人を厳重に監視し、この地域の公共の安全と秩序を全力で守っている。","ja_ai":true},{"zh":"警方持续监视嫌疑人的行踪，等待合适时机开展统一抓捕行动。","ja":"警察は容疑者の行方を監視し続け、適切なタイミングで一斉逮捕を実施する。","ja_ai":false},{"zh":"家长不要过度监视孩子的一举一动，过度管控反而会疏远亲子之间的感情。","ja":"親は子どもの一挙一動を過度に監視すべきではない。管理しすぎるとかえって親子の気持ちが離れてしまう。","ja_ai":true}],"related":["视奸"],"parent":"","pages":[86],"notes":"資料 p86 のピンインは「shì jiān」（视奸 と同じ表記）で誤りと思われるため jiān shì とした。"},{"id":"2026春-2-070","lesson":2,"type":"単語","role":"見出し語","zh":"信息茧房","pinyin":"xìn xī jiǎn fáng","ja":"情報の繭（フィルターバブル）","ja_ai":true,"ja_note":"興味や好み、プラットフォームのアルゴリズムによるおすすめ機能などの要因によって、人々が長期間にわたり同質的な情報ばかりに触れるようになり、まるで繭（まゆ）の中に閉じ込められているような状態になることがある。その結果、多様な意見や新しい情報に触れる機会が徐々に失われ、視野が狭くなったり、認識や考え方が固定化したりする現象を指す。","def_zh":"由兴趣偏好、平台算法推送等因素导致，人们长期只接触同质化信息，如同被困在蚕茧之中，逐渐失去接触多元观点、新鲜资讯的机会，造成视野狭窄、认知固化的现象。","def_zh_ai":false,"examples":[{"zh":"长期只浏览同类资讯很容易陷入信息茧房，我们要主动接触不同观点拓宽眼界。","ja":"同じ種類の情報ばかり見ていると情報の繭に閉じ込められやすいので、積極的に多様な意見に触れ視野を広げよう。","ja_ai":false},{"zh":"很多网民被困在信息茧房之中，久而久之便难以理解他人不一样的想法。","ja":"多くのネットユーザーは情報の繭の中に閉じ込められ、時間がたつにつれて他人の異なる考えを理解しにくくなる。","ja_ai":true},{"zh":"想要真正打破信息茧房，就要主动跳出固有圈子，耐心倾听多元的声音。","ja":"情報の繭を本当に打ち破りたいなら、自分から固定化した仲間内の世界を飛び出し、多様な声に辛抱強く耳を傾けなければならない。","ja_ai":true}],"related":["算法"],"parent":"","pages":[87],"notes":"資料の日本語説明文は ja_note に移し、ja は短い訳語を補完。"},{"id":"2026春-2-071","lesson":2,"type":"単語","role":"見出し語","zh":"算法","pinyin":"suàn fǎ","ja":"アルゴリズム（通用外来语，日本全网通用）；配信アルゴリズム","ja_ai":false,"ja_note":"","def_zh":"本义指计算机领域的计算规则；本课专指互联网平台的个性化推送技术：平台分析用户浏览、点击、停留等行为数据，自动推送用户偏好的内容，是网络信息分发的核心技术，也是形成信息茧房的主要诱因。","def_zh_ai":false,"examples":[{"zh":"平台的算法会持续推送你感兴趣的内容，不要被算法控制，更不要被一种声音洗脑。","ja":"プラットフォームのアルゴリズムは興味のあるコンテンツを次々配信する。アルゴリズムに支配されず、一方的な意見に洗脳されてはならない。","ja_ai":false},{"zh":"很多用户被动接收算法推送的内容，久而久之个人视野会变得越来越狭隘（xiá ài）。","ja":"多くの利用者がアルゴリズム配信のコンテンツを受け身で見続け、視野がだんだん狭くなっていく。","ja_ai":false},{"zh":"我们要学会主动筛选信息而非依赖算法，这样才能长久保持独立思考的能力。","ja":"アルゴリズムに依存せず自ら情報を選別する習慣をつければ、長く独力で考える力を保てる。","ja_ai":false}],"related":["信息茧房"],"parent":"","pages":[88],"notes":"ja の括弧内（通用外来语，日本全网通用）は資料どおり中国語の補足。"},{"id":"2026春-2-072","lesson":2,"type":"単語","role":"見出し語","zh":"老破小","pinyin":"lǎo pò xiǎo","ja":"築古・狭小・老朽化した中古住宅／古くて狭いボロ物件","ja_ai":false,"ja_note":"","def_zh":"名词（网络俗语、房地产用语）指房龄老、设施旧、面积小的住宅，一般位置较好但居住条件较差。","def_zh_ai":false,"examples":[{"zh":"父母觉得老破小再怎么便宜，也不适合长期居住，因为环境和物业都太差了。","ja":"両親は、古くて狭いボロ物件はいくら安くても長く住むのには向かないと考えている。環境も管理もひどすぎるからだ。","ja_ai":true},{"zh":"虽然这套房子是典型的老破小，但因为离地铁站很近，价格一直没有降下来。","ja":"この物件は典型的な古くて狭いボロ物件だが、地下鉄の駅に近いため、価格がずっと下がっていない。","ja_ai":true},{"zh":"老破小第一个被她排除掉。","ja":"古くて狭いボロ物件は真っ先に候補から外した。","ja_ai":true}],"related":[],"parent":"","pages":[50,90,91,100,103],"notes":"ピンイン補完。p50 にも書き込みあり。ja の2つの訳語は資料では空白区切り。3つ目の例文は本文（p90）から。"},{"id":"2026春-2-073","lesson":2,"type":"単語","role":"見出し語","zh":"窝囊","pinyin":"wō nang","ja":"みじめだ／情けない／息苦しくて惨めな気分","ja_ai":false,"ja_note":"","def_zh":"① 因受委屈或压抑而感到难受。② 没有出息、软弱无能。","def_zh_ai":false,"examples":[{"zh":"他努力工作了很多年，却还是买不起房子，心里觉得特别窝囊。","ja":"彼は何年も懸命に働いてきたのに、まだ家を買えず、ひどく情けない気持ちになっている。","ja_ai":true},{"zh":"在会议上被领导批评以后，他一句话也没说，默默坐在那里，样子很窝囊。","ja":"会議で上司に叱られた後、彼は一言も言わずに黙って座っていて、とても情けない様子だった。","ja_ai":true},{"zh":"“看完那些房子，我都觉得好窝囊。再便宜我都不会去买。”","ja":"「ああいう家を見終わったら、本当にみじめな気分になった。どんなに安くても絶対に買わない」","ja_ai":true}],"related":[],"parent":"","pages":[90,91,103],"notes":"資料のピンイン表記は「wōnang」（nang は軽声）。3つ目の例文は本文（p90）から。"},{"id":"2026春-2-074","lesson":2,"type":"成語","role":"見出し語","zh":"歪七扭八","pinyin":"wāi qī niǔ bā","ja":"ゆがんで乱れている／ぐにゃぐにゃ","ja_ai":true,"ja_note":"整っておらず、きちんとしておらず、ゆがんで乱れていること。文字・物・道・姿勢・構造などが曲がったり乱雑だったりする様子を表す。","def_zh":"不整齐、不端正、歪斜错乱，可形容文字、物品、道路、姿态、结构。","def_zh_ai":false,"examples":[{"zh":"弟弟刚开始学毛笔字的时候，写出来的字歪七扭八，老师看了半天才认出来。","ja":"弟が毛筆の練習を始めたばかりの頃、書いた字はぐにゃぐにゃに曲がっていて、先生は長い時間かけてやっと読み取れた。","ja_ai":true},{"zh":"山区里的小路歪七扭八，下雨以后特别难开车，新手司机根本不敢进去。","ja":"山間部の小道はくねくねと曲がりくねっていて、雨が降ると特に運転しにくく、初心者ドライバーはとても入っていけない。","ja_ai":true},{"zh":"有些人坐姿总是歪七扭八，长期下来很容易影响脊柱的正常发育。","ja":"座る姿勢がいつも崩れている人がいるが、長く続くと背骨の正常な発達に影響しやすい。","ja_ai":true},{"zh":"有些老房子外立面掉渣，户型也歪七扭八，“进去逛一圈出来，感觉走道都走不正了。”","ja":"古い家の中には外壁がぼろぼろと剥がれ落ち、間取りもゆがんでいるものがあり、「中を一回りして出てくると、まっすぐ歩けなくなった気がする」。","ja_ai":true}],"related":[],"parent":"","pages":[90,92,103],"notes":"ピンインはページ末尾に離れて記載（wāi qī niǔ bā）。同ページの「jǐ zhù」は例文中「脊柱」の読み。4つ目の例文は本文（p90）から。 資料の日本語説明文は ja_note に移し、ja は短い訳語を補完。"},{"id":"2026春-2-075","lesson":2,"type":"単語","role":"見出し語","zh":"挥发","pinyin":"huī fā","ja":"蒸発する／資産が消える／含み益が吹き飛ぶ","ja_ai":false,"ja_note":"","def_zh":"液体变成气体散发到空气中。金钱、资产、市值迅速减少或消失。","def_zh_ai":false,"examples":[{"zh":"短短半年时间，这个小区的房价跌了很多，不少业主的资产直接挥发了上百万。","ja":"わずか半年で、この団地の住宅価格は大きく下がり、多くの所有者の資産が100万元以上も一気に吹き飛んだ。","ja_ai":true},{"zh":"很多年轻人开玩笑说，工资刚发下来就挥发了，因为房租和信用卡一下子全扣掉了。","ja":"多くの若者は、給料は振り込まれた途端に蒸発してしまうと冗談を言う。家賃とクレジットカードの支払いで一気に引き落とされるからだ。","ja_ai":true},{"zh":"这家公司发布财报以后，市值一天之内挥发了几十亿，引发了市场恐慌。","ja":"この会社は決算発表後、時価総額が1日で数十億元も消え、市場にパニックが広がった。","ja_ai":false},{"zh":"仅过了一个春节，她看好的楼盘单价从7.5万-8万之间，降到了如今的6万多，一套房的总价又挥发掉近百万。","ja":"春節を一度過ぎただけで、彼女が目をつけていた物件の単価は7.5万〜8万元から現在の6万元余りまで下がり、1戸あたりの総額がまた100万元近く消えてしまった。","ja_ai":true}],"related":["酒精挥发"],"parent":"","pages":[90,93,103],"notes":"資料のピンイン表記は「huīfā」。def_zh は2つの意味を並べたもの（資料では第1義の後に「酒精挥发」を併記）。ja の3訳語は資料では空白・改行区切り。4つ目の例文は本文（p90）から。"},{"id":"2026春-2-076","lesson":2,"type":"単語","role":"見出し語","zh":"陷入……困境","pinyin":"xiàn rù … kùn jìng","ja":"困難な状況に陥る","ja_ai":false,"ja_note":"","def_zh":"陷入，指落在（不利的境地）；困境，指困难的境地。合指进入难以摆脱的困难局面。","def_zh_ai":false,"examples":[{"zh":"这家公司因为投资决策失误，一下子陷入了资金链断裂的困境，差点儿破产。","ja":"この会社は投資判断を誤ったため、一気に資金繰りが途絶える苦境に陥り、危うく倒産するところだった。","ja_ai":true},{"zh":"他同时打三份工还贷款，结果累倒了，陷入了身体和经济的双重困境。","ja":"彼はローン返済のために3つの仕事を掛け持ちした結果、過労で倒れ、体と経済の二重の苦境に陥った。","ja_ai":true},{"zh":"2023年以来，随着全国房价持续下行，一部分高杠杆购房者陷入“负资产”困境，房子市值低于未还贷款余额。","ja":"2023年以降、全国の住宅価格が下落し続ける中、高レバレッジで家を購入した人の一部は「負の資産」という苦境に陥り、住宅の時価がローン残高を下回っている。","ja_ai":true}],"related":["陷入经济困境","陷入资金困境","陷入债务困境","陷入进退两难的境地","陷入尴尬的局面","陷入被动","陷入孤独"],"parent":"","pages":[94,95,103],"notes":"まとめ p103 の表記は「陷入……的困境」（表記ゆれ）。資料のピンイン表記は「xiànrù … kùnjìng」。p95 の搭配: 陷入＋经济/资金/债务＋困境／陷入＋进退两难的境地／陷入＋尴尬（gān gà）的局面／陷入＋被动/孤独。3つ目の例文は本文（p94）から。"},{"id":"2026春-2-077","lesson":2,"type":"単語","role":"見出し語","zh":"动辄","pinyin":"dòng zhé","ja":"ちょっとしたことで～する、とかく～しがちだ","ja_ai":false,"ja_note":"","def_zh":"动不动就。指事情经常发生，且常带有负面评价。","def_zh_ai":false,"examples":[{"zh":"这个老板脾气很差，对员工动辄责骂，导致很多老员工都辞职了。","ja":"この社長は気性が荒く、何かにつけて社員を叱りつけるので、多くのベテラン社員が辞めてしまった。","ja_ai":true},{"zh":"大城市的生活成本太高了，出去吃一顿饭动辄几百块。","ja":"大都市は生活費が高すぎて、外食を一回すればともすると数百元かかる。","ja_ai":true},{"zh":"没有养成理财习惯的人，花钱没有规划，动辄超前消费，很容易陷入债务困境。","ja":"お金の管理の習慣がない人は計画なくお金を使い、何かと先取り消費をしがちで、借金苦に陥りやすい。","ja_ai":true},{"zh":"在小红书等社交平台上，“断供实录”类帖子动辄获得数万点赞，成为年轻购房者心中挥之不去的阴影。","ja":"小紅書などのSNSでは、「返済停止の実録」といった投稿がしばしば数万の「いいね」を集め、若い住宅購入者の心から消えない影となっている。","ja_ai":true}],"related":[],"parent":"","pages":[94,96,103],"notes":"資料のピンイン表記は「dòngzhé」。4つ目の例文は本文（p94）から。"},{"id":"2026春-2-078","lesson":2,"type":"成語","role":"見出し語","zh":"挥之不去","pinyin":"huī zhī bú qù","ja":"（心から）消え去らない、しつこく残る","ja_ai":false,"ja_note":"","def_zh":"（印象、情绪、感觉等）在脑海中残留，无法消除。原指用手赶也赶不走，比喻记忆或情感难以忘记。","def_zh_ai":false,"examples":[{"zh":"那场车祸已经过去三年了，但他每次开车时，恐惧的感觉仍然挥之不去。","ja":"あの交通事故から3年が経ったが、彼は運転するたびに恐怖感がいまだに消えない。","ja_ai":true},{"zh":"成功者的光环有时也会变成一种负担，让他们对失败的恐惧挥之不去。","ja":"成功者の栄光は時に重荷にもなり、失敗への恐怖がつきまとって離れない。","ja_ai":true},{"zh":"童年时留下的心理阴影，往往会在长大后依然挥之不去，悄悄影响一个人的性格和选择。","ja":"子供時代に受けた心のトラウマは、大人になってもなかなか払拭できず、性格や選択に静かに影響を与える。","ja_ai":false},{"zh":"在小红书等社交平台上，“断供实录”类帖子动辄获得数万点赞，成为年轻购房者心中挥之不去的阴影。","ja":"小紅書などのSNSでは、「返済停止の実録」といった投稿がしばしば数万の「いいね」を集め、若い住宅購入者の心から消えない影となっている。","ja_ai":true}],"related":[],"parent":"","pages":[94,97,103],"notes":"4つ目の例文は本文（p94）から。"},{"id":"2026春-2-079","lesson":2,"type":"単語","role":"見出し語","zh":"跌幅","pinyin":"diē fú","ja":"下げ幅；下落幅","ja_ai":false,"ja_note":"","def_zh":"（物价、指数等）下跌的幅度，通常用百分比（%）表示。","def_zh_ai":false,"examples":[{"zh":"这家公司的季度财报发布后，股价立刻跳水，最大跌幅达到了百分之八。","ja":"この会社の四半期決算発表後、株価はすぐに急落し、最大下落幅は8%に達した。","ja_ai":true},{"zh":"受国际油价下跌影响，汽油价格上周出现了百分之五的跌幅。","ja":"国際原油価格の下落を受けて、先週ガソリン価格は5%下落した。","ja_ai":true},{"zh":"股市连续三天大跌，累计跌幅超过了百分之十","ja":"株式市場は3日連続で大きく下落し、累計の下落幅は10%を超えた。","ja_ai":true},{"zh":"要加杠杆去买一个跌幅空间挺大的东西，确实不划算，风险也很大。","ja":"下落の余地がかなり大きいものをレバレッジをかけて買うのは、確かに割に合わないし、リスクも大きい。","ja_ai":true}],"related":["幅度","涨幅"],"parent":"","pages":[94,98,103],"notes":"資料のピンイン表記は「diēfú」。3つ目の例文は資料で句点なし（そのまま）。4つ目の例文は本文（p94）から。"},{"id":"2026春-2-080","lesson":2,"type":"単語","role":"見出し語","zh":"幅度","pinyin":"fú dù","ja":"幅／変動幅","ja_ai":true,"ja_note":"","def_zh":"事物变动的大小程度","def_zh_ai":true,"examples":[],"related":["跌幅","涨幅"],"parent":"","pages":[98,103],"notes":"p98 跌幅 スライドに「幅度 涨幅」と併記、まとめ p103 掲載。語釈・例文なし。ピンイン補完。"},{"id":"2026春-2-081","lesson":2,"type":"単語","role":"見出し語","zh":"涨幅","pinyin":"zhǎng fú","ja":"上げ幅／上昇幅","ja_ai":true,"ja_note":"","def_zh":"（物价、指数等）上涨的幅度","def_zh_ai":true,"examples":[{"zh":"物价涨幅落入可控区间，不会影响日常生活。","ja":"物価の上昇幅が管理可能な範囲に収まっており、日常生活には影響しない。","ja_ai":true}],"related":["跌幅","幅度"],"parent":"","pages":[51,98,103],"notes":"p98 跌幅 スライドに併記、まとめ p103 掲載。語釈なし。ピンイン補完。例文は 落入……区间 の例文（p51）から。"},{"id":"2026春-2-082","lesson":2,"type":"単語","role":"見出し語","zh":"刷到……帖子","pinyin":"shuā dào … tiě zi","ja":"（SNSで）～という投稿を目にする","ja_ai":false,"ja_note":"","def_zh":"刷，指在社交媒体上快速浏览信息；帖子，指在论坛、微博、小红书等平台上发布的文章或内容。合指在浏览信息时偶然看到某个帖子。","def_zh_ai":false,"examples":[{"zh":"昨天晚上我无聊刷手机，突然刷到一个帖子，说这家餐厅的菜很好吃，今天我就来试试了。","ja":"昨夜、暇つぶしにスマホを見ていたら、この店の料理がおいしいという投稿がたまたま目に入ったので、今日さっそく試しに来てみた。","ja_ai":true},{"zh":"他心情不好的时候，刷到前女友发的旅行帖子，心里更难受了。","ja":"気分が落ち込んでいるときに元恋人の旅行の投稿を目にして、彼はさらにつらくなった。","ja_ai":true},{"zh":"有时候刷到负面情绪的帖子，我会选择快速划过去，免得影响自己的心情。","ja":"ネガティブな投稿が目に入ったときは、自分の気分に影響しないよう、さっとスクロールして飛ばすようにしている。","ja_ai":true},{"zh":"那你这200万的贷款怎么还？我总能刷到这种帖子，太吓人了。","ja":"じゃあその200万元のローンはどうやって返すの？こういう投稿をしょっちゅう目にして、本当に怖い。","ja_ai":true}],"related":[],"parent":"","pages":[94,99,103],"notes":"まとめ p103 の表記は「刷到……的帖子」（表記ゆれ）。資料のピンイン表記は「shuā dào … tiězi」。4つ目の例文は本文（p94）から。"},{"id":"2026春-2-083","lesson":2,"type":"単語","role":"見出し語","zh":"叠buff","pinyin":"dié buff","ja":"バフを重ねる（好条件が重なる）","ja_ai":true,"ja_note":"ゲーム用語に由来する。本来の意味：ゲームにおける「buff」とは、キャラクターに追加の強化効果を与え、その能力を最大限に発揮させることを指す。「バフを重ねる（バフを盛る）」とは、複数の強化効果を同時に発動させ、キャラクターをさらに強くすることを意味する。派生した口語的な意味：有利な条件・強み・幸運などが次々と重なることを指す。また逆に、不利な条件や悪い出来事・不運が重なる場合にも使われる。","def_zh":"源自游戏用语；本义：在游戏中，\"buff\" 指的是为角色添加额外的增强效果，可以使角色的能力得到最大化发挥。\"叠 buff\" 则是指激活多个增益效果，使得角色的能力更强。引申口语义：接连凑齐多个有利条件、优势、好运；也可指凑齐多个不利因素、坏运气（正反都能用）。","def_zh_ai":false,"examples":[{"zh":"这款手机本来性能就很强，再加上定价比竞争对手低百分之二十，相当于给产品叠了双重buff，一上市就被抢购一空。","ja":"この携帯電話はもともと性能が高いうえ、価格も競合より20%安く、製品にバフを二重に重ねたようなもので、発売と同時に売り切れた。","ja_ai":true},{"zh":"他学历过硬，能力突出，性格也沉稳靠谱，求职优势buff叠满。","ja":"彼は学歴も申し分なく、能力も抜きん出ていて、性格も落ち着いていて頼りになり、就職での強みというバフが全部盛りだ。","ja_ai":true},{"zh":"长期熬夜、饮食混乱、压力过大、缺乏运动，负面buff直接叠满了。","ja":"長期間の夜更かし、乱れた食生活、過度のストレス、運動不足と、マイナスのバフが完全に積み重なっている。","ja_ai":true},{"zh":"房贷多付的利息＋房产持续缩水的风险，相当于给自己的财务风险叠了双重buff，这也是大多数全款买房的人所共同面临的购房处境。","ja":"住宅ローンで余分に払う利息と、不動産価値が目減りし続けるリスクは、自分の財務リスクに二重のバフを重ねるようなものであり、これは一括で家を買う人の多くが共通して直面している状況でもある。","ja_ai":true}],"related":["叠debuff"],"parent":"","pages":[100,101,103],"notes":"ピンインは資料に「dié」のみ。buff は英語のまま（音節数チェックで不一致になる）。例文2・3の「buff 叠满」「负面 buff」の空白は詰めた。4つ目の例文は本文（p100）から。 資料の日本語説明文は ja_note に移し、ja は短い訳語を補完。"},{"id":"2026春-2-085","lesson":2,"type":"単語","role":"関連語","zh":"精装","pinyin":"jīng zhuāng","ja":"内装仕上げ済み（の住宅）／高品質な内装","ja_ai":true,"ja_note":"","def_zh":"（房屋）精细装修；交房时已完成较高标准的装修","def_zh_ai":true,"examples":[],"related":["硬装","软装"],"parent":"","pages":[102],"notes":"ページ上の書き込み語（授業メモと思われる）。特定の見出し語との関係は資料上明示されていない。採否要確認。p102 討論（租房・买房）ページの書き込み「精装 硬装 软装」。ピンイン補完。"},{"id":"2026春-2-086","lesson":2,"type":"単語","role":"関連語","zh":"硬装","pinyin":"yìng zhuāng","ja":"（内装の）基礎工事・固定部分の内装","ja_ai":true,"ja_note":"","def_zh":"房屋装修中固定、不能移动的部分，如水电、墙面、地面、吊顶等","def_zh_ai":true,"examples":[],"related":["精装","软装"],"parent":"","pages":[102],"notes":"ページ上の書き込み語（授業メモと思われる）。特定の見出し語との関係は資料上明示されていない。採否要確認。p102 の書き込み「精装 硬装 软装」。ピンイン補完。"},{"id":"2026春-2-087","lesson":2,"type":"単語","role":"関連語","zh":"软装","pinyin":"ruǎn zhuāng","ja":"インテリア装飾（家具・カーテンなど可動の装飾）","ja_ai":true,"ja_note":"","def_zh":"装修完成后可移动、可更换的装饰，如家具、窗帘、灯具、布艺等","def_zh_ai":true,"examples":[],"related":["精装","硬装"],"parent":"","pages":[102],"notes":"ページ上の書き込み語（授業メモと思われる）。特定の見出し語との関係は資料上明示されていない。採否要確認。p102 の書き込み「精装 硬装 软装」。ピンイン補完。"},{"id":"2026春-2-088","lesson":2,"type":"成語","role":"関連語","zh":"集思广益","pinyin":"jí sī guǎng yì","ja":"衆知を集める／広く意見を募る","ja_ai":true,"ja_note":"","def_zh":"集中众人的智慧，广泛吸收有益的意见","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[102],"notes":"ページ上の書き込み語（授業メモと思われる）。特定の見出し語との関係は資料上明示されていない。採否要確認。p102 討論ページ末尾の書き込み。ピンイン補完。"},{"id":"2026春-2-089","lesson":2,"type":"単語","role":"見出し語","zh":"重启","pinyin":"chóng qǐ","ja":"再起動する／再スタートする","ja_ai":true,"ja_note":"","def_zh":"重新启动；比喻重新开始（工作、生活等）","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[103],"notes":"まとめ p103 のみ掲載。本文・語釈・例文なし（本文中に該当語が見当たらない）。ピンイン補完。"},{"id":"2026春-2-090","lesson":2,"type":"単語","role":"見出し語","zh":"淡化","pinyin":"dàn huà","ja":"薄れる、弱まる","ja_ai":false,"ja_note":"","def_zh":"逐渐变淡、减弱","def_zh_ai":true,"examples":[{"zh":"国人对房子的执念，在90后这代人身上并没有被淡化，随着年岁渐长，房子给人带来的安全感和归属感反而日渐浓烈。","ja":"中国人の家に対するこだわりは、90年代生まれの世代でも薄れておらず、年齢を重ねるにつれて、家がもたらす安心感や帰属感はむしろ日に日に強まっている。","ja_ai":true}],"related":[],"parent":"","pages":[104,105],"notes":"まとめ p105 掲載。ピンイン補完。例文は本文から採録。"},{"id":"2026春-2-091","lesson":2,"type":"単語","role":"見出し語","zh":"日渐浓烈","pinyin":"rì jiàn nóng liè","ja":"日に日に強まる／ますます強くなる","ja_ai":false,"ja_note":"","def_zh":"一天比一天浓厚、强烈","def_zh_ai":true,"examples":[{"zh":"国人对房子的执念，在90后这代人身上并没有被淡化，随着年岁渐长，房子给人带来的安全感和归属感反而日渐浓烈。","ja":"中国人の家に対するこだわりは、90年代生まれの世代でも薄れておらず、年齢を重ねるにつれて、家がもたらす安心感や帰属感はむしろ日に日に強まっている。","ja_ai":true}],"related":[],"parent":"","pages":[104,105],"notes":"まとめ p105 掲載。ピンイン補完。四字だが成語ではない語句のため 単語 扱い。例文は本文から採録。"},{"id":"2026春-2-092","lesson":2,"type":"成語","role":"見出し語","zh":"随心所欲","pinyin":"suí xīn suǒ yù","ja":"思いのままに、好き勝手に","ja_ai":false,"ja_note":"","def_zh":"完全按照自己的心意，想怎么做就怎么做","def_zh_ai":true,"examples":[{"zh":"璀璨收房后，最近一直在忙着装修，她自己动手刷墙，搬家，随心所欲地把小房子一点一点布置成自己喜欢的风格，不用担心租房时因为改装得太好而被房东收回。","ja":"璀璨は家の引き渡しを受けた後、最近はずっと内装に追われている。自分で壁を塗り、引っ越しをし、小さな家を思いのままに少しずつ自分好みのスタイルに整えている。賃貸のときのように、改装しすぎて大家に部屋を取り上げられる心配もない。","ja_ai":true}],"related":[],"parent":"","pages":[104,105],"notes":"まとめ p105 掲載。ピンイン補完。例文は本文から採録。"},{"id":"2026春-2-093","lesson":2,"type":"単語","role":"見出し語","zh":"原木风","pinyin":"yuán mù fēng","ja":"ナチュラルウッド風、無垢材風インテリア","ja_ai":false,"ja_note":"","def_zh":"以天然木材的原色、原纹理为主要元素的装修风格","def_zh_ai":true,"examples":[{"zh":"原木风的家里，每一个细节都是两人精心设计的。","ja":"ナチュラルウッド風の家は、細部の一つひとつまで二人が丹念に設計したものだ。","ja_ai":true}],"related":[],"parent":"","pages":[104,105],"notes":"まとめ p105 掲載。ピンイン補完。例文は本文から採録。"},{"id":"2026春-2-094","lesson":2,"type":"単語","role":"見出し語","zh":"承重墙","pinyin":"chéng zhòng qiáng","ja":"耐力壁","ja_ai":false,"ja_note":"","def_zh":"建筑中承受上部重量、不能随意拆除的墙体","def_zh_ai":true,"examples":[{"zh":"他们砸掉了非承重墙，做成开放式厨房，通铺了地板，追求“一推开门就能从厨房看到餐厅客厅的通透感”。","ja":"二人は耐力壁ではない壁を取り壊してオープンキッチンにし、床材を全面に張り、「ドアを開けた瞬間にキッチンからダイニングやリビングまで見渡せる開放感」を追求した。","ja_ai":true}],"related":["非承重墙"],"parent":"","pages":[104,105],"notes":"まとめ p105 掲載。ピンイン補完。本文は「非承重墙」。例文は本文から採録。"},{"id":"2026春-2-095","lesson":2,"type":"単語","role":"見出し語","zh":"通铺","pinyin":"tōng pù","ja":"全面張り（床材などを部屋全体に張り巡らす）","ja_ai":false,"ja_note":"","def_zh":"把地板等材料连续地铺满整个房间","def_zh_ai":true,"examples":[{"zh":"他们砸掉了非承重墙，做成开放式厨房，通铺了地板，追求“一推开门就能从厨房看到餐厅客厅的通透感”。","ja":"二人は耐力壁ではない壁を取り壊してオープンキッチンにし、床材を全面に張り、「ドアを開けた瞬間にキッチンからダイニングやリビングまで見渡せる開放感」を追求した。","ja_ai":true}],"related":[],"parent":"","pages":[104,105],"notes":"まとめ p105 掲載。ピンイン補完（「通铺」は大部屋の雑魚寝ベッドの意味もあるが、本課は床材の全面張り）。例文は本文から採録。"},{"id":"2026春-2-096","lesson":2,"type":"単語","role":"見出し語","zh":"通透感","pinyin":"tōng tòu gǎn","ja":"開放感、抜け感（部屋の広々とした視覚的な感じ）","ja_ai":false,"ja_note":"","def_zh":"空间开阔、视线通畅、采光通风良好的感觉","def_zh_ai":true,"examples":[{"zh":"他们砸掉了非承重墙，做成开放式厨房，通铺了地板，追求“一推开门就能从厨房看到餐厅客厅的通透感”。","ja":"二人は耐力壁ではない壁を取り壊してオープンキッチンにし、床材を全面に張り、「ドアを開けた瞬間にキッチンからダイニングやリビングまで見渡せる開放感」を追求した。","ja_ai":true}],"related":[],"parent":"","pages":[104,105],"notes":"まとめ p105 の日本語欄に掲載（中国語欄には無く、日本語欄の並びから対応付け）。ピンイン補完。例文は本文から採録。"},{"id":"2026春-2-097","lesson":2,"type":"成語","role":"見出し語","zh":"直截了当","pinyin":"zhí jié liǎo dàng","ja":"ストレートに、遠回しなく、率直に、ずばりと","ja_ai":false,"ja_note":"","def_zh":"形容说话、做事不绕弯子，不兜圈子，开门见山，爽快坦率，直接点明本意或态度。","def_zh_ai":false,"examples":[{"zh":"和成熟的人沟通不用拐弯抹角，有想法就可以直截了当说出来，反而能节省彼此的时间和精力。","ja":"成熟した人とのコミュニケーションでは遠回しに言う必要はなく、考えがあればストレートに言えばいい。そのほうがかえってお互いの時間と労力の節約になる。","ja_ai":true},{"zh":"面对工作中的不合理安排，他敢于直截了当提出意见，从不刻意迎合领导的想法。","ja":"仕事上の不合理な割り振りに対して、彼は率直に意見を言うことができ、決してわざと上司の考えに迎合しない。","ja_ai":true},{"zh":"在感情里与其互相猜测纠结，不如直截了当表达心意，避免产生不必要的误会和内耗（nèihào）。","ja":"恋愛ではお互いに探り合って悩むより、率直に気持ちを伝えたほうが、不要な誤解や消耗を避けられる。","ja_ai":true},{"zh":"她可以直截了当地留父亲多住几天，“这个房子不是谁的家，是我的家。”","ja":"彼女は父親にもう何日か泊まっていってと率直に引き留められる。「この家は誰かの家じゃなくて、私の家なんだ」","ja_ai":true}],"related":["拐弯抹角","开门见山"],"parent":"","pages":[106,107],"notes":"本文 p106 の語を p107 で解説（まとめスライドは無し）。p107 末尾の「guǎiwān mòjiǎo」「cāicè jiūjié」は例文中の 拐弯抹角・猜测纠结 の読み。4つ目の例文は本文（p106）から。"},{"id":"2026春-2-098","lesson":2,"type":"成語","role":"関連語","zh":"拐弯抹角","pinyin":"guǎi wān mò jiǎo","ja":"遠回しに言う／回りくどい","ja_ai":true,"ja_note":"","def_zh":"沿着弯弯曲曲的路走；比喻说话、写文章不直截了当","def_zh_ai":true,"examples":[{"zh":"和成熟的人沟通不用拐弯抹角，有想法就可以直截了当说出来，反而能节省彼此的时间和精力。","ja":"成熟した人とのコミュニケーションでは遠回しに言う必要はなく、考えがあればストレートに言えばいい。そのほうがかえってお互いの時間と労力の節約になる。","ja_ai":true}],"related":["直截了当"],"parent":"直截了当","pages":[107],"notes":"直截了当 の例文中の語で、ページ末尾に読み「guǎiwān mòjiǎo」が記載（反義語として関連語化）。"},{"id":"2026春-2-099","lesson":2,"type":"単語","role":"見出し語","zh":"串串房","pinyin":"chuàn chuàn fáng","ja":"安普請の細切れ賃貸物件","ja_ai":true,"ja_note":"不動産仲介業者や又貸し業者、投資目的のオーナーなどによって、低コストで短期間にリフォームされたあと、高い家賃で貸し出される物件のこと。特徴としては、部屋が非常に狭い、仕切りが多い（1つの部屋をいくつもの小部屋に分けている）、内装が安っぽくデザインも画一的、家具は一見おしゃれだが実際の品質は低い、風通しや日当たりが悪い、主に若い賃貸入居者向けである、などが挙げられる。","def_zh":"被中介、二房东、投资客低成本快速装修后，再高价出租的房子。特点通常有：面积很小，隔断很多（一个房子被分成很多小间），装修廉价、风格统一，家具看起来“精致”，实际质量差，通风采光不好，专门面向年轻租客。","def_zh_ai":false,"examples":[{"zh":"以前她住在高碑店十几平的串串房里，猫晒不到太阳，她担心猫会生病。","ja":"以前彼女は高碑店にある十数平米の「串串房」に住んでいて、猫が日光浴できず、病気にならないか心配していた。","ja_ai":true}],"related":[],"parent":"","pages":[108,109,110],"notes":"ピンイン補完。同じ日本語説明が p110（优绩主义 のページ）にも重複掲載。例文は本文から採録。 資料の日本語説明文は ja_note に移し、ja は短い訳語を補完。"},{"id":"2026春-2-100","lesson":2,"type":"単語","role":"見出し語","zh":"优绩主义","pinyin":"yōu jì zhǔ yì","ja":"能力主義／メリトクラシー","ja_ai":true,"ja_note":"","def_zh":"以能力、成绩和努力为标准，分配社会资源与地位的价值观。","def_zh_ai":false,"examples":[{"zh":"她反思过去的自己，容易被优绩主义捆绑，为了在事业上干出点成绩，时常没日没夜地剪片子，日子过得天昏地暗。","ja":"彼女はかつての自分を振り返り、能力主義に縛られやすく、仕事で成果を出そうと昼夜を問わず動画を編集し、目の回るような日々を送っていたと反省している。","ja_ai":true}],"related":[],"parent":"","pages":[108,110],"notes":"ピンイン補完。p110 の特徴: 学历高才有价值／工作厉害才值得被认可／必须一直努力／必须不断进步／不能停下来／休息会有罪恶感。p110 の日本語文は 串串房 の説明の重複で 优绩主义 の訳ではないため不採用、ja は AI 補完。例文は本文から採録。"},{"id":"2026春-2-101","lesson":2,"type":"単語","role":"見出し語","zh":"托底","pinyin":"tuō dǐ","ja":"下支えする／セーフティネットになる","ja_ai":true,"ja_note":"下から支えること。比喩的には、最低限の基準やラインを守り、最も基本的な保障を提供することを指す。また比喩的には、後ろ盾となって支援したり、責任を引き受けたり、リスクをカバーしたりすることを指す。","def_zh":"从底部托住；比喻守住最低标准、底线，提供最基础保障。比喻作为后盾，给予支持、兜底承担风险。","def_zh_ai":false,"examples":[{"zh":"“没贷款就没那么慌，”即便暂时失业，还有小家给自己托底。","ja":"「ローンがなければそんなに慌てない」。たとえ一時的に失業しても、自分を支えてくれる小さな家がある。","ja_ai":true}],"related":["托举","兜底"],"parent":"","pages":[111,113],"notes":"資料ではピンインと語釈が連続（tuō dǐ 从底部…）していたため分離。例文は本文から採録。 資料の日本語説明文は ja_note に移し、ja は短い訳語を補完。"},{"id":"2026春-2-102","lesson":2,"type":"単語","role":"見出し語","zh":"停摆","pinyin":"tíng bǎi","ja":"停止する／ストップする","ja_ai":true,"ja_note":"元々は時計の振り子が止まり、時計が進まなくなることを指す。現在は主に、物事・業界・イベント・事業などが途中で稼働を停止し、実施を一時中断して停滞した状態になることを比喩的に言う。","def_zh":"原指钟表停止摆动不走了；现多用于比喻事情、行业、活动、事业等中途停止运行、暂停开展，陷入停滞状态。","def_zh_ai":false,"examples":[{"zh":"受到市场影响，不少线下门店被迫停摆，大家只能暂时调整经营方式。","ja":"市場の影響を受けて、多くの実店舗が営業停止を余儀なくされ、皆一時的に経営方法を見直すしかなかった。","ja_ai":true},{"zh":"连续多日暴雨让户外工程全面停摆，工作人员只好等待天气好转再开工。","ja":"連日の豪雨で屋外工事が全面的にストップし、作業員は天気が回復するのを待って工事を再開するしかなかった。","ja_ai":true},{"zh":"对徐熙以及与她处境相似的年轻人而言，全款买房的意义在于，虽然工作停摆了，但房子还在，人生也没有彻底失控。","ja":"徐熙や彼女と似た境遇の若者にとって、一括で家を買う意味は、仕事が止まっても家は残り、人生が完全にコントロールを失うことはないという点にある。","ja_ai":true}],"related":[],"parent":"","pages":[112],"notes":"3つ目の例文は本文（p112）から。 資料の日本語説明文は ja_note に移し、ja は短い訳語を補完。"},{"id":"2026春-2-103","lesson":2,"type":"成語","role":"関連語","zh":"感同身受","pinyin":"gǎn tóng shēn shòu","ja":"我が身のことのように感じる","ja_ai":true,"ja_note":"","def_zh":"虽然没有亲身经历，但感受就像亲身经历一样","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[113],"notes":"ページ上の書き込み語（授業メモと思われる）。特定の見出し語との関係は資料上明示されていない。採否要確認。p113 討論ページの書き込み。ピンイン補完。"},{"id":"2026春-2-104","lesson":2,"type":"単語","role":"関連語","zh":"首付比例","pinyin":"shǒu fù bǐ lì","ja":"頭金比率","ja_ai":true,"ja_note":"","def_zh":"首付款占房屋总价的比例","def_zh_ai":true,"examples":[{"zh":"对年轻人来说，首付比例直接影响刚需门槛。","ja":"若者にとって、頭金の比率は実需の参入ハードルに直接影響する。","ja_ai":true}],"related":["首付"],"parent":"首付","pages":[50,55,60,113],"notes":"p113 討論ページの書き込み。刚需门槛 の例文（p50）、高杠杆买房 の語釈（p55）にも出現。ピンイン補完。"},{"id":"2026春-2-105","lesson":2,"type":"単語","role":"関連語","zh":"托举","pinyin":"tuō jǔ","ja":"持ち上げる／（比喩）後押しして支える","ja_ai":true,"ja_note":"","def_zh":"向上托起、举起；比喻给予支持帮助，使人向上发展","def_zh_ai":true,"examples":[],"related":["托底"],"parent":"托底","pages":[113],"notes":"p113 の書き込み「托底 托举」。ピンイン補完。"},{"id":"2026春-2-106","lesson":2,"type":"単語","role":"関連語","zh":"婚前财产","pinyin":"hūn qián cái chǎn","ja":"婚前財産（結婚前から所有する個人の財産）","ja_ai":true,"ja_note":"","def_zh":"结婚前个人已经拥有的财产","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[113],"notes":"ページ上の書き込み語（授業メモと思われる）。特定の見出し語との関係は資料上明示されていない。採否要確認。p113 の書き込み「买房与结婚的顺序 婚前财产」。ピンイン補完。"},{"id":"2026春-3-001","lesson":3,"type":"単語","role":"見出し語","zh":"嬷","pinyin":"mó","ja":"（年配の女性への呼び名）おばあさん；乳母","ja_ai":true,"ja_note":"","def_zh":"称呼年老的妇女／奶妈","def_zh_ai":false,"examples":[],"related":["阿嬷"],"parent":"","pages":[117],"notes":"画像ページより（p117 の辞書アプリ画像。語釈・ピンインは画像の内容による）。同ページに「康辉」「咬文嚼字」の文字あり（カード化せず）。課題名《给阿嬷的情书》の「阿嬷」はおばあちゃん（潮汕・閩南方言）。"},{"id":"2026春-3-002","lesson":3,"type":"単語","role":"見出し語","zh":"反流量","pinyin":"fǎn liú liàng","ja":"反・流量型","ja_ai":false,"ja_note":"","def_zh":"不依靠明星、话题热度等流量因素来吸引观众","def_zh_ai":true,"examples":[{"zh":"这部电影有着几个“反流量”的元素：成本1400万，演员几乎全员素人，并且大量使用潮汕方言作为电影的对白语言。","ja":"この映画には、いくつもの「反・流量型」とも言える要素があった。制作費は1400万元、出演者のほとんどが素人であり、さらに映画のセリフには潮汕方言が大量に使用されていた。","ja_ai":false}],"related":[],"parent":"","pages":[118,138],"notes":"ピンイン補完。日本語訳は p118 の本文訳より。例文は資料の本文から採録（訳は資料の本文訳）。本文中のピンイン注記は例文から除いた。"},{"id":"2026春-3-003","lesson":3,"type":"単語","role":"見出し語","zh":"全员素人","pinyin":"quán yuán sù rén","ja":"全員が素人","ja_ai":true,"ja_note":"","def_zh":"全部演员都是没有专业表演经验的普通人","def_zh_ai":true,"examples":[{"zh":"这部电影有着几个“反流量”的元素：成本1400万，演员几乎全员素人，并且大量使用潮汕方言作为电影的对白语言。","ja":"この映画には、いくつもの「反・流量型」とも言える要素があった。制作費は1400万元、出演者のほとんどが素人であり、さらに映画のセリフには潮汕方言が大量に使用されていた。","ja_ai":false}],"related":[],"parent":"","pages":[118,138],"notes":"ピンイン補完。本文は「几乎全员素人」（訳は「出演者のほとんどが素人」）。例文は資料の本文から採録（訳は資料の本文訳）。本文中のピンイン注記は例文から除いた。"},{"id":"2026春-3-004","lesson":3,"type":"単語","role":"見出し語","zh":"潮汕","pinyin":"Cháo shàn","ja":"潮汕（広東省東部の地域）","ja_ai":true,"ja_note":"","def_zh":"中国广东省东部的一个文化地区，主要包括潮州、汕头和揭阳等城市。","def_zh_ai":false,"examples":[{"zh":"这部电影有着几个“反流量”的元素：成本1400万，演员几乎全员素人，并且大量使用潮汕方言作为电影的对白语言。","ja":"この映画には、いくつもの「反・流量型」とも言える要素があった。制作費は1400万元、出演者のほとんどが素人であり、さらに映画のセリフには潮汕方言が大量に使用されていた。","ja_ai":false}],"related":["潮汕方言","潮州","汕头","揭阳"],"parent":"","pages":[118,121,122,126,132,138],"notes":"語釈は p122 の本文説明「潮汕是…」から採録（揭阳のピンイン注記は除いた）。ピンインは資料表記（Cháo shàn、大文字始まり）のまま。例文は資料の本文から採録（訳は資料の本文訳）。本文中のピンイン注記は例文から除いた。"},{"id":"2026春-3-005","lesson":3,"type":"単語","role":"見出し語","zh":"旋即","pinyin":"xuán jí","ja":"すぐに；ほどなく","ja_ai":true,"ja_note":"","def_zh":"随即；很快就","def_zh_ai":true,"examples":[{"zh":"但就是这样一部影片，在豆瓣开出了9分的高分，并旋即攀升到9.1分，上映第九日便实现了票房破亿。","ja":"しかし、そのような作品でありながら、Doubanでは9.0という高評価を獲得し、その後すぐに9.1点まで上昇した。公開9日目には興行収入1億元を突破した。","ja_ai":false}],"related":["攀升"],"parent":"","pages":[118,138],"notes":"資料では「旋即攀升(xuán jí pān shēng）」と2語まとめてピンイン注記。まとめページ p138 では別々の語として掲載。例文は資料の本文から採録（訳は資料の本文訳）。本文中のピンイン注記は例文から除いた。"},{"id":"2026春-3-006","lesson":3,"type":"単語","role":"見出し語","zh":"攀升","pinyin":"pān shēng","ja":"上昇する；（数値が）上がる","ja_ai":true,"ja_note":"","def_zh":"（数量、价格、排名等）向上升高","def_zh_ai":true,"examples":[{"zh":"但就是这样一部影片，在豆瓣开出了9分的高分，并旋即攀升到9.1分，上映第九日便实现了票房破亿。","ja":"しかし、そのような作品でありながら、Doubanでは9.0という高評価を獲得し、その後すぐに9.1点まで上昇した。公開9日目には興行収入1億元を突破した。","ja_ai":false}],"related":["旋即"],"parent":"","pages":[118,138],"notes":"資料では「旋即攀升(xuán jí pān shēng）」と2語まとめてピンイン注記。例文は資料の本文から採録（訳は資料の本文訳）。本文中のピンイン注記は例文から除いた。"},{"id":"2026春-3-007","lesson":3,"type":"単語","role":"見出し語","zh":"生腌","pinyin":"shēng yān","ja":"生の海鮮の漬け込み（潮汕料理）","ja_ai":true,"ja_note":"","def_zh":"把新鲜的海鲜，比如虾、蟹、贝类等，不经过加热，而是直接用酱油、蒜、辣椒、香菜和白酒等调料进行腌制。","def_zh_ai":false,"examples":[{"zh":"潮州生腌是潮汕地区非常有代表性的一种传统美食。","ja":"潮州の生腌（生の海鮮の漬け）は、潮汕地域を代表する伝統料理の一つだ。","ja_ai":true}],"related":["潮州生腌"],"parent":"","pages":[126,138],"notes":"語釈は p126 の本文「“生腌”指的是…」から採録。例文は本文から（ピンイン注記を除いた）、訳はAI。"},{"id":"2026春-3-008","lesson":3,"type":"単語","role":"見出し語","zh":"爆款","pinyin":"bào kuǎn","ja":"ヒット作","ja_ai":false,"ja_note":"","def_zh":"非常受欢迎、销量或关注度极高的作品或商品","def_zh_ai":true,"examples":[{"zh":"对电影业来说，比今天有没有爆款更重要的是，明天还有没有人、有没有耐心去等待一部电影这样慢慢长出来。","ja":"映画業界にとって、今日ヒット作があるかどうかよりも大切なのは、明日もなお、人々が一つの映画がゆっくりと育っていくのを待つ気持ちや忍耐を持ち続けられるかどうかである。","ja_ai":false}],"related":[],"parent":"","pages":[127,138,174,175],"notes":"ピンイン補完。日本語訳は p130 の本文訳より。例文は資料の本文から採録（訳は資料の本文訳）。p174・p175（「年度爆款」）にも出る。"},{"id":"2026春-3-009","lesson":3,"type":"慣用句","role":"見出し語","zh":"名不见经传","pinyin":"míng bú jiàn jīng zhuàn","ja":"無名（名は経伝に見えず）","ja_ai":false,"ja_note":"古代の経典や歴史書に名前や事績が記されていないこと。転じて、名声がなく無名であり、世間にあまり知られていないことをいう。人・企業・地域・作品などに用いられる。","def_zh":"经传：古代被奉为典范的典籍、史书。名字没有记载在典籍史书里，形容没有名气、不出名、不起眼，很少被世人知晓；可用于人、企业、地方、作品。","def_zh_ai":false,"examples":[{"zh":"这家小店的创始人早年名不见经传，靠着扎实的产品品质慢慢收获了全国各地的忠实顾客。","ja":"この店の創業者は昔は無名で世に知られていなかったが、確かな商品の品質によって全国各地の固定客を徐々に獲得した。","ja_ai":false},{"zh":"赛前这名运动员还名不见经传，凭借决赛超常发挥一举拿下了全国赛事的冠军。","ja":"試合前までこの選手は無名の存在だったが、決勝で絶好のパフォーマンスを見せ一気に全国大会優勝を手にした。","ja_ai":false}],"related":[],"parent":"","pages":[127,129,138],"notes":"五字のため type は慣用句（一般には成語とも）。日本語訳は p130 の本文訳より。p129 の日本語解説は ja_note へ。例文1の「扎实」に資料ではピンイン注記（zhā shi）あり、例文からは除いた。"},{"id":"2026春-3-010","lesson":3,"type":"単語","role":"見出し語","zh":"整块时间","pinyin":"zhěng kuài shí jiān","ja":"まとまった時間","ja_ai":true,"ja_note":"","def_zh":"完整、连续而不被打断的一段时间","def_zh_ai":true,"examples":[{"zh":"《给阿嬷的情书》热映证明，观众乐于消费故事、人物、冲突和情感，好电影会吸引人走进电影院，把整块时间和情绪信任地交出来。","ja":"『おばあちゃんへの手紙』の大ヒットは、観客が物語や登場人物、葛藤、そして感情に喜んでお金を払うことを証明している。優れた映画は人々を映画館へと引き寄せ、自分の時間と感情をまるごと作品に委ねようという気持ちにさせるのである。","ja_ai":false}],"related":[],"parent":"","pages":[127,138],"notes":"ピンイン補完。例文は資料の本文から採録（訳は資料の本文訳）。"},{"id":"2026春-3-011","lesson":3,"type":"単語","role":"見出し語","zh":"拓荒者","pinyin":"tuò huāng zhě","ja":"開拓者","ja_ai":false,"ja_note":"","def_zh":"开垦荒地的人；比喻在某一领域开创新局面的先行者","def_zh_ai":true,"examples":[{"zh":"很多人认为，蓝鸿春让更多中国观众开始注意潮汕文化，因此他也被称为“潮汕电影拓荒者”。","ja":"多くの人は、藍鴻春が中国の観客に潮汕文化への関心を抱かせるきっかけを作ったと評価しており、そのため彼はしばしば「潮汕映画の開拓者（潮汕映画のパイオニア）」とも呼ばれている。","ja_ai":false}],"related":[],"parent":"","pages":[132,138],"notes":"本文中に「拓荒者（tuò huāng zhě 開拓者）」と注記。例文は資料の本文から採録（訳は資料の本文訳）。本文中のピンイン注記は例文から除いた。"},{"id":"2026春-3-012","lesson":3,"type":"単語","role":"見出し語","zh":"票房飘红","pinyin":"piào fáng piāo hóng","ja":"興行成績が伸びる","ja_ai":false,"ja_note":"","def_zh":"原指股市中红色代表上涨，引申为票房成绩非常好、持续增长。","def_zh_ai":false,"examples":[{"zh":"10多年前，以《爸爸去哪儿》《奔跑吧！兄弟》为代表的综艺大电影接连上映，票房飘红。","ja":"10数年前には、爸爸去哪儿 や 奔跑吧！兄弟 に代表される「バラエティー番組発の映画」が次々と公開され、興行的な成功を収めた。","ja_ai":false}],"related":[],"parent":"","pages":[134,135,138,139],"notes":"ピンイン補完。四字だが成語ではないため単語扱い。例文は資料の本文から採録（訳は資料の本文訳）。"},{"id":"2026春-3-013","lesson":3,"type":"慣用句","role":"見出し語","zh":"尝到甜头","pinyin":"cháng dào tián tou","ja":"うまみを知る；味をしめる","ja_ai":true,"ja_note":"","def_zh":"得到了好处或利益，因而想继续这样做","def_zh_ai":true,"examples":[{"zh":"这让行业尝到了甜头，原来，热度可以平移成票房，电影可以先是别的东西，再顺便“变”成电影。","ja":"この成功によって業界は大きな手応えを得た。つまり、人気や話題性はそのまま興行収入へと転換できること、そして映画はまず別のコンテンツとして人気を集め、その後で「映画化」されることも可能だと分かったのである。","ja_ai":false}],"related":[],"parent":"","pages":[134,138,139],"notes":"ピンイン補完。本文は「尝到了甜头」。訳は p137 で「大きな手応えを得た」。例文は資料の本文から採録（訳は資料の本文訳）。"},{"id":"2026春-3-014","lesson":3,"type":"単語","role":"見出し語","zh":"大数据电影","pinyin":"dà shù jù diàn yǐng","ja":"ビッグデータ映画／データ分析主導型映画","ja_ai":false,"ja_note":"","def_zh":"利用用户数据、搜索趋势、社交媒体数据等分析观众喜好，并据此开发、制作和营销的电影。","def_zh_ai":false,"examples":[{"zh":"然后，是“大数据电影”的兴起。","ja":"その後、「ビッグデータ映画」と呼ばれる潮流が台頭した。","ja_ai":false}],"related":[],"parent":"","pages":[134,135,138,139],"notes":"ピンイン補完。資料の訳は空白区切りで2つ（「／」で区切った）。例文は資料の本文から採録（訳は資料の本文訳）。"},{"id":"2026春-3-015","lesson":3,"type":"単語","role":"見出し語","zh":"用户基础","pinyin":"yòng hù jī chǔ","ja":"ユーザー基盤","ja_ai":false,"ja_note":"","def_zh":"已经拥有的用户数量和用户群体。","def_zh_ai":false,"examples":[{"zh":"这类电影项目不再首先被当成作品来构思，而被当作一个已经有用户基础、热搜潜力和传播模板的工业化产品。","ja":"この種の映画プロジェクトは、もはや最初から一つの作品として構想されるのではなく、既にユーザー基盤を持ち、SNSで話題化する可能性や拡散のテンプレートを備えた工業製品として扱われるようになった。","ja_ai":false}],"related":["粉丝群","会员群","固定观众群"],"parent":"","pages":[134,135,138,139],"notes":"ピンイン補完。日本語訳は p137 の本文訳より。related は p135 で語釈の後に並ぶ例。例文は資料の本文から採録（訳は資料の本文訳）。"},{"id":"2026春-3-016","lesson":3,"type":"単語","role":"見出し語","zh":"热搜潜力","pinyin":"rè sōu qián lì","ja":"トレンド入りする可能性","ja_ai":false,"ja_note":"","def_zh":"有能力成为网络热门话题。","def_zh_ai":false,"examples":[{"zh":"这类电影项目不再首先被当成作品来构思，而被当作一个已经有用户基础、热搜潜力和传播模板的工业化产品。","ja":"この種の映画プロジェクトは、もはや最初から一つの作品として構想されるのではなく、既にユーザー基盤を持ち、SNSで話題化する可能性や拡散のテンプレートを備えた工業製品として扱われるようになった。","ja_ai":false}],"related":[],"parent":"","pages":[134,135,138,139],"notes":"ピンインはページ下部に離れて記載されていたものを対応付け。例文は資料の本文から採録（訳は資料の本文訳）。"},{"id":"2026春-3-017","lesson":3,"type":"単語","role":"見出し語","zh":"传播模板","pinyin":"chuán bō mú bǎn","ja":"拡散テンプレート／プロモーションの定型パターン","ja_ai":false,"ja_note":"","def_zh":"已经验证过、容易复制的传播模式。","def_zh_ai":false,"examples":[{"zh":"这类电影项目不再首先被当成作品来构思，而被当作一个已经有用户基础、热搜潜力和传播模板的工业化产品。","ja":"この種の映画プロジェクトは、もはや最初から一つの作品として構想されるのではなく、既にユーザー基盤を持ち、SNSで話題化する可能性や拡散のテンプレートを備えた工業製品として扱われるようになった。","ja_ai":false}],"related":[],"parent":"","pages":[134,135,138,139],"notes":"ピンインはページ下部に離れて記載されていたものを対応付け。資料の訳は空白区切りで2つ（「／」で区切った）。例文は資料の本文から採録（訳は資料の本文訳）。"},{"id":"2026春-3-018","lesson":3,"type":"単語","role":"見出し語","zh":"品牌联营","pinyin":"pǐn pái lián yíng","ja":"共同マーケティング／ブランド共同展開","ja_ai":false,"ja_note":"","def_zh":"多个品牌共同合作经营、推广产品或项目。","def_zh_ai":false,"examples":[{"zh":"有些电影项目，甚至一开始就被放在“品牌联营”“影剧联动”的逻辑里讨论，制作方更关心的是IP效应、是演员流量、是用户画像、是宣发路径。","ja":"中には、企画段階からすでに「ブランドとの共同展開」や「映画とドラマの連動」という発想のもとで議論される作品もあった。制作側がより重視したのは、作品そのものよりも、IP効果、俳優の集客力・ファン流入効果、ユーザー属性の分析、宣伝・プロモーションの導線といった要素だったのである。","ja_ai":false}],"related":[],"parent":"","pages":[134,135,138,139],"notes":"ピンイン補完。資料の訳は空白区切りで2つ（「／」で区切った）。例文は資料の本文から採録（訳は資料の本文訳）。"},{"id":"2026春-3-019","lesson":3,"type":"単語","role":"見出し語","zh":"影剧联动","pinyin":"yǐng jù lián dòng","ja":"映像作品間のクロスメディア展開","ja_ai":false,"ja_note":"","def_zh":"电影与电视剧共享角色、世界观、剧情或营销资源，实现相互带动。","def_zh_ai":false,"examples":[{"zh":"有些电影项目，甚至一开始就被放在“品牌联营”“影剧联动”的逻辑里讨论，制作方更关心的是IP效应、是演员流量、是用户画像、是宣发路径。","ja":"中には、企画段階からすでに「ブランドとの共同展開」や「映画とドラマの連動」という発想のもとで議論される作品もあった。制作側がより重視したのは、作品そのものよりも、IP効果、俳優の集客力・ファン流入効果、ユーザー属性の分析、宣伝・プロモーションの導線といった要素だったのである。","ja_ai":false}],"related":[],"parent":"","pages":[134,135,138,139],"notes":"ピンイン補完。例文は資料の本文から採録（訳は資料の本文訳）。"},{"id":"2026春-3-020","lesson":3,"type":"単語","role":"見出し語","zh":"IP效应","pinyin":"IP xiào yìng","ja":"IP効果","ja_ai":false,"ja_note":"","def_zh":"利用已有知名度吸引观众、消费者的能力。","def_zh_ai":false,"examples":[{"zh":"有些电影项目，甚至一开始就被放在“品牌联营”“影剧联动”的逻辑里讨论，制作方更关心的是IP效应、是演员流量、是用户画像、是宣发路径。","ja":"中には、企画段階からすでに「ブランドとの共同展開」や「映画とドラマの連動」という発想のもとで議論される作品もあった。制作側がより重視したのは、作品そのものよりも、IP効果、俳優の集客力・ファン流入効果、ユーザー属性の分析、宣伝・プロモーションの導線といった要素だったのである。","ja_ai":false}],"related":[],"parent":"","pages":[134,139,140,141],"notes":"ピンイン補完（IP はそのまま）。まとめページには無いが p140 で語釈付き解説。日本語訳は p137 の本文訳より。資料の例：《哈利·波特》《名侦探柯南》。例文は資料の本文から採録（訳は資料の本文訳）。"},{"id":"2026春-3-021","lesson":3,"type":"単語","role":"見出し語","zh":"演员流量","pinyin":"yǎn yuán liú liàng","ja":"俳優の集客力・ファン流入効果","ja_ai":false,"ja_note":"","def_zh":"明星带来的关注度和粉丝数量。","def_zh_ai":false,"examples":[{"zh":"有些电影项目，甚至一开始就被放在“品牌联营”“影剧联动”的逻辑里讨论，制作方更关心的是IP效应、是演员流量、是用户画像、是宣发路径。","ja":"中には、企画段階からすでに「ブランドとの共同展開」や「映画とドラマの連動」という発想のもとで議論される作品もあった。制作側がより重視したのは、作品そのものよりも、IP効果、俳優の集客力・ファン流入効果、ユーザー属性の分析、宣伝・プロモーションの導線といった要素だったのである。","ja_ai":false}],"related":[],"parent":"","pages":[134,139,140,141],"notes":"ピンイン補完。まとめページには無いが p140 で語釈付き解説。日本語訳は p137 の本文訳より。資料の補足：粉丝来支持偶像/先定演员……。例文は資料の本文から採録（訳は資料の本文訳）。"},{"id":"2026春-3-022","lesson":3,"type":"単語","role":"見出し語","zh":"用户画像","pinyin":"yòng hù huà xiàng","ja":"ユーザー属性の分析","ja_ai":false,"ja_note":"","def_zh":"对目标用户特征的分析和总结。","def_zh_ai":false,"examples":[{"zh":"制作方可能会说：用户画像显示年轻女性占70%。","ja":"制作側は「ユーザー像の分析によると若い女性が70％を占める」と言うかもしれない。","ja_ai":true},{"zh":"有些电影项目，甚至一开始就被放在“品牌联营”“影剧联动”的逻辑里讨论，制作方更关心的是IP效应、是演员流量、是用户画像、是宣发路径。","ja":"中には、企画段階からすでに「ブランドとの共同展開」や「映画とドラマの連動」という発想のもとで議論される作品もあった。制作側がより重視したのは、作品そのものよりも、IP効果、俳優の集客力・ファン流入効果、ユーザー属性の分析、宣伝・プロモーションの導線といった要素だったのである。","ja_ai":false}],"related":[],"parent":"","pages":[134,139,140,141],"notes":"ピンイン補完。まとめページには無いが p140 で語釈付き解説。日本語訳は p137 の本文訳より。資料の補足：因此：选年轻偶像演员/强调爱情线。例文2は本文から採録。"},{"id":"2026春-3-023","lesson":3,"type":"単語","role":"見出し語","zh":"宣发路径","pinyin":"xuān fā lù jìng","ja":"宣伝・プロモーションの導線","ja_ai":false,"ja_note":"","def_zh":"(宣传+发行)一部电影如何被推广给观众。","def_zh_ai":false,"examples":[{"zh":"有些电影项目，甚至一开始就被放在“品牌联营”“影剧联动”的逻辑里讨论，制作方更关心的是IP效应、是演员流量、是用户画像、是宣发路径。","ja":"中には、企画段階からすでに「ブランドとの共同展開」や「映画とドラマの連動」という発想のもとで議論される作品もあった。制作側がより重視したのは、作品そのものよりも、IP効果、俳優の集客力・ファン流入効果、ユーザー属性の分析、宣伝・プロモーションの導線といった要素だったのである。","ja_ai":false}],"related":["宣传","发行"],"parent":"","pages":[134,139,140,141],"notes":"ピンイン補完。まとめページには無いが p140 で語釈付き解説。日本語訳は p137 の本文訳より。資料の例：第一步：微博热搜／第二步：短视频营销／第三步：明星直播宣传／第四步：主演参加电视节目。例文は資料の本文から採録（訳は資料の本文訳）。"},{"id":"2026春-3-024","lesson":3,"type":"単語","role":"見出し語","zh":"凸显","pinyin":"tū xiǎn","ja":"際立たせる；顕著に表れる；浮き彫りにする","ja_ai":false,"ja_note":"","def_zh":"像凸起一样明显地被看到或感知到。清楚地显露出来；使鲜明突出。","def_zh_ai":false,"examples":[{"zh":"随着经验不断积累，他的领导能力逐渐凸显出来。","ja":"経験を積み重ねるにつれて、彼のリーダーシップが次第に際立ってきた。","ja_ai":true},{"zh":"这次合作中，团队沟通的重要性被进一步凸显。","ja":"今回の協力で、チーム内コミュニケーションの重要性がいっそう浮き彫りになった。","ja_ai":true},{"zh":"这次事故凸显了安全生产管理中的长期漏洞。","ja":"今回の事故は、安全生産管理における長年の欠陥を浮き彫りにした。","ja_ai":true},{"zh":"青少年视力下降是个日渐凸显的问题。","ja":"青少年の視力低下は、日に日に顕著になっている問題だ。","ja_ai":true}],"related":["凹凸不平"],"parent":"","pages":[145,146,155,171],"notes":""},{"id":"2026春-3-025","lesson":3,"type":"成語","role":"関連語","zh":"凹凸不平","pinyin":"āo tū bù píng","ja":"でこぼこしている","ja_ai":true,"ja_note":"","def_zh":"表面高低不平，不平整","def_zh_ai":true,"examples":[],"related":["凸显"],"parent":"凸显","pages":[146],"notes":"p146 の凸显の解説中に名前とピンインのみ掲載。"},{"id":"2026春-3-026","lesson":3,"type":"単語","role":"見出し語","zh":"样本","pinyin":"yàng běn","ja":"サンプル；標本；見本；事例","ja_ai":false,"ja_note":"","def_zh":"从整体里抽取出来的一部分，用作同类事物的代表，供研究、检验、参考。也可指范例、典型案例。","def_zh_ai":false,"examples":[{"zh":"我们挑选不同年龄的人群作为样本，开展这次社会调查。","ja":"私たちは異なる年齢層の人々をサンプルとして選び、今回の社会調査を実施した。","ja_ai":true},{"zh":"这份作品可以当作优秀样本，供初学者学习和参考。","ja":"この作品は優れた見本として、初心者の学習や参考に役立てることができる。","ja_ai":true},{"zh":"如果样本数量太少，那么结论可能不够准确。","ja":"サンプル数が少なすぎると、結論が十分に正確でない可能性がある。","ja_ai":true},{"zh":"网络平台总喜欢复制成功样本，因此类似的作品越来越多。","ja":"ネットのプラットフォームはいつも成功事例をコピーしたがるので、似たような作品がますます増えている。","ja_ai":true}],"related":["抽取样本","收集样本","数据样本","调查样本","典型样本","样本分析"],"parent":"","pages":[145,148,155],"notes":""},{"id":"2026春-3-027","lesson":3,"type":"単語","role":"見出し語","zh":"倾斜","pinyin":"qīng xié","ja":"傾く；（関心・資源が）偏る","ja_ai":true,"ja_note":"","def_zh":"偏向某一方；（资源、关注等）向某一方面集中","def_zh_ai":true,"examples":[{"zh":"而平台和大数据最擅长识别的，是已经成功过的模式，因此会向熟悉的明星、熟悉的题材、熟悉的情绪和熟悉的成功样本倾斜。","ja":"そして、プラットフォームやビッグデータが最も得意としているのは、すでに成功したパターンを見つけ出すことである。そのため、よく知られたスター、定番の題材、馴染みのある感情表現、そして過去に成功した事例へと資源や関心が集中しやすくなる。","ja_ai":false}],"related":[],"parent":"","pages":[145,155],"notes":"ピンイン補完。例文は資料の本文から採録（訳は資料の本文訳）。"},{"id":"2026春-3-028","lesson":3,"type":"単語","role":"見出し語","zh":"循着","pinyin":"xún zhe","ja":"～に沿って；～をたどって；～に従って；～を手掛かりにして","ja_ai":false,"ja_note":"","def_zh":"沿着某个方向、线索、规律、路径前进。“循”有“遵循、依照”的意思，强调被动地跟随既有痕迹，带有探索、寻找的意味。","def_zh_ai":false,"examples":[{"zh":"他循着儿时的记忆，再次回到了故乡的那棵老树下。","ja":"彼は幼い頃の記憶をたどって、再び故郷のあの古い木の下に戻ってきた。","ja_ai":true},{"zh":"企业如果只循着过去成功的经验发展，就可能失去创新能力。","ja":"企業が過去の成功体験に従って発展するだけなら、イノベーションの力を失いかねない。","ja_ai":true},{"zh":"循着淡淡的花香望去，才发现墙角开满了小花。","ja":"ほのかな花の香りをたどって目をやると、壁の隅に小さな花が一面に咲いているのに気づいた。","ja_ai":true},{"zh":"循着前人留下的经验前行，能让我们少走许多弯路。","ja":"先人が残した経験に沿って進めば、多くの回り道をせずに済む。","ja_ai":true}],"related":["循规蹈矩","循序渐进"],"parent":"","pages":[145,147,155],"notes":""},{"id":"2026春-3-029","lesson":3,"type":"成語","role":"見出し語","zh":"循规蹈矩","pinyin":"xún guī dǎo jǔ","ja":"規則を守り堅く行う；型にはまる；杓子定規","ja_ai":false,"ja_note":"","def_zh":"指严格遵守规矩、法度，一举一动都依照准则行事；也形容人保守、拘泥旧例，不敢变通。","def_zh_ai":false,"examples":[],"related":["循着","循序渐进"],"parent":"","pages":[147,155,171],"notes":"p147 で循着の関連成語として解説され、まとめページ p155・p171 に掲載されているため見出し語扱い。p147 では日本語訳2組が語釈の後にまとめて並んでおり、内容から対応付けた。"},{"id":"2026春-3-030","lesson":3,"type":"成語","role":"見出し語","zh":"循序渐进","pinyin":"xún xù jiàn jìn","ja":"段階を追って進める；順を追って徐々に進む","ja_ai":false,"ja_note":"","def_zh":"按照一定的步骤、顺序逐步推进、提高，不急于求成。多用于学习、训练、做事等场景。","def_zh_ai":false,"examples":[],"related":["循着","循规蹈矩"],"parent":"","pages":[147,155,171],"notes":"p147 で循着の関連成語として解説され、まとめページ p155・p171 に掲載されているため見出し語扱い。p147 では日本語訳2組が語釈の後にまとめて並んでおり、内容から対応付けた。"},{"id":"2026春-3-031","lesson":3,"type":"単語","role":"見出し語","zh":"切片传播","pinyin":"qiē piàn chuán bō","ja":"切り抜き動画による拡散","ja_ai":true,"ja_note":"映画を数十秒から数分程度の見どころだけに切り出し、ショート動画プラットフォームで素早く拡散して注目や流量を獲得する手法を指す。例えば、印象的なセリフ、盛り上がるシーンやクライマックス、意外な展開やどんでん返し、俳優の魅力が際立つ映像などを短く編集して配信し、視聴者の興味を瞬時に引きつけることで拡散を狙う。","def_zh":"把一部电影剪成几十秒到几分钟的高能片段放到短视频平台快速扩散、博取流量。","def_zh_ai":false,"examples":[{"zh":"从把电影当成流量兑现的工具，到把已有的热度当成作品生命力，再到平台和数据反过来定义电影应该长什么样：更快、更准、更能切片传播、更能快速激发多巴胺分泌。","ja":"映画を「話題性や流量を収益化するための道具」として捉えることから始まり、やがて既存の人気や注目度そのものを作品の生命力とみなすようになり、さらに進んでは、プラットフォームやデータが逆に「映画とはどうあるべきか」を定義するようになった。すなわち、より速く、より正確に、より短く切り分けて拡散しやすく、そしてより素早く人々のドーパミン分泌を刺激できるものが求められるようになったのである。","ja_ai":false}],"related":["精彩台词","爆点场面","反转","颜值镜头"],"parent":"","pages":[149,159,160],"notes":"ピンイン補完。まとめページには無いが p160 で語釈付き解説。資料には短い訳語が無いため ja は AI の短訳、p160 の日本語解説は ja_note へ。例文は資料の本文から採録（訳は資料の本文訳）。"},{"id":"2026春-3-032","lesson":3,"type":"単語","role":"見出し語","zh":"多巴胺","pinyin":"duō bā àn","ja":"ドーパミン","ja_ai":false,"ja_note":"ドーパミンは脳内で分泌される神経伝達物質の一種であり、その本質的な役割は「快楽を生み出すこと」ではなく、「欲求や期待を駆り立てること」にある。ドーパミンは報酬を実際に得たときよりも、むしろ「これから報酬が得られる」と期待しているときに最も多く分泌され、実際に報酬を手にした瞬間には、かえって分泌量が低下する傾向がある。","def_zh":"大脑分泌的一种神经递质，核心功能不是“产生快乐”，而是驱动欲望和期待。它在“预期获得奖励”时分泌最多，在“实际获得奖励”时反而下降。","def_zh_ai":false,"examples":[{"zh":"从把电影当成流量兑现的工具，到把已有的热度当成作品生命力，再到平台和数据反过来定义电影应该长什么样：更快、更准、更能切片传播、更能快速激发多巴胺分泌。","ja":"映画を「話題性や流量を収益化するための道具」として捉えることから始まり、やがて既存の人気や注目度そのものを作品の生命力とみなすようになり、さらに進んでは、プラットフォームやデータが逆に「映画とはどうあるべきか」を定義するようになった。すなわち、より速く、より正確に、より短く切り分けて拡散しやすく、そしてより素早く人々のドーパミン分泌を刺激できるものが求められるようになったのである。","ja_ai":false}],"related":[],"parent":"","pages":[149,155,159,160,171],"notes":"語釈は p160「多巴胺是大脑分泌（fēn mì）的一种神经递质…」から冒頭の「是」とピンイン注記を除いて採録。日本語訳は p150・p160 の訳より。p160 の日本語解説は ja_note へ。例文は資料の本文から採録（訳は資料の本文訳）。"},{"id":"2026春-3-033","lesson":3,"type":"単語","role":"見出し語","zh":"发酵","pinyin":"fā jiào","ja":"発酵する；（評判などが）じわじわ広がる","ja_ai":true,"ja_note":"","def_zh":"原指微生物分解有机物的过程；比喻事情、舆论、影响等逐渐扩大、加深","def_zh_ai":true,"examples":[{"zh":"有明星，有导演，有预算，有工业外壳，可电影最难被替代的那些东西——人物的陌生感、命运的重量、创作的个性、缓慢发酵出来的余韵却变得稀缺。","ja":"そこにはスターがいて、監督がいて、予算があり、映画産業としての外形も備わっている。しかし、映画において最も代替しがたい要素――人物との未知なる出会い、運命の重み、創作者の個性、そして時間をかけて静かに醸成される余韻――は、かえって希少なものになってしまったのである。","ja_ai":false},{"zh":"《周处除三害》不是传统意义上的“潜力股”，《破·地狱》也不是那种一眼看上去会“赢”的项目，但都靠着观众口碑慢慢发酵出来。","ja":"また、『周处除三害』は従来の意味での「有望株」ではなく、『破·地狱』も一見して「勝てる」と思われるような企画ではなかった。しかし、これらの作品はいずれも観客の口コミによって評価が広がり、時間をかけてじわじわと支持を獲得していったのである。","ja_ai":false}],"related":[],"parent":"","pages":[149,155,159,161],"notes":"ピンイン補完。例文は資料の本文から採録（訳は資料の本文訳）。本文中のピンイン注記は例文から除いた。"},{"id":"2026春-3-034","lesson":3,"type":"単語","role":"見出し語","zh":"余韵","pinyin":"yú yùn","ja":"余韻","ja_ai":false,"ja_note":"","def_zh":"事情过去后留下的韵味、回味","def_zh_ai":true,"examples":[{"zh":"有明星，有导演，有预算，有工业外壳，可电影最难被替代的那些东西——人物的陌生感、命运的重量、创作的个性、缓慢发酵出来的余韵却变得稀缺。","ja":"そこにはスターがいて、監督がいて、予算があり、映画産業としての外形も備わっている。しかし、映画において最も代替しがたい要素――人物との未知なる出会い、運命の重み、創作者の個性、そして時間をかけて静かに醸成される余韻――は、かえって希少なものになってしまったのである。","ja_ai":false}],"related":[],"parent":"","pages":[149,155,159],"notes":"日本語訳は p150 の本文訳より。例文は資料の本文から採録（訳は資料の本文訳）。本文中のピンイン注記は例文から除いた。"},{"id":"2026春-3-035","lesson":3,"type":"単語","role":"見出し語","zh":"稀缺","pinyin":"xī quē","ja":"希少である；乏しい","ja_ai":true,"ja_note":"","def_zh":"稀少而缺乏","def_zh_ai":true,"examples":[{"zh":"有明星，有导演，有预算，有工业外壳，可电影最难被替代的那些东西——人物的陌生感、命运的重量、创作的个性、缓慢发酵出来的余韵却变得稀缺。","ja":"そこにはスターがいて、監督がいて、予算があり、映画産業としての外形も備わっている。しかし、映画において最も代替しがたい要素――人物との未知なる出会い、運命の重み、創作者の個性、そして時間をかけて静かに醸成される余韻――は、かえって希少なものになってしまったのである。","ja_ai":false}],"related":[],"parent":"","pages":[149,155,159,171],"notes":"ピンイン補完。p150 の本文訳では「希少なもの」。例文は資料の本文から採録（訳は資料の本文訳）。本文中のピンイン注記は例文から除いた。"},{"id":"2026春-3-036","lesson":3,"type":"単語","role":"見出し語","zh":"话语权","pinyin":"huà yǔ quán","ja":"発言権；発言力","ja_ai":true,"ja_note":"","def_zh":"指说话、表达观点并让他人采纳、影响决策的权力与分量；指群体、个人拥有表达诉求、左右舆论与判断的资格。","def_zh_ai":false,"examples":[{"zh":"女性从业者正在逐步争取更多话语权，打破职场中长期存在的性别偏见。","ja":"女性の就業者は徐々により多くの発言権を勝ち取り、職場に長く存在してきたジェンダー偏見を打ち破りつつある。","ja_ai":true}],"related":[],"parent":"","pages":[151,153],"notes":"まとめページには無いが p151 で語釈・例文付き解説。"},{"id":"2026春-3-037","lesson":3,"type":"単語","role":"見出し語","zh":"饭圈","pinyin":"fàn quān","ja":"ファンコミュニティ、アイドル追っかけ集団","ja_ai":false,"ja_note":"","def_zh":"“粉丝圈子”的简称，指喜爱同一明星、偶像的群体形成的社交圈层，包含追星、应援、舆论互动等整套行为体系。","def_zh_ai":false,"examples":[{"zh":"饭圈内部有一套专属用语和规则，不追星的路人很难看懂他们的聊天内容。","ja":"ファン界隈の内部には独自の用語やルールがあり、推し活をしない一般の人には彼らの会話の内容がなかなか理解できない。","ja_ai":true}],"related":["粉丝圈子","黑粉","粉头","粉转路","路转黑","粉转黑","脱粉","正主"],"parent":"","pages":[151,152,153,154],"notes":"まとめページには無いが p151 で語釈・例文付き解説。"},{"id":"2026春-3-038","lesson":3,"type":"単語","role":"見出し語","zh":"吃瓜群众","pinyin":"chī guā qún zhòng","ja":"傍観者、ネットでゴシップを見物する一般人","ja_ai":false,"ja_note":"","def_zh":"网络流行语，指不参与事件纷争，仅旁观娱乐八卦、社会争议、明星纠纷，单纯看热闹、搜集消息的普通网友。","def_zh_ai":false,"examples":[{"zh":"大部分吃瓜群众只愿意看热闹不愿查证真相，很容易被片面截图误导判断。","ja":"ゴシップを見物する人の大半は野次馬として楽しむだけで真相を確かめようとはせず、一部だけ切り取ったスクリーンショットに判断を惑わされやすい。","ja_ai":true}],"related":["吃瓜","吃瓜吃到正主了"],"parent":"","pages":[151],"notes":"まとめページには無いが p151 で語釈・例文付き解説。四字の新語のため単語扱い。"},{"id":"2026春-3-039","lesson":3,"type":"単語","role":"見出し語","zh":"路人","pinyin":"lù rén","ja":"（ファン界隈で）どのファンでもない一般人","ja_ai":true,"ja_note":"","def_zh":"饭圈衍生词义：既不喜欢也不讨厌某位明星，不加入任何粉丝群体，仅作为普通旁观者的网民；与粉丝、黑粉相对。","def_zh_ai":false,"examples":[{"zh":"路人对明星没有固有偏爱，评价艺人只会依靠对方的作品与公众行为。","ja":"一般の人はスターに特別な思い入れがないので、芸能人を評価するときはその作品や公の場での振る舞いだけを基準にする。","ja_ai":true}],"related":["粉丝","黑粉","粉转路","路转黑"],"parent":"","pages":[151,152,153,154,164],"notes":"まとめページには無いが p151・p152 で語釈・例文付き解説（同じ内容が2ページに重複掲載）。"},{"id":"2026春-3-040","lesson":3,"type":"単語","role":"見出し語","zh":"无脑","pinyin":"wú nǎo","ja":"思考停止した；何も考えない","ja_ai":true,"ja_note":"","def_zh":"形容人缺乏独立思考能力，不分辨是非对错，盲目跟风、盲从他人观点，冲动做出极端言行。","def_zh_ai":false,"examples":[{"zh":"部分无脑粉丝不分对错维护偶像，哪怕艺人犯错也拒绝接受客观批评。","ja":"一部の思考停止したファンは善悪の区別なくアイドルを擁護し、たとえ本人が過ちを犯しても客観的な批判を受け入れようとしない。","ja_ai":true}],"related":[],"parent":"","pages":[152],"notes":"まとめページには無いが p152 で語釈・例文付き解説。"},{"id":"2026春-3-041","lesson":3,"type":"単語","role":"見出し語","zh":"立人设","pinyin":"lì rén shè","ja":"キャラ設定を作る；イメージ作りをする","ja_ai":true,"ja_note":"","def_zh":"人设：人物设定；立人设指明星、网红刻意对外塑造统一、讨喜的公众形象（如温柔、自律、学霸、耿直等），以此吸引观众、收获好感。","def_zh_ai":false,"examples":[{"zh":"很多新人明星刚出道会刻意立人设，依靠鲜明标签快速让观众记住自己。","ja":"多くの新人スターはデビュー直後に意図的にキャラ設定を作り、はっきりしたイメージで素早く視聴者に覚えてもらおうとする。","ja_ai":true}],"related":["人设倒了"],"parent":"","pages":[152],"notes":"まとめページには無いが p152 で語釈・例文付き解説。三字の動詞フレーズのため単語扱い。"},{"id":"2026春-3-042","lesson":3,"type":"慣用句","role":"見出し語","zh":"人设倒了","pinyin":"rén shè dǎo le","ja":"キャラ（イメージ）が崩壊する","ja_ai":true,"ja_note":"","def_zh":"明星、网红维持的公众正面形象因负面事件、言行反差彻底崩塌，大众不再相信其塑造的完美形象。","def_zh_ai":false,"examples":[{"zh":"被媒体拍到撒谎、耍大牌后，这位温柔绅士偶像人设倒了。","ja":"うそをついたり大物ぶった態度を取ったりする様子をメディアに撮られてから、この優しい紳士系アイドルのキャラは崩壊した。","ja_ai":true}],"related":["立人设"],"parent":"","pages":[152],"notes":"まとめページには無いが p152 で語釈・例文付き解説。四字だが成語ではない決まり文句のため慣用句扱い。"},{"id":"2026春-3-043","lesson":3,"type":"単語","role":"関連語","zh":"黑粉","pinyin":"hēi fěn","ja":"アンチ（特定のスターを嫌う人）","ja_ai":true,"ja_note":"","def_zh":"对特定明星抱有反感，常常刻意关注、放大明星的负面消息，甚至会发布不实言论抹黑他人，容易引发网络矛盾。","def_zh_ai":false,"examples":[],"related":["路人","粉转黑","路转黑"],"parent":"饭圈","pages":[151,152,153],"notes":"ピンイン補完。p153–154 の饭圈についての読み物で説明された語。語釈は読み物の「他们对特定明星…」から主語を除いて採録。p151・p152 の路人の語釈にも名前が出る。"},{"id":"2026春-3-044","lesson":3,"type":"単語","role":"関連語","zh":"粉头","pinyin":"fěn tóu","ja":"ファンのリーダー格","ja_ai":true,"ja_note":"","def_zh":"饭圈里十分关键的角色，他们是资深的老粉丝，拥有大量粉丝关注，掌握着饭圈的主要话语权。","def_zh_ai":false,"examples":[],"related":["脱粉","话语权"],"parent":"饭圈","pages":[153,154],"notes":"ピンイン補完。p153–154 の饭圈についての読み物で説明された語。語釈は読み物の「粉头是…」から採録。"},{"id":"2026春-3-045","lesson":3,"type":"単語","role":"関連語","zh":"粉转路","pinyin":"fěn zhuǎn lù","ja":"ファンから一般人に戻ること","ja_ai":true,"ja_note":"","def_zh":"原本喜欢偶像的粉丝，因为对偶像失望、厌倦饭圈的纷争，不再主动支持和关注，就会变成普通路人","def_zh_ai":false,"examples":[],"related":["路转黑","粉转黑","路人"],"parent":"饭圈","pages":[154],"notes":"ピンイン補完。p153–154 の饭圈についての読み物で説明された語。語釈は読み物の該当文から採録。"},{"id":"2026春-3-046","lesson":3,"type":"単語","role":"関連語","zh":"路转黑","pinyin":"lù zhuǎn hēi","ja":"一般人からアンチになること","ja_ai":true,"ja_note":"","def_zh":"原本对明星毫无感觉的路人，因为反感明星的言行或者极端粉丝的行为，开始讨厌这位明星","def_zh_ai":false,"examples":[],"related":["粉转路","粉转黑","黑粉"],"parent":"饭圈","pages":[154],"notes":"ピンイン補完。p153–154 の饭圈についての読み物で説明された語。語釈は読み物の該当文から採録。"},{"id":"2026春-3-047","lesson":3,"type":"単語","role":"関連語","zh":"粉转黑","pinyin":"fěn zhuǎn hēi","ja":"ファンからアンチに転じること","ja_ai":true,"ja_note":"","def_zh":"曾经的忠实粉丝彻底对偶像失望，甚至开始批判、抹黑偶像","def_zh_ai":false,"examples":[],"related":["粉转路","路转黑","黑粉"],"parent":"饭圈","pages":[154],"notes":"ピンイン補完。p153–154 の饭圈についての読み物で説明された語。語釈は読み物の該当文から採録。"},{"id":"2026春-3-048","lesson":3,"type":"単語","role":"関連語","zh":"脱粉","pinyin":"tuō fěn","ja":"ファンをやめる","ja_ai":true,"ja_note":"","def_zh":"不再做某位明星的粉丝，退出粉丝群体","def_zh_ai":true,"examples":[],"related":["粉头"],"parent":"饭圈","pages":[154],"notes":"ピンイン補完。p153–154 の饭圈についての読み物で説明された語。読み物では「粉头脱粉」として出るが明示的な語釈は無い。"},{"id":"2026春-3-049","lesson":3,"type":"単語","role":"関連語","zh":"吃瓜","pinyin":"chī guā","ja":"（野次馬として）ゴシップを見物する","ja_ai":true,"ja_note":"","def_zh":"普通人围观网络八卦、舆论纠纷，只是单纯看热闹。","def_zh_ai":false,"examples":[],"related":["吃瓜群众","吃瓜吃到正主了"],"parent":"吃瓜群众","pages":[151,154],"notes":"ピンイン補完。p153–154 の饭圈についての読み物で説明された語。語釈は読み物の「“吃瓜”是指…」から採録。"},{"id":"2026春-3-050","lesson":3,"type":"単語","role":"関連語","zh":"正主","pinyin":"zhèng zhǔ","ja":"（ファンにとっての）推し本人","ja_ai":true,"ja_note":"","def_zh":"粉丝对自己喜欢的偶像的称呼。","def_zh_ai":false,"examples":[],"related":["吃瓜吃到正主了"],"parent":"饭圈","pages":[154],"notes":"ピンイン補完。p153–154 の饭圈についての読み物で説明された語。語釈は読み物の「而“正主”是…」から採録。"},{"id":"2026春-3-051","lesson":3,"type":"慣用句","role":"関連語","zh":"吃瓜吃到正主了","pinyin":"chī guā chī dào zhèng zhǔ le","ja":"野次馬で見ていたら推し本人が当事者だった","ja_ai":true,"ja_note":"","def_zh":"本来只是围观别人的网络纷争和八卦，意外发现自己喜欢的偶像也被牵扯进事件当中","def_zh_ai":false,"examples":[],"related":["吃瓜","正主","吃瓜群众"],"parent":"吃瓜群众","pages":[154],"notes":"ピンイン補完。p153–154 の饭圈についての読み物で説明された語。語釈は読み物の「这句话的意思是…」から採録。資料では「俗语」と説明。"},{"id":"2026春-3-052","lesson":3,"type":"成語","role":"見出し語","zh":"扬名立万","pinyin":"yáng míng lì wàn","ja":"名を成して出世する；名声を轟かせ成功を収める","ja_ai":false,"ja_note":"","def_zh":"指在社会上声名远扬、成就大业，获得名望与地位，多用于追逐事业、名利的语境。","def_zh_ai":false,"examples":[{"zh":"不少新人渴望在大赛中脱颖而出，借此机会扬名立万。","ja":"多くの新人が大会で頭角を現し、それをきっかけに名を上げたいと願っている。","ja_ai":true},{"zh":"想要靠一部作品就扬名立万并不容易，背后需要长久的积累。","ja":"一つの作品だけで名を成すのは簡単ではなく、その裏には長い積み重ねが必要だ。","ja_ai":true},{"zh":"早年他四处闯荡，一心只想在大城市扬名立万。","ja":"若い頃、彼は各地を渡り歩き、大都市で名を上げようと一心に頑張っていました。","ja_ai":false}],"related":[],"parent":"","pages":[161,163,171],"notes":"本文 p161 では映画タイトル《扬名立万》として登場。例文1の「脱颖而出」に資料ではピンイン注記（tuōyǐng érchū）が離れて記載。"},{"id":"2026春-3-053","lesson":3,"type":"成語","role":"見出し語","zh":"孤注一掷","pinyin":"gū zhù yí zhì","ja":"一か八か賭ける","ja_ai":false,"ja_note":"注： 赌注（かけ金）。孤注：持っている金をすべて一つの賭けに注ぎ込むこと。掷：賭博でサイコロを投げること。負けが込んで追い詰められたときに、持ち金のすべてを一度に賭けて勝負を決することをいう。転じて、危機的な状況において、持てる力のすべてを注ぎ込み、最後の一回の冒険や勝負に出ることのたとえ。","def_zh":"注：赌注；孤注：把所有的钱并作一注；掷：赌钱时掷骰子。在输急时把所有的钱一次押上去，决一输赢。比喻在危急时把所有力量拿出来做最后一次冒险。","def_zh_ai":false,"examples":[{"zh":"这一步风险极高，但凡理智的人都不会轻易孤注一掷。","ja":"この選択はリスクが非常に高く、理性のある人は簡単に全てを賭けたりしません。","ja_ai":false},{"zh":"团队已经陷入困境，他们只能孤注一掷，尝试全新的创作思路。","ja":"チームは窮地に立たされ、すべてをかけて新たな制作方針に挑むしかありません。","ja_ai":false}],"related":[],"parent":"","pages":[161,163,171],"notes":"本文 p161 では映画タイトル《孤注一掷》として登場。ピンインは資料表記（一→yí の変調表記）のまま。「一か八か賭ける」は p163 に単独で記載された訳。p163 の日本語解説は ja_note へ（資料中の ** 強調記号は除去）。"},{"id":"2026春-3-054","lesson":3,"type":"単語","role":"見出し語","zh":"潜力股","pinyin":"qián lì gǔ","ja":"将来有望な人材；将来性のある存在；伸びしろのあるコンテンツ","ja_ai":false,"ja_note":"","def_zh":"原指价格有上涨潜力的股票；比喻具备发展潜能、未来容易取得成功的人或事物。","def_zh_ai":false,"examples":[{"zh":"他做事踏实又善于学习，是公司里公认的潜力股。","ja":"彼は仕事ぶりが堅実で学ぶのも上手く、社内で誰もが認める将来有望な人材だ。","ja_ai":true},{"zh":"这位新人演员演技自然灵动，很多导演都把他看作潜力股。","ja":"この新人俳優の演技は自然で生き生きとしており、多くの監督が彼を将来有望な存在と見ている。","ja_ai":true},{"zh":"这家初创团队创意十足执行力强，被业内视作一支潜力股。","ja":"この新興チームはアイデアにあふれ実行力も高く、業界から将来性のある集団と見られています。","ja_ai":false}],"related":[],"parent":"","pages":[161,164,171],"notes":"p162 の本文訳では「有望株」。"},{"id":"2026春-3-055","lesson":3,"type":"単語","role":"見出し語","zh":"口碑","pinyin":"kǒu bēi","ja":"口コミ；評判；世間の評価","ja_ai":false,"ja_note":"","def_zh":"指群众口头上的评价、名声，多用于文艺作品、商品、服务、人物等领域。","def_zh_ai":false,"examples":[{"zh":"他为人正直、待人真诚，在职场和朋友圈里都有着极佳的口碑。","ja":"彼は人柄が正直で人に誠実に接するので、職場でも友人の間でもとても評判が良い。","ja_ai":true},{"zh":"酒店不断优化住宿体验，短短半年就让整体口碑大幅提升。","ja":"ホテルは宿泊体験の改善を続け、わずか半年で全体の評判を大きく高めた。","ja_ai":true},{"zh":"过度炒作只会消耗路人好感，最终严重损害作品的口碑。","ja":"過度な話題づくりや宣伝は、一般層からの好感度を消耗させるだけであり、最終的には作品の評判を大きく損なうことになる。","ja_ai":false}],"related":["有口皆碑"],"parent":"","pages":[153,154,161,164,171],"notes":"例文3は資料では日本語訳が中国語より前に置かれている。例文3の「消耗」に資料ではピンイン注記（xiāohào）が離れて記載。"},{"id":"2026春-3-056","lesson":3,"type":"成語","role":"見出し語","zh":"有口皆碑","pinyin":"yǒu kǒu jiē bēi","ja":"誰もが褒めたたえる；評判が高い","ja_ai":true,"ja_note":"すべての人の口が生きた記念碑であるという意味で、人々が皆称賛し、広く高い評価を受けていることのたとえ。","def_zh":"所有人的嘴都是活的纪念碑。比喻人人称赞，普遍受到好评。","def_zh_ai":false,"examples":[{"zh":"虽然这家公司规模不大，但是产品质量稳定，因此在业内有口皆碑。","ja":"この会社は規模こそ大きくないが、製品の品質が安定しているので、業界内で誰もが称賛している。","ja_ai":true},{"zh":"这家餐厅开业很多年了，而且价格合理、服务周到，有口皆碑。","ja":"このレストランは開業して長年になり、しかも価格が手頃でサービスも行き届いているので、誰もが褒めている。","ja_ai":true},{"zh":"这部纪录片没有邀请明星参与，不过内容真实感人，上映后有口皆碑。","ja":"このドキュメンタリーは、特別ゲストとして人気芸能人を出演させていない。しかし内容はリアルで心に響くものがあり、公開後は評判になった。","ja_ai":false}],"related":["口碑"],"parent":"","pages":[165,171],"notes":"資料ではピンインと語釈が連続（分離した）。資料には短い訳語が無いため ja は AI の短訳、p165 の日本語解説は ja_note へ。"},{"id":"2026春-3-057","lesson":3,"type":"単語","role":"見出し語","zh":"葆有","pinyin":"bǎo yǒu","ja":"保ち続ける、持ち続ける","ja_ai":false,"ja_note":"","def_zh":"保持并拥有（积极抽象品质、心态、信念），侧重长久守住珍贵的内在状态。","def_zh_ai":false,"examples":[{"zh":"前路难免遇到困难，始终葆有信心，才能平稳渡过所有难关。","ja":"この先困難に出会うのは避けられないが、常に自信を持ち続けてこそ、すべての難関を無事に乗り越えられる。","ja_ai":true},{"zh":"即便工作重复枯燥，也要葆有热情，认真做好手里每一件事。","ja":"たとえ仕事が単調で退屈でも、情熱を持ち続け、手元の一つひとつの仕事を丁寧にこなすべきだ。","ja_ai":true},{"zh":"即便工作平淡重复，也要葆有初心，记住自己最初选择这份事业的理由。","ja":"たとえ仕事が平凡で繰り返しでも、初心を持ち続け、自分が最初にこの仕事を選んだ理由を忘れないようにしよう。","ja_ai":true},{"zh":"对新鲜事物葆有好奇，不断学习新东西，心灵就能永葆青春。","ja":"新しい物事への好奇心を持ち続け、絶えず新しいことを学べば、心はいつまでも若さを保てる。","ja_ai":true}],"related":["永葆青春"],"parent":"","pages":[166,167,172,173],"notes":"ピンイン補完。まとめページには無いが p167（=p173）で語釈・例文付き解説。見出しは本文の「需要对不确定性葆有耐心」。"},{"id":"2026春-3-058","lesson":3,"type":"単語","role":"見出し語","zh":"编剧","pinyin":"biān jù","ja":"脚本家","ja_ai":false,"ja_note":"","def_zh":"创作或改编剧本的人","def_zh_ai":true,"examples":[{"zh":"这个中间地带，是电影生态的重要组成，包括中腰部项目、青年导演的实验空间、非头部的编剧和剪辑岗位以及一整套不那么耀眼却决定电影厚度的工作。","ja":"この中間層とは、映画産業のエコシステムを支える重要な領域を指す。具体的には、中規模作品（中堅プロジェクト）、若手監督が挑戦や実験を行うための創作空間、トップ層ではない脚本家や編集者の活躍の場、そして派手ではないものの映画の厚みや完成度を支える数多くの仕事が含まれる。","ja_ai":false}],"related":["剪辑"],"parent":"","pages":[166,172],"notes":"本文中に「编剧（biānjù 脚本家）」と注記のみ（まとめページには無い）。ピンインは音節ごとに分けた。例文は資料の本文から採録（訳は資料の本文訳）。本文中のピンイン注記は例文から除いた。"},{"id":"2026春-3-059","lesson":3,"type":"単語","role":"見出し語","zh":"剪辑","pinyin":"jiǎn jí","ja":"カット編集","ja_ai":false,"ja_note":"","def_zh":"对影片素材进行挑选、剪接和编排的工作","def_zh_ai":true,"examples":[{"zh":"这个中间地带，是电影生态的重要组成，包括中腰部项目、青年导演的实验空间、非头部的编剧和剪辑岗位以及一整套不那么耀眼却决定电影厚度的工作。","ja":"この中間層とは、映画産業のエコシステムを支える重要な領域を指す。具体的には、中規模作品（中堅プロジェクト）、若手監督が挑戦や実験を行うための創作空間、トップ層ではない脚本家や編集者の活躍の場、そして派手ではないものの映画の厚みや完成度を支える数多くの仕事が含まれる。","ja_ai":false}],"related":["编剧"],"parent":"","pages":[166,172],"notes":"本文中に「剪辑（jiǎnjí カット編集）」と注記のみ（まとめページには無い）。ピンインは音節ごとに分けた。例文は資料の本文から採録（訳は資料の本文訳）。本文中のピンイン注記は例文から除いた。"},{"id":"2026春-3-060","lesson":3,"type":"単語","role":"見出し語","zh":"梯队","pinyin":"tī duì","ja":"（人材の）層；段階的に引き継ぐ人材体制","ja_ai":true,"ja_note":"一定の階層や順序に従って編成・配置された隊列。さらに、持続的な発展を実現するために構築される、層構造を持ち、継続性があり、次世代へ引き継ぐことのできる人材または組織力の体系を指す。","def_zh":"按照一定层次、顺序排列形成的队伍。为了保证持续发展而建立的分层、连续、能够接替的人才或力量结构。","def_zh_ai":false,"examples":[{"zh":"学校不仅要关注优秀学生，也要建立长期的人才梯队。","ja":"学校は優秀な学生に目を向けるだけでなく、長期的な人材の層も築かなければならない。","ja_ai":true},{"zh":"企业如果忽视梯队建设，那么核心员工离职后容易出现断层。","ja":"企業が人材層の構築を怠れば、中核社員が辞めたあとに断絶が生じやすい。","ja_ai":true},{"zh":"这支球队之所以长期保持竞争力，是因为形成了完整的年龄梯队。","ja":"このチームが長く競争力を保っているのは、年齢ごとの選手層がしっかり形成されているからだ。","ja_ai":true},{"zh":"一个行业真正的竞争力，不只是头部人才，而是完整的梯队结构。","ja":"ある業界の本当の競争力とは、トップ人材だけでなく、切れ目のない人材の層にある。","ja_ai":true}],"related":["梯队培养","人才梯队","梯队建设","年龄梯队","梯队结构"],"parent":"","pages":[177,178],"notes":"まとめページには無いが p178 で語釈・例文付き解説。見出しは本文の「还应正视电影人才成长和梯队培养的重要性」。資料には短い訳語が無いため ja は AI の短訳、p178 の日本語解説は ja_note へ。資料ではピンインと語釈が連続（分離した）。"},{"id":"2026春-3-061","lesson":3,"type":"成語","role":"関連語","zh":"脱颖而出","pinyin":"tuō yǐng ér chū","ja":"頭角を現す；抜きん出る","ja_ai":true,"ja_note":"","def_zh":"比喻有才能的人显露出来，从众多人或事物中突出出来","def_zh_ai":true,"examples":[{"zh":"不少新人渴望在大赛中脱颖而出，借此机会扬名立万。","ja":"多くの新人が大会で頭角を現し、それをきっかけに名を上げたいと願っている。","ja_ai":true},{"zh":"《给阿嬷的情书》就是从中间地带脱颖而出的佳作。","ja":"『おばあちゃんへのラブレター（《给阿嬷的情书》）』は、まさにその「中間地帯」から頭角を現した優れた作品である。","ja_ai":false}],"related":["扬名立万"],"parent":"","pages":[163,174],"notes":"コーディネーター指示により追加した関連語。p163 の扬名立万の例文中に資料のピンイン注記「tuōyǐng érchū」あり（音節ごとに分けた）。例文1は p163 の扬名立万の例文、例文2は p174 の本文（訳は資料の本文訳）。"},{"id":"2026春-3-062","lesson":3,"type":"成語","role":"関連語","zh":"参差不齐","pinyin":"cēn cī bù qí","ja":"ばらつきがある；玉石混交","ja_ai":true,"ja_note":"","def_zh":"长短、高低、好坏不一致，很不整齐","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[142],"notes":"コーディネーター指示により追加した関連語。ピンイン補完。p142 の学習者の発言メモに語のみ記載。"},{"id":"2026春-3-063","lesson":3,"type":"成語","role":"関連語","zh":"急于求成","pinyin":"jí yú qiú chéng","ja":"成果を急ぐ；功を焦る","ja_ai":true,"ja_note":"","def_zh":"急着要取得成功，不顾客观条件和应有的步骤","def_zh_ai":true,"examples":[{"zh":"不能急于求成","ja":"成果を急いではいけない。","ja_ai":true}],"related":["循序渐进"],"parent":"","pages":[147,183],"notes":"コーディネーター指示により追加した関連語。ピンイン補完。p183 の学習者の発言メモ（「…能训练出来。不能急于求成」）に記載。p147 の循序渐进の語釈中にも「不急于求成」として出る。例文は p183 の発言メモの一句。"},{"id":"2026春-3-064","lesson":3,"type":"慣用句","role":"関連語","zh":"用脚投票","pinyin":"yòng jiǎo tóu piào","ja":"（購入・来場などの）行動で支持を示す","ja_ai":true,"ja_note":"","def_zh":"观众通过购票观影的实际行动来表达对好电影的支持；泛指人们用实际行动（选择去留、买或不买）来表达态度","def_zh_ai":true,"examples":[{"zh":"过去10多年里，观众用脚投票选出来的“年度爆款”几乎都是真正有内容、有质感、有情感的电影。","ja":"この十数年、観客が実際の鑑賞行動で支持してきた「年間大ヒット作品」は、ほぼ例外なく中身、質感、情感にあふれた真の映画ばかりだ。","ja_ai":false}],"related":[],"parent":"","pages":[175,176],"notes":"コーディネーター指示により追加した関連語。ピンイン補完。語釈前半は p176 の設問の正解選択肢 A「观众通过购票观影的实际行动来表达对好电影的支持」を採用（設問は正解を明示していないため A を正解と判断）。例文は p175 の本文（訳は資料の本文訳）。pages は指示の [176] に本文の p175 を加えた。"},{"id":"2026春-4-001","lesson":4,"type":"単語","role":"見出し語","zh":"草根","pinyin":"cǎo gēn","ja":"草の根／一般庶民","ja_ai":true,"ja_note":"本来は草の根を意味する。転じて、一般市民や民間の人々、専門家ではない人々、または大きな資本や政府の支援に依存しない活動や組織を指す。エリートや専門組織、商業化されたものと対比されることが多い。","def_zh":"原指草的根部；引申义：普通底层民众、民间非专业、非官方、无资本加持的群体 / 事物，区别于精英、专业、商业化上层群体。","def_zh_ai":false,"examples":[{"zh":"这场草根足球赛事没有专业外援（wài yuán），普通村民和上班族都能站上赛场。","ja":"この草の根サッカー大会にはプロの外部助っ人選手はおらず、一般の村民や会社員でも試合に出場できる。","ja_ai":true},{"zh":"很多草根创作者依靠短视频表达想法，不用依赖大型媒体公司宣传自己。","ja":"多くの草根クリエイターはショート動画を使って思いを伝え、大手メディア企業に頼らず自身を発信できる。","ja_ai":false},{"zh":"草根文化拥有强大的生命力，它源自群众真实的生活，不受商业规则束缚（shù fù）。","ja":"草の根文化は強い生命力を持っている。それは人々の実際の暮らしから生まれ、商業的なルールに縛られない。","ja_ai":true}],"related":["草根群体","草根赛事","草根体育","草根创作者","草根品牌","草根文化","草根力量"],"parent":"","pages":[197,201,215],"notes":"例文中の 外援（wài yuán）・束缚（shù fù）はピンイン注のみで語釈が無いため独立カードにしていない。"},{"id":"2026春-4-002","lesson":4,"type":"単語","role":"見出し語","zh":"壁垒","pinyin":"bì lěi","ja":"障壁／隔たり","ja_ai":true,"ja_note":"人と人、集団、国家の間におけるコミュニケーションや交流、相互理解、融合を妨げる目に見えない隔たり・境界・障害。本課での中心的な意味：目に見えない隔たり、考え方や価値観による障害。","def_zh":"阻碍人与人、群体、国家之间沟通、来往、融合的无形隔阂、界限与障碍。本课核心义：无形隔阂、观念障碍。","def_zh_ai":false,"examples":[{"zh":"真诚的沟通可以打破观念的壁垒，让不同文化背景的人互相理解包容。","ja":"誠実なコミュニケーションは考え方の壁を打ち破り、異なる文化的背景を持つ人々が互いに理解し、受け入れ合えるようにする。","ja_ai":true},{"zh":"求同存异的相处方式能跨越文化壁垒，拉近不同国家民众之间的距离。","ja":"共通点を求めつつ違いを認め合う付き合い方は、文化の壁を越え、異なる国の人々の距離を縮めることができる。","ja_ai":true},{"zh":"语言的壁垒会阻碍跨国合作，所以我们需要学习对方国家的语言与文化。","ja":"言葉の壁は国際協力の妨げになるため、私たちは相手国の言語と文化を学ぶ必要がある。","ja_ai":true},{"zh":"尽管两家公司在业务上存在许多合作的可能，但由于企业文化差异形成的无形壁垒，使得双方的合作谈判始终难以推进。","ja":"2社の間には業務上多くの協力の可能性があるものの、企業文化の違いによって生じた目に見えない壁のために、双方の提携交渉はなかなか進まなかった。","ja_ai":true}],"related":[],"parent":"","pages":[197,202,215,236],"notes":""},{"id":"2026春-4-003","lesson":4,"type":"単語","role":"見出し語","zh":"摊贩","pinyin":"tān fàn","ja":"露店商 屋台の店主","ja_ai":false,"ja_note":"","def_zh":"摆摊子做小买卖的人。","def_zh_ai":false,"examples":[],"related":[],"parent":"","pages":[203,204,215,236],"notes":"資料はピンインがページ下部に分離して記載（tān fàn）。"},{"id":"2026春-4-004","lesson":4,"type":"単語","role":"見出し語","zh":"一扫疲惫","pinyin":"yī sǎo pí bèi","ja":"疲れが一気に吹き飛ぶ、疲労を一掃する","ja_ai":false,"ja_note":"","def_zh":"一下子把全身的劳累、疲倦全部消除干净。","def_zh_ai":false,"examples":[],"related":[],"parent":"","pages":[203,204,215],"notes":"ピンイン補完（資料 p204 にピンイン無し。一 は本調で表記）。「一扫＋疲惫」の組み合わせ表現のため type は単語とした。"},{"id":"2026春-4-005","lesson":4,"type":"単語","role":"見出し語","zh":"绿茵场","pinyin":"lǜ yīn chǎng","ja":"芝生の競技場 サッカー場","ja_ai":false,"ja_note":"","def_zh":"铺满绿色草坪的场地，多指足球场。","def_zh_ai":false,"examples":[],"related":[],"parent":"","pages":[203,204,215],"notes":"資料はピンインがページ下部に分離して記載。"},{"id":"2026春-4-006","lesson":4,"type":"単語","role":"見出し語","zh":"精湛","pinyin":"jīng zhàn","ja":"巧みな、見事な","ja_ai":false,"ja_note":"","def_zh":"技艺、技术精深纯熟，水平极高。","def_zh_ai":false,"examples":[],"related":[],"parent":"","pages":[203,204,215],"notes":"資料はピンインが語釈の後に分離して記載。"},{"id":"2026春-4-007","lesson":4,"type":"単語","role":"見出し語","zh":"精英叙事","pinyin":"jīng yīng xù shì","ja":"エリート叙事、エリート向けストーリー、エリート中心の物語","ja_ai":false,"ja_note":"","def_zh":"以社会精英、高端成功人士为核心视角，围绕财富、地位、专业顶层成就构建的故事表达逻辑；常突出优越资源、高端圈层、专业化高标准，与“草根叙事”相对。","def_zh_ai":false,"examples":[],"related":["草根叙事"],"parent":"","pages":[203,204,215],"notes":"資料はピンインが語釈の後に分離して記載。"},{"id":"2026春-4-008","lesson":4,"type":"単語","role":"関連語","zh":"草根叙事","pinyin":"cǎo gēn xù shì","ja":"草の根の物語、庶民目線のストーリー","ja_ai":true,"ja_note":"","def_zh":"以普通民众、基层群体的视角和日常生活为核心的故事表达方式，与“精英叙事”相对。","def_zh_ai":true,"examples":[],"related":["精英叙事","草根"],"parent":"精英叙事","pages":[204],"notes":"精英叙事の語釈中で対義語として名前のみ言及。ピンイン補完。"},{"id":"2026春-4-009","lesson":4,"type":"単語","role":"見出し語","zh":"代入感","pinyin":"dài rù gǎn","ja":"没入感、感情移入","ja_ai":false,"ja_note":"","def_zh":"读者、观众、观者能够走进故事或场景，切身感受到人物处境、情绪的心理感受。","def_zh_ai":false,"examples":[],"related":[],"parent":"","pages":[203,204,215],"notes":"ピンイン補完（資料 p204 にピンイン無し）。"},{"id":"2026春-4-010","lesson":4,"type":"単語","role":"見出し語","zh":"久违","pinyin":"jiǔ wéi","ja":"久しぶり","ja_ai":false,"ja_note":"","def_zh":"好久没有见到、好久没有体验，时隔许久再次遇见。","def_zh_ai":false,"examples":[],"related":[],"parent":"","pages":[203,204,215],"notes":"資料はピンインがページ下部に分離して記載。"},{"id":"2026春-4-011","lesson":4,"type":"慣用句","role":"見出し語","zh":"接地气","pinyin":"jiē dì qì","ja":"庶民的で親しみやすい／地に足がついた","ja_ai":true,"ja_note":"本来の意味：地面に近づくこと、地面に接すること。引申義（現在の主な用法）：一般の人々の実際の生活に寄り添い、庶民の暮らしに密着していること。飾り気がなく親しみやすく、堅苦しくも現実離れもしておらず、人々に共感や親近感を与えやすいこと。","def_zh":"本义：贴近地面、接触地气；引申义（现主流用法）：贴近普通老百姓的真实生活，朴实通俗，不空洞、不脱离大众，容易让人产生亲近感。","def_zh_ai":false,"examples":[{"zh":"主播说话风趣又接地气，直播间每天都有大量忠实观众停留。","ja":"配信者の話し方はユーモラスで堅苦しくなく、毎日多くの固定視聴者が配信ルームに残っている。","ja_ai":false},{"zh":"这位作家的文字特别接地气，普通人都能读懂其中的生活感悟。","ja":"この作家の文章はとても庶民に寄り添っており、一般の人でも文中の暮らしの感じ取りを理解できる。","ja_ai":false}],"related":[],"parent":"","pages":[210,211,215,216],"notes":"動目構造の三字慣用語として type を慣用句とした（単語扱いも可）。資料では例文1の訳が例文2の後に置かれている。"},{"id":"2026春-4-012","lesson":4,"type":"単語","role":"見出し語","zh":"纽带","pinyin":"niǔ dài","ja":"絆／つながり／架け橋","ja_ai":true,"ja_note":"本来の意味：物を縛ったり、まとめたり、つないだりするための帯状のもの。引申義（現在よく使われる意味）：人や物事を結び付ける役割を果たす人・物・手段・媒体のこと。両者のつながりを深めたり、関係を築いたりするものを指す。","def_zh":"本义：用来缠绕、捆扎、连接物品的带子；引申义（主流）：起联系、联结作用的人、事物、媒介，让两方建立稳固关联。","def_zh_ai":false,"examples":[{"zh":"共同的爱好成为我们之间的情感纽带，多年来我们始终保持往来。","ja":"共通の趣味が私たちの心の絆となり、長年にわたってずっと付き合いが続いている。","ja_ai":true},{"zh":"美食是联结各国文化的纽带，不同地域的人能借食物拉近距离。","ja":"美食は各国の文化を結ぶ架け橋であり、異なる地域の人々は食べ物を通じて距離を縮めることができる。","ja_ai":true}],"related":[],"parent":"","pages":[210,211,215,216],"notes":"本文 p242/p244（情感纽带）にも出るが解説ページではないため pages には含めていない。"},{"id":"2026春-4-013","lesson":4,"type":"単語","role":"見出し語","zh":"营销梗","pinyin":"yíng xiāo gěng","ja":"マーケティングの話題づくり／宣伝目的のネタ","ja_ai":false,"ja_note":"","def_zh":"为营销宣传而刻意策划、制造出来的话题或噱头。","def_zh_ai":true,"examples":[{"zh":"这些细节，不是策划出来的“营销梗”，而是来自乡土市井的泥土味、烟火气。","ja":"こうした細かな場面は、企画された「マーケティングの話題づくり」ではなく、地域に根ざした暮らしならではの素朴な雰囲気や、人々の日常生活の温かみから生まれたものです。","ja_ai":false}],"related":["梗"],"parent":"","pages":[210,212,216],"notes":"p212 で本文の一文とともに日本語訳が付された語。中国語語釈は資料に無い。"},{"id":"2026春-4-014","lesson":4,"type":"単語","role":"見出し語","zh":"乡土市井","pinyin":"xiāng tǔ shì jǐng","ja":"地域に根ざした暮らし／庶民の暮らし","ja_ai":false,"ja_note":"","def_zh":"乡村与城镇里普通百姓的日常生活环境。","def_zh_ai":true,"examples":[{"zh":"这些细节，不是策划出来的“营销梗”，而是来自乡土市井的泥土味、烟火气。","ja":"こうした細かな場面は、企画された「マーケティングの話題づくり」ではなく、地域に根ざした暮らしならではの素朴な雰囲気や、人々の日常生活の温かみから生まれたものです。","ja_ai":false}],"related":[],"parent":"","pages":[210,212,216],"notes":"ピンイン補完。中国語語釈は資料に無い。乡土＋市井の組み合わせ表現のため type は単語とした。"},{"id":"2026春-4-015","lesson":4,"type":"単語","role":"見出し語","zh":"泥土味","pinyin":"ní tǔ wèi","ja":"素朴さ／土の香りを感じるような素朴さ","ja_ai":false,"ja_note":"","def_zh":"像泥土一样的气息，比喻朴实、不加修饰的乡土风格。","def_zh_ai":true,"examples":[{"zh":"这些细节，不是策划出来的“营销梗”，而是来自乡土市井的泥土味、烟火气。","ja":"こうした細かな場面は、企画された「マーケティングの話題づくり」ではなく、地域に根ざした暮らしならではの素朴な雰囲気や、人々の日常生活の温かみから生まれたものです。","ja_ai":false}],"related":[],"parent":"","pages":[210,212,216],"notes":"ピンイン補完。中国語語釈は資料に無い。"},{"id":"2026春-4-016","lesson":4,"type":"単語","role":"見出し語","zh":"烟火气","pinyin":"yān huǒ qì","ja":"生活感／人間味／日常生活の温かみ","ja_ai":false,"ja_note":"","def_zh":"原指做饭时的烟火气息，比喻普通百姓热闹、温暖的日常生活气息。","def_zh_ai":true,"examples":[{"zh":"这些细节，不是策划出来的“营销梗”，而是来自乡土市井的泥土味、烟火气。","ja":"こうした細かな場面は、企画された「マーケティングの話題づくり」ではなく、地域に根ざした暮らしならではの素朴な雰囲気や、人々の日常生活の温かみから生まれたものです。","ja_ai":false}],"related":[],"parent":"","pages":[210,212,216],"notes":"ピンイン補完。中国語語釈は資料に無い。"},{"id":"2026春-4-017","lesson":4,"type":"単語","role":"見出し語","zh":"梗","pinyin":"gěng","ja":"ネタ／（ネットの）ミーム","ja_ai":true,"ja_note":"インターネットで生まれた新しい意味（現在の主な用法。「哏（gén）」という伝統芸能の用語が、同音の「梗（gěng）」として広く使われるようになったことに由来する）映画やドラマ、ショート動画、お笑いネタ、会話などに登場する笑いどころや定番のネタ、多くの人に知られているエピソード、印象的なセリフ、名場面などを指す。また、若者同士が共通の理解を示すために使う文化的な合言葉（共通コード）という意味でも使われる。","def_zh":"名词：植物的枝、茎，例：菜梗、花梗 网络衍生新义（当代主流用法，源自曲艺词「哏 gén」，同音误用普及）指影视剧、短视频、段子、对话里自带笑点、专属典故、大众熟知的桥段、名台词、名画面，是年轻人社交的文化暗号。","def_zh_ai":false,"examples":[{"zh":"年轻人聚会总爱互相玩梗，不懂网络热点的人很难跟上话题。","ja":"若者の集まりではお互いネタを使って話すのが習わしで、ネットの話題を知らない人は会話についていくのが難しい。","ja_ai":false},{"zh":"每年都会诞生大批全新网梗，很多热度只能维持一两个月。","ja":"毎年たくさんの新しいネットミームが生まれるが、多くは1～2ヶ月で話題が冷めてしまう。","ja_ai":false},{"zh":"他反应很快总能完美接梗，和他聊天永远不会出现冷场。","ja":"彼は反射神経が良くいつも上手くネタに乗れるので、彼と話すと場が白けることがない。","ja_ai":false},{"zh":"聊天时他总喜欢主动抛梗，希望身边人能顺着他的玩笑互动。","ja":"会話の時彼は自発的にネタを振るのが好きで、周りの人にジョークに乗ってもらいたい。","ja_ai":false},{"zh":"这部喜剧电影全是十年前的老梗，年轻观众很难产生共鸣。","ja":"このコメディ映画は10年前の古いネタばかりで、若い観客にはなかなか共感されない。","ja_ai":true},{"zh":"评论区总有人反复刷同款烂梗，大量重复内容会破坏观看体验。","ja":"コメント欄に同じつまらないネタを連投する人が多く、反復投稿が視聴体験を損なう。","ja_ai":false}],"related":["玩梗","接梗","抛梗","老梗","新梗","热梗","爆梗","网络梗","有梗","没梗","网梗","烂梗","营销梗","菜梗","花梗","哏"],"parent":"","pages":[210,213,214,215,216,236],"notes":"資料の日本語訳はネット由来の新義のみで、本義（植物の枝・茎）の訳は無い。def_zh の「花梗」と「网络衍生新义」の間は資料で改行のみ（句読点なし）。p214・p215 に並ぶコロケーション（玩梗 接梗 抛梗 老梗 新梗 热梗 爆梗 网络梗 有梗 没梗）は 草根 と同様に related に入れ、独立カードにはしていない。"},{"id":"2026春-4-018","lesson":4,"type":"単語","role":"見出し語","zh":"侗族","pinyin":"Dòng zú","ja":"トン族（中国の少数民族の一つ）","ja_ai":true,"ja_note":"","def_zh":"侗族（Dòngzú）是中国的一个少数民族，主要分布在贵州、湖南、广西等地，其中贵州省的侗族人口最多。","def_zh_ai":false,"examples":[{"zh":"近年来，在贵州榕江举办的“村超”足球赛事中，侗族大歌、侗族舞蹈等民族文化表演也成为比赛的一大特色，向来自各地的游客展示了侗族文化的独特魅力。","ja":"近年、貴州省榕江県で開催されている「村超」サッカー大会では、トン族大歌やトン族の踊りなどの民族文化パフォーマンスも大会の大きな特色となり、各地から訪れる観光客にトン族文化の独特な魅力を伝えている。","ja_ai":true}],"related":["侗语","侗族大歌","鼓楼","风雨桥","苗族"],"parent":"","pages":[210,216,217,218,236],"notes":"資料ピンインは「Dòngzú」（連続表記）。音節区切りに合わせ「Dòng zú」とした。日本語訳は資料に見出しとしては無い（p188 の本文訳では「トン族」）。def_zh は p218 の解説（背景知識ページ）冒頭文を採用、例文も同ページ末段の文を採用。p218 の 侗语（Dòngyǔ）・鼓楼（gǔlóu）・风雨桥（fēngyǔqiáo）・侗族大歌（Dòngzú dàgē）は背景知識として related のみに入れた。"},{"id":"2026春-4-019","lesson":4,"type":"成語","role":"見出し語","zh":"一腔热血","pinyin":"yì qiāng rè xuè","ja":"燃え上がるような情熱；一腔の熱血","ja_ai":false,"ja_note":"","def_zh":"指满含热烈真挚的感情，比喻为正义事业而献身的热情。","def_zh_ai":false,"examples":[{"zh":"他当初凭着一腔热血辞去了稳定的工作去创业，然而现实很快让他明白，光靠热情是远远不够的。","ja":"彼は当時、情熱だけを頼りに安定した仕事を辞めて起業したが、現実はすぐに、情熱だけでは到底うまくいかないことを思い知らせた。","ja_ai":false},{"zh":"虽然屡次遭遇挫折，但他那一腔热血从未冷却，始终坚信自己能够改变现状。","ja":"彼は何度も挫折を経験したが、その情熱が冷めることは一度もなく、いつか必ず現状を変えられると信じ続けていた。","ja_ai":false},{"zh":"很多年轻人都怀着一腔热血投身于公益事业，但他们往往缺乏应对复杂局面的经验。","ja":"多くの若者は熱い思いを胸に社会貢献活動に飛び込むが、複雑な状況に対応する経験が不足していることが少なくない。","ja_ai":false}],"related":[],"parent":"","pages":[225,230,236],"notes":"ピンインは資料どおり変調表記（yì）。"},{"id":"2026春-4-020","lesson":4,"type":"成語","role":"見出し語","zh":"双向奔赴","pinyin":"shuāng xiàng bēn fù","ja":"互いに向かって進む。双方が努力し合う関係","ja_ai":false,"ja_note":"","def_zh":"指为了实现共同的目标或愿景，双方彼此靠近、共同努力。常用于形容人际关系中的平等付出。","def_zh_ai":false,"examples":[{"zh":"粉丝与偶像之间最理想的状态莫过于双向奔赴，一方给予支持，另一方则用优秀的作品来回馈(huí kuì)。","ja":"ファンとアイドルの間で最も理想的な状態は、互いに努力し合う関係であり、一方が支持を与え、もう一方が優秀な作品で応えることだ。","ja_ai":false},{"zh":"在职场中，员工与公司的关系也需要双向奔赴，公司提供发展平台，员工则贡献自己的才华与忠诚。","ja":"職場においても、社員と会社の関係は互いに努力し合うことが必要だ。会社は発展の場を提供し、社員は自分の才能と忠誠心を捧げる。","ja_ai":false},{"zh":"我们都在抱怨朋友越来越难交，却忘了友谊本身就是一场双向奔赴，需要彼此投入时间和精力去维系。","ja":"私たちは友達が作りにくくなったと愚痴りながらも、友情そのものが互いに努力し合う関係であり、時間と労力を投じて維持する必要があることを忘れがちだ。","ja_ai":false}],"related":[],"parent":"","pages":[225,231,236],"notes":"伝統的な成語ではない新しい四字表現だが、四字の固定表現として type を成語とした。例文1の(huí kuì)は資料で半角括弧。"},{"id":"2026春-4-021","lesson":4,"type":"成語","role":"見出し語","zh":"大包大揽","pinyin":"dà bāo dà lǎn","ja":"何もかも一人で抱え込む","ja_ai":true,"ja_note":"すべての仕事や責任、役割を一人で引き受けること。自分の能力や役割の範囲を考えず、一人ですべてを抱え込んでしまうことを指し、仕事を独り占めしたり、適切に役割分担をしなかったりするという否定的な意味で使われることが多い。","def_zh":"把全部事情、责任、工作全部承揽下来；多指不顾自身能力、不分边界，独自包揽所有事务，常带有“做事独断、不懂得分工分担”的负面倾向。","def_zh_ai":false,"examples":[{"zh":"团队合作切忌凡事大包大揽，合理分工才能提升整体的工作效率。","ja":"チームで協力する際、何もかも一人で引き受けるのは厳に避けるべきで、適切な役割分担こそ全体の業務効率を高める。","ja_ai":false},{"zh":"管理者如果遇事大包大揽，下属会慢慢失去主动思考、自主解决问题的意识。","ja":"管理者が問題が起きるたび全て一人で対応すると、部下は次第に自主的に考え、問題を解決する意識を失ってしまう。","ja_ai":false},{"zh":"就算你的能力十分出众，也不能在项目里大包大揽，要给其他同事锻炼的空间。","ja":"たとえあなたの実力が非常に優れていても、プロジェクトの業務を全部一人で抱え込んではいけず、他の同僚に練習の場を与えなければならない。","ja_ai":false}],"related":[],"parent":"","pages":[225,232,236],"notes":""},{"id":"2026春-4-022","lesson":4,"type":"単語","role":"見出し語","zh":"前瞻性","pinyin":"qián zhān xìng","ja":"先見性","ja_ai":true,"ja_note":"将来の発展の流れを見通し、潜在的なチャンスやリスクを前もって予測できる考え方や視点、能力を指す。「前瞻（前瞻性）」とは、将来を見据え、長期的な視点で物事を考えることを意味する。","def_zh":"指能够提前预判未来发展趋势、提前看到潜在机遇与风险的特性、眼光与能力；“前瞻”即向前眺望、预判长远局势。","def_zh_ai":false,"examples":[{"zh":"优秀的企业决策者拥有极强的前瞻性，总能提前布局行业未来的发展赛道。","ja":"優れた企業の意思決定者は強い先見性を備えており、業界の将来の発展分野に事前に布石を打つことができる。","ja_ai":false},{"zh":"这份城市交通规划富有前瞻性，充分考虑了十年后人口增长带来的出行需求。","ja":"この都市交通計画は先見性にあふれており、10年後の人口増加に伴う移動ニーズを十分に考慮している。","ja_ai":false},{"zh":"只看重短期收益的项目方案缺乏前瞻性，很容易在行业变革中被市场淘汰（táo tài）。","ja":"短期的な利益ばかり重視するプランは先見性に欠け、業界の変革の波に市場から淘汰されやすい。","ja_ai":false}],"related":["前瞻","瞻前顾后","马首是瞻"],"parent":"","pages":[226,233,236],"notes":""},{"id":"2026春-4-023","lesson":4,"type":"成語","role":"見出し語","zh":"瞻前顾后","pinyin":"zhān qián gù hòu","ja":"あれこれ迷う／優柔不断","ja_ai":true,"ja_note":"もともとは、前を見たり後ろを振り返ったりすることを指す。転じて、物事を慎重に進める様子を表すほか、あれこれ心配しすぎて決断できず、優柔不断であることもいう。","def_zh":"原指看看前面，又看看后面。形容做事谨慎，也形容顾虑太多、犹豫不决。","def_zh_ai":false,"examples":[{"zh":"我们必须在月底前做出决定，已经没有时间让你瞻前顾后了，现在需要的是果断地采取行动。","ja":"私たちは月末までに決定を下さなければならない。あなたがためらっている時間はもうない。今必要なのは断固として行動を起こすことだ。","ja_ai":false}],"related":["前瞻性","马首是瞻"],"parent":"","pages":[234,236],"notes":"「成语学习」として 前瞻性 の「瞻」つながりで掲載。単語のまとめ p236 にあるため見出し語とした。資料ではピンインと語釈が連続していたのを分離。"},{"id":"2026春-4-024","lesson":4,"type":"成語","role":"見出し語","zh":"马首是瞻","pinyin":"mǎ shǒu shì zhān","ja":"人の指揮に従う／言いなりになる","ja_ai":true,"ja_note":"もともとは、戦場で兵士が主将の馬の向きを見て進退を決めたことを指す。そこから転じて、指揮に従ったり、人の行動に従って行動したりすることを意味する。","def_zh":"原指作战时士卒看着主将的马头决定进退方向，后泛指服从指挥或追随别人行动。","def_zh_ai":false,"examples":[{"zh":"我们鼓励团队合作，但不希望成员们盲目地唯领导马首是瞻，而丧失（sàng shī）了独立思考的能力。","ja":"私たちはチームワークを奨励するが、メンバーがリーダーの指揮に盲目的に従い、独立して考える能力を失うことは望んでいない。","ja_ai":false}],"related":["前瞻性","瞻前顾后"],"parent":"","pages":[235,236],"notes":"「成语学习」として掲載。例文は「唯～马首是瞻」の形。資料ではピンインと語釈が連続していたのを分離。"},{"id":"2026春-4-025","lesson":4,"type":"単語","role":"見出し語","zh":"交织","pinyin":"jiāo zhī","ja":"織り交ざる、入り混じる、複雑に絡み合う、絡み合う、交錯する","ja_ai":false,"ja_note":"","def_zh":"①多条线、事物互相穿插缠绕；②多种情感、因素、景象错综复杂地融合在一起。","def_zh_ai":false,"examples":[{"zh":"不同民族的文化在这里交织，长久的融合造就了包容多元的城市氛围。","ja":"複数の民族文化がここで交わり、長年の融合が寛容で多様な都市の雰囲気を生み出しました。","ja_ai":false},{"zh":"这座城市既保留了传统建筑，又建起了许多现代化高楼，传统文化与现代文明在这里相互交织。","ja":"この町には伝統的な建物が残る一方で近代的な高層ビルも建ち並び、伝統文化と現代文明が互いに交錯している。","ja_ai":false},{"zh":"回顾这几年的经历，我的心里交织着感激、遗憾和希望，因为每一次选择都让我成长了不少。","ja":"ここ数年を振り返ると、私の心には感謝、後悔、そして希望が入り交じっている。どの選択も私を大きく成長させてくれたからだ。","ja_ai":false}],"related":[],"parent":"","pages":[237,238],"notes":"単語のまとめページには無いが、語釈・例文付きで解説されているため見出し語とした。"},{"id":"2026春-4-026","lesson":4,"type":"単語","role":"見出し語","zh":"催生","pinyin":"cuī shēng","ja":"誘発する、生み出す、促して登場させる、促進する","ja_ai":false,"ja_note":"","def_zh":"①用外力促使事物加速产生、出现；②原指助产，现多用于经济、文化、行业语境，推动新业态、新需求诞生。","def_zh_ai":false,"examples":[{"zh":"大众对短途文旅的需求持续上涨，催生了串联城乡的一站式消费模式。","ja":"大衆の短期観光需要が伸び続け、都市と田舎をつなぐワンストップ消費モデルが誕生しました。","ja_ai":false},{"zh":"数字化办公的普及催生了线上协同工具，大幅降低了跨地域团队沟通成本。","ja":"デジタルオフィスの普及がオンライン共同作業ツールを生み出し、地域をまたぐチームの連絡コストを大きく削減しました。","ja_ai":false},{"zh":"短视频传播的浪潮催生了本地生活博主，为线下实体门店带来全新客流。","ja":"ショート動画の普及が地域生活インフルエンサーを生み出し、実店舗に新たな来店客をもたらしました。","ja_ai":false}],"related":[],"parent":"","pages":[237,239],"notes":"単語のまとめページには無いが、語釈・例文付きで解説されているため見出し語とした。"},{"id":"2026春-4-027","lesson":4,"type":"単語","role":"見出し語","zh":"撬动","pinyin":"qiào dòng","ja":"梃子で動かす、少ない資源で大きな資金 / 市場を動かす、呼び水となって牽引する","ja_ai":false,"ja_note":"","def_zh":"①本义用杠杆拨开、抬起重物；②引申义：以少量资源、政策、投入作为支点，带动大规模的资金、市场、资源流动。经济、议论文高频书面词。","def_zh_ai":false,"examples":[{"zh":"一次成功的城市体育赛事，足以撬动跨城市文旅联动，带动餐饮住宿全线增收。","ja":"成功した都市スポーツ大会は都市をまたぐ観光連携を動かし、飲食・宿泊業全体の売上増加を引き起こします。","ja_ai":false},{"zh":"只要我们能找到问题的关键点，就可以用有限的资源去撬动整个项目的发展。","ja":"問題の鍵となる点を見つけられれば、限られた資源でプロジェクト全体の発展を推進することができる。","ja_ai":false},{"zh":"如果只是靠传统的方法，那么我们很难撬动这些沉年的问题，必须寻求新的思路。","ja":"従来の方法だけに頼っていては、これらの長年の問題を解決するのは難しい。新しい考え方を模索しなければならない。","ja_ai":false}],"related":[],"parent":"","pages":[237,240],"notes":"単語のまとめページには無いが、語釈・例文付きで解説されているため見出し語とした。例文3の「沉年」は「陈年」の誤字の可能性（資料どおり）。"},{"id":"2026春-4-028","lesson":4,"type":"成語","role":"関連語","zh":"骁勇善战","pinyin":"xiāo yǒng shàn zhàn","ja":"勇敢で戦いに優れ","ja_ai":false,"ja_note":"","def_zh":"形容勇猛矫健，善于作战。","def_zh_ai":true,"examples":[{"zh":"人人骁勇善战（xiāo yǒng shàn zhàn），武艺高强","ja":"彼らは皆、勇敢で戦いに優れ（骁勇善战）、武芸にも秀でていました。","ja_ai":false}],"related":[],"parent":"","pages":[198],"notes":"知识补充「十三太保」の本文中にピンイン注付きで出た成語。ja は p198 の日本語訳の該当箇所をそのまま採用。例文は同ページの一節（文の途中まで）とその対応訳。中国語語釈は資料に無い。"},{"id":"2026春-4-029","lesson":4,"type":"単語","role":"関連語","zh":"嘉年华","pinyin":"jiā nián huá","ja":"カーニバル","ja_ai":false,"ja_note":"","def_zh":"大型的狂欢节、娱乐庆典活动。","def_zh_ai":true,"examples":[{"zh":"在“村超”赛场，侗族大歌、苗族舞蹈与足球竞技同台绽放，地方美食与激情呐喊交织共鸣；在“苏超”看台，“水蜜桃加油”“盐水鸭必胜”的趣味口号，以及各赛区融入的地方戏曲、非遗展示，将一场场比赛升级为地域文化展示的嘉年华（jiā nián huá カーニバル），让更多人为家乡自豪、为中国喝彩。","ja":"「村超」の会場では、トン族大歌やミャオ族の踊りがサッカーの試合とともに披露され、地元グルメと熱い声援が響き合う。「蘇超」の観客席では、「水蜜桃がんばれ」「塩水鴨必勝」といったユーモラスなスローガンや、各会場に取り入れられた地方劇・無形文化遺産の展示によって、一つ一つの試合が地域文化を披露するカーニバルへと格上げされ、より多くの人が故郷を誇りに思い、中国に喝采を送るようになっている。","ja_ai":true}],"related":[],"parent":"","pages":[237],"notes":"本文 p237 にピンインと日本語（カーニバル）の注付きで出た語。中国語語釈は資料に無い。"},{"id":"2026春-4-030","lesson":4,"type":"成語","role":"関連語","zh":"畅所欲言","pinyin":"chàng suǒ yù yán","ja":"思う存分に意見を述べる、言いたいことを遠慮なく話す","ja_ai":true,"ja_note":"","def_zh":"尽情地说出想说的话。","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[205],"notes":"p205 の討論問題に「畅所欲言」（自由に話そう）という指示として出た成語。例文は資料に無い。ピンイン補完。"},{"id":"2026春-4-031","lesson":4,"type":"成語","role":"関連語","zh":"朴实无华","pinyin":"pǔ shí wú huá","ja":"質素で飾り気がない、素朴で華美でない","ja_ai":true,"ja_note":"","def_zh":"朴素实在，不加修饰，没有浮华。","def_zh_ai":true,"examples":[],"related":[],"parent":"","pages":[205],"notes":"p205 の学生回答メモ（选手有种没有修饰的像泥土一样的样子质朴 朴实无华）に出た成語。メモは文の断片のため例文にしていない。ピンイン補完。 【重複】第1課にも同じ語あり"},{"id":"2026春-4-032","lesson":4,"type":"慣用句","role":"関連語","zh":"有所为有所不为","pinyin":"yǒu suǒ wéi yǒu suǒ bù wéi","ja":"なすべきことはなし、なすべきでないことはしない","ja_ai":true,"ja_note":"","def_zh":"有些事情要做，有些事情不做，指做事有选择、有分寸。","def_zh_ai":true,"examples":[{"zh":"当管理部门从“台前”走到“幕后”，从“主导者”转成“共建者”“服务者”，有所为有所不为，来自民间的创造力、创新力就会如江河破冰、奔流不息。","ja":"管理部門が「表舞台」から「舞台裏」へと移り、「主導者」から「共に築く者」「サービスを提供する者」へと役割を変え、なすべきことはなし、なすべきでないことはしないようにすれば、民間から生まれる創造力や革新力は、氷を割って流れ出す大河のように絶え間なく湧き出てくる。","ja_ai":true}],"related":[],"parent":"","pages":[226],"notes":"本文 p226 に出た慣用句。ピンイン補完。"}]};
+</script>
+<script>
+(function(){
+'use strict';
+
+/* ---------- 開発用サンプルデータ（CARD_DATA が null のとき使用） ---------- */
+var SAMPLE = {
+  semester: "2026春",
+  lessons: [
+    {id: 1, title: "张雪：按照你想干的去干，一直干", pages: "1-44"},
+    {id: 2, title: "示例课：守得云开见月明", pages: "45-80"}
+  ],
+  cards: [
+    {id:"2026春-1-001",lesson:1,type:"単語",role:"見出し語",zh:"出圈",pinyin:"chū quān",
+     ja:"広い層に拡散する／一般層に知られるようになる",ja_ai:false,
+     ja_note:"「圈」は仲間内・特定のファン層などの小さな範囲を指す。ある分野の中だけで知られていた人や作品が、その外側の一般層にまで広く知られるようになることをいう。",
+     def_zh:"突破原有小范围，被更广泛的人群关注或传播",def_zh_ai:false,
+     examples:[
+       {zh:"这部小众电影突然出圈，被很多不看电影的人也关注到了。",ja:"このマイナーな映画は突然ブレイクし、普段映画を見ない多くの人にも注目された。",ja_ai:true},
+       {zh:"他的一段视频在网上出圈了。",ja:"彼の動画がネットで広く拡散した。",ja_ai:false},
+       {zh:"想要出圈，内容必须有自己的特色。",ja:"広く知られるには、内容に独自の特色がなければならない。",ja_ai:true}],
+     related:["破圈","草根群体"],parent:"",pages:[7,12],notes:""},
+    {id:"2026春-1-002",lesson:1,type:"単語",role:"見出し語",zh:"草根",pinyin:"cǎo gēn",
+     ja:"庶民／一般の人々",ja_ai:false,def_zh:"比喻普通百姓、基层群众",def_zh_ai:false,
+     examples:[
+       {zh:"他是从草根成长起来的明星。",ja:"彼は庶民から成り上がったスターだ。",ja_ai:false},
+       {zh:"草根赛事越来越受欢迎。",ja:"草の根の大会がますます人気になっている。",ja_ai:true}],
+     related:["草根群体","草根赛事"],parent:"",pages:[8],notes:""},
+    {id:"2026春-1-003",lesson:1,type:"単語",role:"見出し語",zh:"瓶颈",pinyin:"píng jǐng",
+     ja:"ボトルネック／行き詰まり",ja_ai:false,def_zh:"比喻事情进行中容易发生阻碍的关键环节",def_zh_ai:false,
+     examples:[
+       {zh:"我的汉语学习遇到了瓶颈。",ja:"私の中国語学習は行き詰まった。",ja_ai:false},
+       {zh:"公司发展进入了瓶颈期。",ja:"会社の発展は停滞期に入った。",ja_ai:true}],
+     related:["瓶颈期","突破瓶颈"],parent:"",pages:[15],notes:""},
+    {id:"2026春-1-004",lesson:1,type:"成語",role:"見出し語",zh:"可见一斑",pinyin:"kě jiàn yī bān",
+     ja:"一端からも全体がうかがえる",ja_ai:true,
+     ja_note:"斑：まだら模様。竹の筒から豹をのぞくと、全体を見ることはできないが、体の一部の斑紋は見ることができる。そこから、物事の一部分から全体の様子を推し量ることができるというたとえである。",def_zh:"比喻从观察到的部分，可以推测到全貌",def_zh_ai:false,
+     examples:[{zh:"从这件小事上，他的性格可见一斑。",ja:"この小さな出来事からも、彼の性格がうかがえる。",ja_ai:false}],
+     related:["管中窥豹"],parent:"",pages:[20],notes:""},
+    {id:"2026春-1-005",lesson:1,type:"成語",role:"関連語",zh:"管中窥豹",pinyin:"guǎn zhōng kuī bào",
+     ja:"管の穴から豹をのぞく（一部から全体を推し量る）",ja_ai:true,def_zh:"比喻只看到事物的一部分，也比喻从观察到的部分可以推测全貌",def_zh_ai:true,
+     examples:[],related:["可见一斑"],parent:"可见一斑",pages:[20],notes:""},
+    {id:"2026春-1-006",lesson:1,type:"成語",role:"見出し語",zh:"有口皆碑",pinyin:"yǒu kǒu jiē bēi",
+     ja:"誰もが褒めたたえる",ja_ai:false,def_zh:"比喻人人称赞",def_zh_ai:false,
+     examples:[
+       {zh:"他的人品在村里有口皆碑。",ja:"彼の人柄は村中で評判だ。",ja_ai:false},
+       {zh:"这家餐厅的服务有口皆碑。",ja:"このレストランのサービスは誰もが褒める。",ja_ai:true},
+       {zh:"张老师的教学水平有口皆碑。",ja:"張先生の教え方は誰もが認めている。",ja_ai:true}],
+     related:["口碑","交口称赞"],parent:"",pages:[25,26],notes:""},
+    {id:"2026春-1-007",lesson:1,type:"単語",role:"見出し語",zh:"潜力股",pinyin:"qián lì gǔ",
+     ja:"将来性のある人（株）",ja_ai:false,def_zh:"比喻有发展潜力的人或事物",def_zh_ai:false,
+     examples:[{zh:"公司认为他是一只潜力股。",ja:"会社は彼を将来有望な人材だと考えている。",ja_ai:false}],
+     related:[],parent:"",pages:[30],notes:""},
+    {id:"2026春-1-008",lesson:1,type:"慣用句",role:"見出し語",zh:"一步一个脚印",pinyin:"yí bù yí gè jiǎo yìn",
+     ja:"一歩一歩着実に",ja_ai:false,def_zh:"比喻做事踏实",def_zh_ai:false,
+     examples:[{zh:"学习要一步一个脚印，不能急于求成。",ja:"勉強は一歩ずつ着実に。焦って結果を求めてはいけない。",ja_ai:true}],
+     related:["脚踏实地"],parent:"",pages:[40],notes:""},
+    {id:"2026春-2-001",lesson:2,type:"慣用句",role:"見出し語",zh:"守得云开见月明",pinyin:"shǒu dé yún kāi jiàn yuè míng",
+     ja:"耐え抜けば雲が晴れて月が見える（辛抱すれば報われる）",ja_ai:false,def_zh:"比喻坚持下去，终会等到好的结果",def_zh_ai:true,
+     examples:[
+       {zh:"只要坚持努力，总有一天会守得云开见月明。",ja:"努力を続ければ、いつかきっと報われる日が来る。",ja_ai:true},
+       {zh:"他创业十年，终于守得云开见月明。",ja:"彼は起業して十年、ついに報われた。",ja_ai:true}],
+     related:["苦尽甘来"],parent:"",pages:[52],notes:""},
+    {id:"2026春-2-002",lesson:2,type:"成語",role:"関連語",zh:"苦尽甘来",pinyin:"kǔ jìn gān lái",
+     ja:"苦労が終わって楽しい時が来る",ja_ai:true,def_zh:"",def_zh_ai:false,
+     examples:[],related:[],parent:"守得云开见月明",pages:[52],notes:""},
+    {id:"2026春-2-003",lesson:2,type:"単語",role:"見出し語",zh:"垮",pinyin:"kuǎ",
+     ja:"崩れる／倒れる／（体を）壊す",ja_ai:false,
+     ja_note:"建物などが崩れるという意味のほか、「累垮」「压垮」のように動詞の後ろに付いて、疲労や重圧で体や気持ちが持たなくなる結果を表す。",def_zh:"倒塌；坍下；比喻失败或身体支持不住",def_zh_ai:false,
+     examples:[
+       {zh:"连续加班把他的身体累垮了。",ja:"連日の残業で彼は体を壊した。",ja_ai:false},
+       {zh:"那座旧桥被洪水冲垮了。",ja:"その古い橋は洪水で流された。",ja_ai:true},
+       {zh:"不要被眼前的困难压垮。",ja:"目の前の困難に押しつぶされないで。",ja_ai:true}],
+     related:["累垮","冲垮","压垮"],parent:"",pages:[55],notes:""},
+    {id:"2026春-2-004",lesson:2,type:"成語",role:"見出し語",zh:"死缠烂打",pinyin:"sǐ chán làn dǎ",
+     ja:"しつこくつきまとう／粘り強く食い下がる",ja_ai:false,def_zh:"形容纠缠不休，不肯放弃",def_zh_ai:false,
+     examples:[{zh:"他靠死缠烂打终于拿下了这个客户。",ja:"彼はしつこく食い下がって、ついにこの顧客を獲得した。",ja_ai:true}],
+     related:[],parent:"",pages:[61],notes:""},
+    {id:"2026春-2-005",lesson:2,type:"単語",role:"見出し語",zh:"折腾",pinyin:"zhē teng",
+     ja:"あれこれやってみる／苦しめる",ja_ai:true,def_zh:"反复做某事；折磨",def_zh_ai:true,
+     examples:[{zh:"别再瞎折腾了。",ja:"もうむやみにあれこれするのはやめなさい。",ja_ai:true}],
+     related:[],parent:"",pages:[70],notes:"ピンイン補完"},
+    {id:"2026春-2-006",lesson:2,type:"単語",role:"見出し語",zh:"一会儿",pinyin:"yí huìr",
+     ja:"少しの間／しばらく",ja_ai:true,def_zh:"很短的时间",def_zh_ai:true,
+     examples:[],related:[],parent:"",pages:[72],notes:"ピンイン補完"}
+  ]
+};
+
+/* ---------- 共通 ---------- */
+function $(s, r){ return (r || document).querySelector(s); }
+function $$(s, r){ return Array.prototype.slice.call((r || document).querySelectorAll(s)); }
+function esc(s){ return String(s == null ? '' : s).replace(/[&<>"']/g, function(ch){
+  return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]; }); }
+var REDUCED = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+var TYPES = ['単語','成語','慣用句'];
+var ROLES = ['見出し語','関連語'];
+var DIR_LABEL = {ja2zh:'日→中', zh2ja:'中→日'};
+var AI = '<span class="ai" lang="ja" title="資料に無く、AI が補った訳">補訳</span>';
+var ICON_SPK = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M11 5 6 9H3v6h3l5 4V5z"/><path d="M15.5 8.5a5 5 0 0 1 0 7"/><path d="M18.5 5.5a9 9 0 0 1 0 13"/></svg>';
+
+/* ---------- データ正規化 ---------- */
+function normalize(raw){
+  var list = Array.isArray(raw) ? raw : (raw && Array.isArray(raw.semesters)) ? raw.semesters : [raw];
+  list = list.filter(function(s){ return s && Array.isArray(s.cards); });
+  if (!list.length) list = [SAMPLE];
+  return list.map(function(s, si){
+    var sem = String(s.semester || ('学期' + (si + 1)));
+    var cards = s.cards.filter(function(c){ return c && c.zh; }).map(function(c, i){
+      return {
+        id: String(c.id || (sem + '-' + i)), lesson: Number(c.lesson) || 0,
+        type: c.type || '単語', role: c.role || '見出し語',
+        zh: String(c.zh), pinyin: String(c.pinyin || ''), ja: String(c.ja || ''), ja_ai: !!c.ja_ai, ja_note: String(c.ja_note || ''),
+        def_zh: String(c.def_zh || ''), def_zh_ai: !!c.def_zh_ai,
+        examples: Array.isArray(c.examples) ? c.examples.filter(function(e){ return e && e.zh; }) : [],
+        related: Array.isArray(c.related) ? c.related.filter(Boolean) : [],
+        parent: c.parent || '', pages: Array.isArray(c.pages) ? c.pages : [], _o: i
+      };
+    });
+    var lessons = Array.isArray(s.lessons) ? s.lessons.map(function(l){
+      return {id: Number(l.id), title: l.title || '', pages: l.pages || ''}; }) : [];
+    var seen = {}; lessons.forEach(function(l){ seen[l.id] = 1; });
+    cards.forEach(function(c){ if (!seen[c.lesson]) { seen[c.lesson] = 1; lessons.push({id: c.lesson, title: '', pages: ''}); } });
+    lessons.sort(function(a, b){ return a.id - b.id; });
+    return {semester: sem, lessons: lessons, cards: cards};
+  });
+}
+var SEMS = normalize(window.CARD_DATA || SAMPLE);
+var USING_SAMPLE = !window.CARD_DATA;
+
+/* ---------- 保存 ---------- */
+var LS_SET = 'kzxyCards.settings.v1', LS_PROG = 'kzxyCards.progress.v1';
+function load(k, def){ try { var v = localStorage.getItem(k); return v ? JSON.parse(v) : def; } catch (e) { return def; } }
+function save(k, v){ try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+var DEF = {dir:'ja2zh', sem:'', lessons:[], types:[], roles:[], status:'all', shuffle:false, font:'100', tone:false, autoSpeak:false};
+var S = Object.assign({}, DEF, load(LS_SET, {}) || {});
+['lessons','types','roles'].forEach(function(k){ if (!Array.isArray(S[k])) S[k] = []; });
+if (!DIR_LABEL[S.dir]) S.dir = 'ja2zh';
+if (['100','115','130'].indexOf(String(S.font)) < 0) S.font = '100';
+S.font = String(S.font);
+var P = load(LS_PROG, null) || {};
+if (!P.ja2zh || typeof P.ja2zh !== 'object') P.ja2zh = {};
+if (!P.zh2ja || typeof P.zh2ja !== 'object') P.zh2ja = {};
+function saveS(){ save(LS_SET, S); }
+function saveP(){ save(LS_PROG, P); }
+function status(c, dir){ var r = P[dir || S.dir][c.id]; return r && r.s ? r.s : ''; }
+
+/* ---------- ピンイン / ルビ ---------- */
+var TONE_MARK = {'̄':1, '́':2, '̌':3, '̀':4};
+function toneOf(syl){
+  var d = String(syl).normalize ? String(syl).normalize('NFD') : String(syl);
+  for (var i = 0; i < d.length; i++) { var t = TONE_MARK[d.charAt(i)]; if (t) return t; }
+  return 5;
+}
+function sylSpan(s){ return '<span class="t' + toneOf(s) + '">' + esc(s) + '</span>'; }
+function pinyinHTML(p){ return String(p || '').trim().split(/\s+/).filter(Boolean).map(sylSpan).join(' '); }
+var SKIP_RE = /[\s\p{P}\p{S}]/u, PUNCT_G = /[\p{P}\p{S}]/gu;
+function isSkip(ch){ return SKIP_RE.test(ch); }
+function hanCount(zh){ return Array.from(zh).filter(function(c){ return !isSkip(c); }).length; }
+function rubyHTML(zh, py){
+  var chars = Array.from(zh || '');
+  var han = chars.filter(function(c){ return !isSkip(c); });
+  var syls = String(py || '').trim().split(/\s+/).map(function(s){ return s.replace(PUNCT_G, ''); }).filter(Boolean);
+  if (syls.length && syls.length === han.length) {
+    var k = 0;
+    // 1 文字ずつ <ruby> にして、狭い画面でも語の途中で折り返せるようにする
+    return chars.map(function(c){
+      return isSkip(c) ? '<span>' + esc(c) + '</span>' : '<ruby>' + esc(c) + '<rt>' + sylSpan(syls[k++]) + '</rt></ruby>';
+    }).join('');
+  }
+  return '<ruby>' + esc(zh) + '<rt>' + pinyinHTML(py) + '</rt></ruby>';
+}
+function plainPy(s){
+  return String(s || '').normalize('NFD').replace(/[̀-ͯ]/g, '').replace(/v/g, 'u').replace(/[\s']/g, '').toLowerCase();
+}
+
+/* ---------- 読み上げ ---------- */
+var TTS = ('speechSynthesis' in window) && ('SpeechSynthesisUtterance' in window);
+var voices = [];
+function refreshVoices(){
+  try { voices = window.speechSynthesis.getVoices() || []; } catch (e) { voices = []; }
+  renderTtsStatus();
+}
+function pickVoice(){
+  var zh = voices.filter(function(v){ return /^zh/i.test(v.lang || ''); });
+  if (!zh.length) return null;
+  function score(v){
+    var l = String(v.lang).replace('_', '-').toLowerCase(), s = 0;
+    if (l === 'zh-cn' || l.indexOf('hans') >= 0) s += 10; else if (l === 'zh') s += 7; else if (l === 'zh-tw') s += 3; else if (l === 'zh-hk') s += 1;
+    if (/ting-?ting|xiaoxiao|yaoyao|huihui|lili|普通话|mandarin/i.test(v.name)) s += 2;
+    if (v.localService) s += 1;
+    return s;
+  }
+  return zh.slice().sort(function(a, b){ return score(b) - score(a); })[0];
+}
+function speak(text){
+  if (!TTS) { toast('この環境では読み上げが使えません'); return; }
+  try {
+    var ss = window.speechSynthesis;
+    ss.cancel();
+    var u = new SpeechSynthesisUtterance(text);
+    u.lang = 'zh-CN'; u.rate = 0.9;
+    var v = pickVoice();
+    if (v) u.voice = v;
+    else if (voices.length) toast('中国語の音声が見つかりません（端末の設定で追加できます）');
+    u.onerror = function(e){ if (e && e.error && e.error !== 'interrupted' && e.error !== 'canceled') toast('この環境では読み上げが使えません'); };
+    ss.speak(u);
+  } catch (e) { toast('この環境では読み上げが使えません'); }
+}
+if (TTS) {
+  refreshVoices();
+  try { window.speechSynthesis.addEventListener('voiceschanged', refreshVoices); }
+  catch (e) { try { window.speechSynthesis.onvoiceschanged = refreshVoices; } catch (e2) {} }
+}
+
+/* ---------- 画面切替 ---------- */
+var VIEWS = ['home','study','done','list','settings'];
+var curView = 'home';
+function show(v){
+  VIEWS.forEach(function(id){ $('#v-' + id).hidden = id !== v; });
+  curView = v;
+  document.body.classList.toggle('wide', v === 'list');
+  var navKey = (v === 'study' || v === 'done') ? 'home' : v;
+  $$('nav.tabs button').forEach(function(b){
+    if (b.dataset.nav === navKey && v !== 'study' && v !== 'done') b.setAttribute('aria-current', 'page');
+    else b.removeAttribute('aria-current');
+  });
+  if (v !== 'study' && TTS) { try { window.speechSynthesis.cancel(); } catch (e) {} }
+  window.scrollTo(0, 0);
+}
+$$('[data-nav]').forEach(function(b){
+  b.addEventListener('click', function(){
+    var v = b.dataset.nav;
+    if (v === 'home') renderHome();
+    if (v === 'list') renderList();
+    if (v === 'settings') renderSettings();
+    show(v);
+  });
+});
+
+/* ---------- トースト / 確認ダイアログ ---------- */
+var toastTimer = null;
+function toast(msg){
+  var t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toastTimer); toastTimer = setTimeout(function(){ t.classList.remove('show'); }, 2600);
+}
+function confirmDialog(msg, okLabel){
+  return new Promise(function(resolve){
+    var m = $('#modal'); $('#m-msg').textContent = msg; $('#m-ok').textContent = okLabel || 'OK';
+    m.hidden = false; $('#m-cancel').focus();
+    function done(v){ m.hidden = true; $('#m-ok').onclick = $('#m-cancel').onclick = m.onclick = null; document.removeEventListener('keydown', onKey, true); resolve(v); }
+    function onKey(e){ if (e.key === 'Escape') { e.stopPropagation(); done(false); } }
+    document.addEventListener('keydown', onKey, true);
+    $('#m-ok').onclick = function(){ done(true); };
+    $('#m-cancel').onclick = function(){ done(false); };
+    m.onclick = function(e){ if (e.target === m) done(false); };
+  });
+}
+
+/* ---------- 絞り込み ---------- */
+function curSem(){
+  for (var i = 0; i < SEMS.length; i++) if (SEMS[i].semester === S.sem) return SEMS[i];
+  return SEMS[SEMS.length - 1];
+}
+function filtered(){
+  var sem = curSem();
+  return sem.cards.filter(function(c){
+    if (S.lessons.length && S.lessons.indexOf(c.lesson) < 0) return false;
+    if (S.types.length && S.types.indexOf(c.type) < 0) return false;
+    if (S.roles.length && S.roles.indexOf(c.role) < 0) return false;
+    if (S.status === 'known' && status(c) !== 'known') return false;
+    if (S.status === 'unknown' && status(c) === 'known') return false;
+    return true;
+  });
+}
+function setSegPressed(el, val){ $$('button', el).forEach(function(b){ b.setAttribute('aria-pressed', String(b.dataset.v === String(val))); }); }
+
+/* ---------- ホーム ---------- */
+function renderHome(){
+  var sem = curSem();
+  S.sem = sem.semester;
+  var valid = sem.lessons.map(function(l){ return l.id; });
+  S.lessons = S.lessons.filter(function(id){ return valid.indexOf(id) >= 0; });
+
+  var semWrap = $('#f-sem-wrap');
+  semWrap.hidden = SEMS.length < 2;
+  $('#f-sem').innerHTML = SEMS.map(function(s){
+    return '<option value="' + esc(s.semester) + '"' + (s.semester === sem.semester ? ' selected' : '') + '>' + esc(s.semester) + '</option>'; }).join('');
+
+  setSegPressed($('#f-dir'), S.dir);
+  setSegPressed($('#f-status'), S.status);
+  setSegPressed($('#f-shuffle'), S.shuffle ? '1' : '0');
+  $('#f-status-note').textContent = '（' + DIR_LABEL[S.dir] + ' の記録）';
+
+  var allL = !S.lessons.length;
+  var h = '<button type="button" class="lrow" data-l="all" aria-pressed="' + allL + '"><span class="ck"></span><span class="lt"><b>すべての課</b></span><span class="n">' + sem.cards.length + ' 枚</span></button>';
+  h += sem.lessons.map(function(l){
+    var n = sem.cards.filter(function(c){ return c.lesson === l.id; }).length;
+    var on = S.lessons.indexOf(l.id) >= 0;
+    return '<button type="button" class="lrow" data-l="' + l.id + '" aria-pressed="' + on + '"><span class="ck"></span><span class="lt"><b>第' + l.id + '課</b>' +
+      (l.title ? '<small lang="zh-Hans">' + esc(l.title) + '</small>' : '') + '</span><span class="n">' + n + ' 枚</span></button>';
+  }).join('');
+  $('#f-lessons').innerHTML = h;
+
+  function chips(list, sel, key){
+    return '<button type="button" class="chip" data-' + key + '="all" aria-pressed="' + (!sel.length) + '">すべて</button>' +
+      list.map(function(t){ return '<button type="button" class="chip" data-' + key + '="' + t + '" aria-pressed="' + (sel.indexOf(t) >= 0) + '">' + t + '</button>'; }).join('');
+  }
+  $('#f-types').innerHTML = chips(TYPES, S.types, 't');
+  $('#f-roles').innerHTML = chips(ROLES, S.roles, 'r');
+  updateCount();
+}
+function updateCount(){
+  var n = filtered().length;
+  $('#h-count').textContent = n;
+  $('#b-study').disabled = !n;
+  var r = $('#b-resume');
+  if (sess && sess.i < sess.order.length && sess.i > 0) {
+    r.hidden = false; r.textContent = '学習の続きから（' + (sess.i + 1) + ' / ' + sess.order.length + '）';
+  } else r.hidden = true;
+}
+function toggleIn(arr, v){ var i = arr.indexOf(v); if (i >= 0) arr.splice(i, 1); else arr.push(v); }
+$('#f-sem').addEventListener('change', function(e){ S.sem = e.target.value; S.lessons = []; saveS(); renderHome(); });
+$('#f-dir').addEventListener('click', function(e){ var b = e.target.closest('button'); if (!b) return; S.dir = b.dataset.v; saveS(); renderHome(); });
+$('#f-status').addEventListener('click', function(e){ var b = e.target.closest('button'); if (!b) return; S.status = b.dataset.v; saveS(); renderHome(); });
+$('#f-shuffle').addEventListener('click', function(e){ var b = e.target.closest('button'); if (!b) return; S.shuffle = b.dataset.v === '1'; saveS(); renderHome(); });
+$('#f-lessons').addEventListener('click', function(e){
+  var b = e.target.closest('[data-l]'); if (!b) return;
+  if (b.dataset.l === 'all') S.lessons = []; else toggleIn(S.lessons, Number(b.dataset.l));
+  if (S.lessons.length === curSem().lessons.length) S.lessons = [];
+  saveS(); renderHome();
+});
+function chipHandler(key, prop, all){
+  return function(e){
+    var b = e.target.closest('[data-' + key + ']'); if (!b) return;
+    var v = b.getAttribute('data-' + key);
+    if (v === 'all') S[prop] = []; else toggleIn(S[prop], v);
+    if (S[prop].length === all.length) S[prop] = [];
+    saveS(); renderHome();
+  };
+}
+$('#f-types').addEventListener('click', chipHandler('t', 'types', TYPES));
+$('#f-roles').addEventListener('click', chipHandler('r', 'roles', ROLES));
+$('#b-study').addEventListener('click', function(){ var cs = filtered(); if (cs.length) startSession(cs); });
+$('#b-tolist').addEventListener('click', function(){ renderList(); show('list'); });
+$('#b-resume').addEventListener('click', function(){ if (sess) { renderCard(); show('study'); } });
+
+/* ---------- 学習セッション ---------- */
+var sess = null, busy = false, suppressClick = false;
+var cardEl = $('#card'), swEl = $('#swipe');
+function shuffled(a){ a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+function byOrder(a, b){ return a.lesson - b.lesson || a._o - b._o; }
+function startSession(cards, startIdx){
+  var base = cards.slice();
+  var order = (startIdx == null && S.shuffle) ? shuffled(base) : base.slice();
+  sess = {base: base, order: order, i: startIdx || 0, dir: S.dir, hist: [], results: {}, shuffle: startIdx == null && S.shuffle};
+  renderCard(); show('study');
+}
+function curCard(){ return sess.order[sess.i]; }
+function srcText(c){ return '第' + c.lesson + '課' + (c.pages.length ? ' p' + c.pages.join(', p') : ''); }
+function metaHTML(c){
+  return '<div class="meta"><span><span class="badge">' + esc(c.type) + '</span>' + (c.role === '関連語' ? '<span class="badge rel">関連語</span>' : '') +
+    '</span><span class="src">' + esc(srcText(c)) + '</span></div>';
+}
+function zhHead(c){
+  var n = hanCount(c.zh);
+  var sz = n <= 2 ? 's1' : n <= 4 ? 's2' : n <= 6 ? 's3' : n <= 8 ? 's4' : 's5';
+  return '<div class="zh-head"><div class="zh-word ' + sz + '" lang="zh-Hans" data-act="ruby">' + rubyHTML(c.zh, c.pinyin) + '</div>' +
+    '<div class="zh-tools"><button type="button" class="icon-btn" data-act="speak" aria-label="読み上げ">' + ICON_SPK + '</button>' +
+    '<button type="button" class="pill" data-act="pin" aria-pressed="false">ピンイン</button></div></div>';
+}
+function frontHTML(c, dir){
+  var body = dir === 'ja2zh' ? '<div class="ja-q" lang="ja">' + esc(c.ja) + (c.ja_ai ? AI : '') + '</div>' : zhHead(c);
+  return metaHTML(c) + '<div class="front-body">' + body + '</div><div class="tap-hint">タップでめくる</div>';
+}
+function backHTML(c, dir){
+  var h = metaHTML(c) + zhHead(c);
+  if (dir === 'zh2ja') h += '<div class="ja-ans" lang="ja">' + esc(c.ja) + (c.ja_ai ? AI : '') + '</div>';
+  if (c.def_zh) h += '<div class="sec"><div class="sec-h">語釈</div><p class="def"><span lang="zh-Hans">' + esc(c.def_zh) + '</span>' + (c.def_zh_ai ? AI : '') + '</p></div>';
+  if (c.ja_note) h += '<div class="sec"><div class="sec-h">解説</div><p class="note" lang="ja">' + esc(c.ja_note) + '</p></div>';
+  if (c.examples.length) {
+    h += '<div class="sec"><div class="sec-h">例文</div><ol class="ex">' + c.examples.map(function(e, i){
+      return '<li' + (i >= 2 ? ' class="ex-more"' : '') + '><div class="ex-zh"><span lang="zh-Hans">' + esc(e.zh) + '</span>' +
+        '<button type="button" class="icon-btn" data-act="speak-ex" data-i="' + i + '" aria-label="例文を読み上げ">' + ICON_SPK + '</button></div>' +
+        (e.ja ? '<div class="ex-ja" lang="ja">' + esc(e.ja) + (e.ja_ai ? AI : '') + '</div>' : '') + '</li>';
+    }).join('') + '</ol>' +
+    (c.examples.length > 2 ? '<button type="button" class="more" data-act="more">もっと見る（+' + (c.examples.length - 2) + '）</button>' : '') + '</div>';
+  }
+  if (c.related.length || c.parent) {
+    h += '<div class="sec"><div class="sec-h">関連語・コロケーション</div><div class="tags">' +
+      (c.parent ? '<span class="tag parent"><span lang="ja">見出し語：</span><span lang="zh-Hans">' + esc(c.parent) + '</span></span>' : '') +
+      c.related.map(function(r){ return '<span class="tag" lang="zh-Hans">' + esc(r) + '</span>'; }).join('') + '</div></div>';
+  }
+  return h;
+}
+function renderCard(){
+  var c = curCard(), dir = sess.dir;
+  cardEl.classList.add('noanim');
+  cardEl.classList.remove('flipped', 'pin-on', 'ex-open');
+  $('#face-front').innerHTML = frontHTML(c, dir);
+  $('#face-back').innerHTML = backHTML(c, dir);
+  $('#face-front').setAttribute('aria-hidden', 'false');
+  $('#face-back').setAttribute('aria-hidden', 'true');
+  void cardEl.offsetWidth;
+  cardEl.classList.remove('noanim');
+  resetDrag(true);
+  var n = sess.order.length;
+  $('#s-pos').textContent = (sess.i + 1) + ' / ' + n;
+  $('#s-dir').textContent = DIR_LABEL[dir];
+  $('#s-bar').style.width = (sess.i / n * 100) + '%';
+  $('#b-prev').disabled = !sess.hist.length;
+  $('#b-shuffle').setAttribute('aria-pressed', String(!!sess.shuffle));
+}
+function flip(){
+  if (!sess) return;
+  var f = !cardEl.classList.contains('flipped');
+  cardEl.classList.toggle('flipped', f);
+  $('#face-front').setAttribute('aria-hidden', String(f));
+  $('#face-back').setAttribute('aria-hidden', String(!f));
+  if (f && S.autoSpeak) speak(curCard().zh);
+}
+function togglePin(){
+  var on = !cardEl.classList.contains('pin-on');
+  cardEl.classList.toggle('pin-on', on);
+  $$('[data-act="pin"]', cardEl).forEach(function(b){ b.setAttribute('aria-pressed', String(on)); });
+}
+function judge(s){
+  if (busy || !sess || curView !== 'study') return;
+  var c = curCard(), d = sess.dir;
+  sess.hist.push({id: c.id, prev: P[d][c.id], i: sess.i});
+  P[d][c.id] = {s: s, t: Date.now()}; saveP();
+  sess.results[c.id] = s;
+  busy = true;
+  var sign = s === 'known' ? 1 : -1;
+  var dur = REDUCED ? 0 : 230;
+  swEl.style.transition = REDUCED ? 'none' : 'transform .23s ease-in, opacity .23s ease-in';
+  swEl.style.transform = 'translateX(' + (sign * 120) + '%) rotate(' + (sign * 12) + 'deg)';
+  swEl.style.opacity = '0';
+  setTimeout(function(){
+    sess.i++;
+    if (sess.i >= sess.order.length) { busy = false; resetDrag(true); showDone(); return; }
+    swEl.style.transition = 'none';
+    renderCard();
+    swEl.style.transform = 'translateY(14px)'; swEl.style.opacity = '0';
+    void swEl.offsetWidth;
+    swEl.style.transition = REDUCED ? 'none' : 'transform .2s ease-out, opacity .2s ease-out';
+    swEl.style.transform = ''; swEl.style.opacity = '';
+    busy = false;
+  }, dur);
+}
+function undo(){
+  if (busy || !sess || !sess.hist.length) return;
+  var h = sess.hist.pop(), d = sess.dir;
+  if (h.prev) P[d][h.id] = h.prev; else delete P[d][h.id];
+  saveP();
+  delete sess.results[h.id];
+  sess.i = h.i;
+  renderCard(); show('study');
+}
+function showDone(){
+  var k = 0, u = 0;
+  Object.keys(sess.results).forEach(function(id){ if (sess.results[id] === 'known') k++; else u++; });
+  $('#d-known').textContent = k; $('#d-unknown').textContent = u;
+  var rest = sess.order.length - Object.keys(sess.results).length;
+  $('#d-note').textContent = '全 ' + sess.order.length + ' 枚（' + DIR_LABEL[sess.dir] + '）' + (rest > 0 ? '・未判定 ' + rest + ' 枚' : '');
+  $('#b-again').disabled = !u;
+  $('#b-done-prev').hidden = !sess.hist.length;
+  $('#s-bar').style.width = '100%';
+  show('done');
+}
+cardEl.addEventListener('click', function(e){
+  if (suppressClick || busy) return;
+  var a = e.target.closest('[data-act]');
+  if (a && cardEl.contains(a)) {
+    var act = a.dataset.act, c = curCard();
+    if (act === 'ruby' || act === 'pin') togglePin();
+    else if (act === 'speak') speak(c.zh);
+    else if (act === 'speak-ex') speak(c.examples[Number(a.dataset.i)].zh);
+    else if (act === 'more') cardEl.classList.add('ex-open');
+    return;
+  }
+  flip();
+});
+cardEl.addEventListener('keydown', function(e){
+  if ((e.key === 'Enter' || e.key === ' ') && e.target === cardEl) { e.preventDefault(); flip(); }
+});
+$('#b-known').addEventListener('click', function(){ judge('known'); });
+$('#b-unknown').addEventListener('click', function(){ judge('unknown'); });
+$('#b-prev').addEventListener('click', undo);
+$('#b-done-prev').addEventListener('click', undo);
+$('#b-quit').addEventListener('click', function(){ if (sess) showDone(); });
+$('#b-shuffle').addEventListener('click', function(){
+  if (!sess || busy) return;
+  sess.shuffle = !sess.shuffle;
+  S.shuffle = sess.shuffle; saveS();
+  // 表示中のカードはそのまま、残りの順番だけを並べ替える
+  var head = sess.order.slice(0, sess.i + 1), rest = sess.order.slice(sess.i + 1);
+  rest = sess.shuffle ? shuffled(rest) : rest.sort(byOrder);
+  sess.order = head.concat(rest);
+  $('#b-shuffle').setAttribute('aria-pressed', String(sess.shuffle));
+  toast(sess.shuffle ? '残りのカードをシャッフルしました' : '残りのカードを資料順に戻しました');
+});
+$('#b-again').addEventListener('click', function(){
+  var cs = sess.order.filter(function(c){ return sess.results[c.id] === 'unknown'; });
+  if (cs.length) startSession(cs.sort(byOrder));
+});
+$('#b-restart').addEventListener('click', function(){ startSession(sess.base); });
+$('#b-home').addEventListener('click', function(){ renderHome(); show('home'); });
+
+document.addEventListener('keydown', function(e){
+  if (curView !== 'study' || !$('#modal').hidden || e.metaKey || e.ctrlKey || e.altKey) return;
+  var tag = (e.target.tagName || '').toLowerCase();
+  if (tag === 'input' || tag === 'select' || tag === 'textarea') return;
+  if (e.key === 'ArrowRight') { e.preventDefault(); judge('known'); }
+  else if (e.key === 'ArrowLeft') { e.preventDefault(); judge('unknown'); }
+  else if (e.key === 'Backspace' || e.key === 'ArrowUp') { e.preventDefault(); undo(); }
+  else if (e.key === 'p' || e.key === 'P') togglePin();
+  else if (e.key === 's' || e.key === 'S') speak(curCard().zh);
+  else if ((e.key === ' ' || e.key === 'Enter') && tag !== 'button') { e.preventDefault(); flip(); }
+});
+
+/* ---------- スワイプ ---------- */
+var tx = null;
+function setDrag(dx){
+  swEl.style.transform = 'translateX(' + dx + 'px) rotate(' + (dx / 22) + 'deg)';
+  var o = Math.min(1, Math.abs(dx) / 60);
+  $('#tag-known').style.opacity = dx > 0 ? o : 0;
+  $('#tag-unknown').style.opacity = dx < 0 ? o : 0;
+}
+function resetDrag(instant){
+  swEl.style.transition = (instant || REDUCED) ? 'none' : 'transform .2s ease-out';
+  swEl.style.transform = ''; swEl.style.opacity = '';
+  $('#tag-known').style.opacity = 0; $('#tag-unknown').style.opacity = 0;
+}
+swEl.addEventListener('touchstart', function(e){
+  if (busy || e.touches.length !== 1) { tx = null; return; }
+  var t = e.touches[0];
+  tx = {x: t.clientX, y: t.clientY, dx: 0, axis: null};
+  swEl.style.transition = 'none';
+}, {passive: true});
+swEl.addEventListener('touchmove', function(e){
+  if (!tx) return;
+  var t = e.touches[0], dx = t.clientX - tx.x, dy = t.clientY - tx.y;
+  if (!tx.axis) {
+    if (Math.abs(dx) < 8 && Math.abs(dy) < 8) return;
+    tx.axis = Math.abs(dx) > Math.abs(dy) ? 'x' : 'y';
+  }
+  if (tx.axis !== 'x') return;   // 縦方向はスクロールに任せる
+  e.preventDefault();
+  tx.dx = dx; setDrag(dx);
+}, {passive: false});
+function touchEnd(){
+  if (!tx) return;
+  var axis = tx.axis, dx = tx.dx; tx = null;
+  if (axis !== 'x') return;
+  suppressClick = true; setTimeout(function(){ suppressClick = false; }, 350);
+  if (Math.abs(dx) >= 60) {
+    $('#tag-known').style.opacity = 0; $('#tag-unknown').style.opacity = 0;
+    judge(dx > 0 ? 'known' : 'unknown');
+  } else resetDrag(false);
+}
+swEl.addEventListener('touchend', touchEnd);
+swEl.addEventListener('touchcancel', function(){ tx = null; resetDrag(false); });
+
+/* ---------- 一覧 ---------- */
+var listRows = [];
+function renderList(){
+  var q = $('#l-q').value.trim().toLowerCase(), qp = plainPy(q);
+  listRows = filtered().filter(function(c){
+    if (!q) return true;
+    return c.zh.indexOf(q) >= 0 || c.ja.toLowerCase().indexOf(q) >= 0 || c.ja_note.toLowerCase().indexOf(q) >= 0 ||
+      c.pinyin.toLowerCase().indexOf(q) >= 0 || (qp && plainPy(c.pinyin).indexOf(qp) >= 0);
+  });
+  $('#l-info').textContent = listRows.length + ' 件 ・ ホームの絞り込み条件を適用 ・ 状況は ' + DIR_LABEL[S.dir] + ' の記録';
+  $('#l-body').innerHTML = listRows.map(function(c, i){
+    var s = status(c);
+    var st = s === 'known' ? '<span class="st known">覚えた</span>' : s === 'unknown' ? '<span class="st unknown">まだ</span>' : '<span class="st none">未学習</span>';
+    return '<tr data-i="' + i + '" tabindex="0"><td class="c-zh" lang="zh-Hans">' + esc(c.zh) + '</td><td class="c-py">' + pinyinHTML(c.pinyin) +
+      '</td><td class="c-ja">' + esc(c.ja) + (c.ja_ai ? AI : '') + '</td><td class="c-ls">第' + c.lesson + '課</td><td class="c-ty">' + esc(c.type) +
+      '</td><td class="c-st">' + st + '</td></tr>';
+  }).join('');
+  $('#l-table').hidden = !listRows.length;
+  $('#l-empty').hidden = !!listRows.length;
+}
+$('#l-q').addEventListener('input', renderList);
+function openRow(tr){ if (!tr) return; startSession(listRows, Number(tr.dataset.i)); }
+$('#l-body').addEventListener('click', function(e){ openRow(e.target.closest('tr')); });
+$('#l-body').addEventListener('keydown', function(e){ if (e.key === 'Enter') openRow(e.target.closest('tr')); });
+
+/* ---------- 設定 ---------- */
+function applySettings(){
+  document.documentElement.style.setProperty('--base', S.font + '%');
+  document.documentElement.classList.toggle('tone-on', !!S.tone);
+}
+function renderTtsStatus(){
+  var el = $('#tts-status'); if (!el) return;
+  if (!TTS) { el.textContent = 'この環境では読み上げが使えません'; return; }
+  var v = pickVoice();
+  el.textContent = v ? '使用する音声: ' + v.name + '（' + v.lang + '）' : voices.length ? '中国語の音声が見つかりません（端末の設定で追加できます）' : '読み上げ: 利用可能（音声の一覧を取得中）';
+}
+function renderSettings(){
+  $$('#v-settings .seg[data-key]').forEach(function(seg){
+    var k = seg.dataset.key, v = k === 'font' ? S.font : (S[k] ? '1' : '0');
+    setSegPressed(seg, v);
+  });
+  renderTtsStatus();
+  $('#b-reset-filter').textContent = '表示中の絞り込み（' + filtered().length + ' 枚）をリセット';
+  var total = SEMS.reduce(function(a, s){ return a + s.cards.length; }, 0);
+  $('#about').textContent = (USING_SAMPLE ? 'サンプルデータで動作中 ・ ' : '') + SEMS.map(function(s){ return s.semester; }).join('・') + ' ・ 全 ' + total + ' 枚';
+}
+$$('#v-settings .seg[data-key]').forEach(function(seg){
+  seg.addEventListener('click', function(e){
+    var b = e.target.closest('button'); if (!b) return;
+    var k = seg.dataset.key;
+    S[k] = k === 'font' ? b.dataset.v : b.dataset.v === '1';
+    saveS(); applySettings(); renderSettings();
+  });
+});
+$('#b-reset-filter').addEventListener('click', function(){
+  var cs = filtered();
+  if (!cs.length) { toast('該当するカードがありません'); return; }
+  confirmDialog('表示中の絞り込みに当てはまる ' + cs.length + ' 枚の進捗（日→中・中→日）を消去します。\nよろしいですか？', 'リセット').then(function(ok){
+    if (!ok) return;
+    cs.forEach(function(c){ delete P.ja2zh[c.id]; delete P.zh2ja[c.id]; });
+    saveP(); renderSettings(); toast('進捗をリセットしました');
+  });
+});
+$('#b-reset-all').addEventListener('click', function(){
+  confirmDialog('すべてのカードの進捗（日→中・中→日）を消去します。\nよろしいですか？', 'リセット').then(function(ok){
+    if (!ok) return;
+    P = {ja2zh: {}, zh2ja: {}}; saveP(); renderSettings(); toast('すべての進捗をリセットしました');
+  });
+});
+
+/* ---------- 起動 ---------- */
+applySettings();
+renderHome();
+show('home');
+})();
+</script>
+</body>
+</html>
